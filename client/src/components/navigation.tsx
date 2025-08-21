@@ -66,42 +66,20 @@ export default function Navigation() {
               Home
             </button>
             <button 
-              onClick={() => scrollToSection('features')} 
-              className={`${textColor} ${hoverColor} transition-colors ${currentSection === 'features' ? 'font-semibold' : ''}`}
-              data-testid="nav-features"
+              className={`${textColor} ${hoverColor} transition-colors`}
+              data-testid="nav-demo"
             >
-              Features
-            </button>
-            <button 
-              onClick={() => scrollToSection('about')} 
-              className={`${textColor} ${hoverColor} transition-colors ${currentSection === 'about' ? 'font-semibold' : ''}`}
-              data-testid="nav-about"
-            >
-              About
-            </button>
-            <button 
-              onClick={() => scrollToSection('pricing')} 
-              className={`${textColor} ${hoverColor} transition-colors ${currentSection === 'pricing' ? 'font-semibold' : ''}`}
-              data-testid="nav-pricing"
-            >
-              Pricing
-            </button>
-            <button 
-              onClick={() => scrollToSection('contact')} 
-              className={`${textColor} ${hoverColor} transition-colors ${currentSection === 'contact' ? 'font-semibold' : ''}`}
-              data-testid="nav-contact"
-            >
-              Contact
+              Demo
             </button>
             <Button 
-              className={`px-6 py-2 rounded-full transition-all ${
+              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
                 isLightSection 
-                  ? 'bg-primary text-white hover:bg-primary/90' 
-                  : 'bg-accent text-white hover:bg-accent/90'
-              }`}
-              data-testid="button-get-started"
+                  ? 'bg-gradient-to-r from-primary to-accent text-white hover:from-primary/90 hover:to-accent/90' 
+                  : 'bg-gradient-to-r from-accent to-primary text-white hover:from-accent/90 hover:to-primary/90'
+              } hover:shadow-primary/30`}
+              data-testid="button-sign-up"
             >
-              Get Started
+              Sign up
             </Button>
           </div>
           
@@ -129,38 +107,19 @@ export default function Navigation() {
               Home
             </button>
             <button 
-              onClick={() => scrollToSection('features')} 
-              className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left ${currentSection === 'features' ? 'font-semibold' : ''}`}
+              className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left`}
             >
-              Features
-            </button>
-            <button 
-              onClick={() => scrollToSection('about')} 
-              className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left ${currentSection === 'about' ? 'font-semibold' : ''}`}
-            >
-              About
-            </button>
-            <button 
-              onClick={() => scrollToSection('pricing')} 
-              className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left ${currentSection === 'pricing' ? 'font-semibold' : ''}`}
-            >
-              Pricing
-            </button>
-            <button 
-              onClick={() => scrollToSection('contact')} 
-              className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left ${currentSection === 'contact' ? 'font-semibold' : ''}`}
-            >
-              Contact
+              Demo
             </button>
             <Button 
-              className={`w-full mt-4 px-6 py-2 rounded-full transition-all ${
+              className={`w-full mt-4 px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
                 isLightSection 
-                  ? 'bg-primary text-white hover:bg-primary/90' 
-                  : 'bg-accent text-white hover:bg-accent/90'
-              }`}
-              data-testid="button-mobile-get-started"
+                  ? 'bg-gradient-to-r from-primary to-accent text-white hover:from-primary/90 hover:to-accent/90' 
+                  : 'bg-gradient-to-r from-accent to-primary text-white hover:from-accent/90 hover:to-primary/90'
+              } hover:shadow-primary/30`}
+              data-testid="button-mobile-sign-up"
             >
-              Get Started
+              Sign up
             </Button>
           </div>
         )}

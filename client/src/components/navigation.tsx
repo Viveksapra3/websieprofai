@@ -38,14 +38,11 @@ export default function Navigation() {
     }
   };
 
-  const isLightSection = currentSection !== 'home';
-  const textColor = isLightSection ? 'text-gray-900' : 'text-white';
-  const hoverColor = isLightSection ? 'hover:text-primary' : 'hover:text-accent';
+  const textColor = 'text-white';
+  const hoverColor = 'hover:text-accent';
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isLightSection ? 'bg-white/95 backdrop-blur-md shadow-md' : 'glass-effect'
-    }`} data-testid="main-navigation">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md shadow-lg transition-all duration-300" data-testid="main-navigation">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-3 sm:py-4">
           <div className="flex items-center" data-testid="logo-brand">
@@ -72,11 +69,7 @@ export default function Navigation() {
               Demo
             </button>
             <Button 
-              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
-                isLightSection 
-                  ? 'bg-gradient-to-r from-primary to-accent text-white hover:from-primary/90 hover:to-accent/90' 
-                  : 'bg-gradient-to-r from-accent to-primary text-white hover:from-accent/90 hover:to-primary/90'
-              } hover:shadow-primary/30`}
+              className="px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg bg-gradient-to-r from-accent to-primary text-white hover:from-accent/90 hover:to-primary/90 hover:shadow-primary/30"
               data-testid="button-sign-up"
             >
               Sign up
@@ -97,9 +90,7 @@ export default function Navigation() {
         
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className={`md:hidden rounded-lg mt-2 p-4 transition-all ${
-            isLightSection ? 'bg-white/95 backdrop-blur-md shadow-lg' : 'glass-effect'
-          }`} data-testid="mobile-menu">
+          <div className="md:hidden rounded-lg mt-2 p-4 bg-black/90 backdrop-blur-md shadow-lg transition-all" data-testid="mobile-menu">
             <button 
               onClick={() => scrollToSection('home')} 
               className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left ${currentSection === 'home' ? 'font-semibold' : ''}`}
@@ -112,11 +103,7 @@ export default function Navigation() {
               Demo
             </button>
             <Button 
-              className={`w-full mt-4 px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg ${
-                isLightSection 
-                  ? 'bg-gradient-to-r from-primary to-accent text-white hover:from-primary/90 hover:to-accent/90' 
-                  : 'bg-gradient-to-r from-accent to-primary text-white hover:from-accent/90 hover:to-primary/90'
-              } hover:shadow-primary/30`}
+              className="w-full mt-4 px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg bg-gradient-to-r from-accent to-primary text-white hover:from-accent/90 hover:to-primary/90 hover:shadow-primary/30"
               data-testid="button-mobile-sign-up"
             >
               Sign up

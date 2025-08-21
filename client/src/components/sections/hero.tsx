@@ -16,9 +16,9 @@ export default function HeroSection() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div className="text-center lg:text-left">
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight" data-testid="hero-title">
-                Meet Your
-                <span className="text-gradient block">AI Teaching</span>
-                Companion
+                <span className="text-gradient block">AI Assistant</span>
+                Driving
+                <span className="block">Effective Learning</span>
               </h1>
               <p className="text-lg sm:text-xl text-white text-opacity-90 mb-6 sm:mb-8 leading-relaxed" data-testid="hero-description">
                 Transform your educational experience with Professor AI - the intelligent teaching assistant that adapts to your learning style and provides personalized guidance 24/7.

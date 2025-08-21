@@ -38,11 +38,14 @@ export default function Navigation() {
     }
   };
 
+  const isOnLandingPage = currentSection === 'home';
   const textColor = 'text-white';
   const hoverColor = 'hover:text-accent';
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md shadow-lg transition-all duration-300" data-testid="main-navigation">
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      isOnLandingPage ? 'bg-transparent' : 'bg-black/80 backdrop-blur-md shadow-lg'
+    }`} data-testid="main-navigation">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-3 sm:py-4">
           <div className="flex items-center" data-testid="logo-brand">

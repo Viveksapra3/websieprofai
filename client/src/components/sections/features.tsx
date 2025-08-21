@@ -62,22 +62,22 @@ export default function FeaturesSection() {
   return (
     <section id="features" className="py-20 bg-white" data-testid="features-section">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-secondary mb-4" data-testid="features-title">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-secondary mb-4" data-testid="features-title">
             Powerful Features for <span className="text-gradient">Modern Learning</span>
           </h2>
-          <p className="text-xl text-muted max-w-3xl mx-auto" data-testid="features-description">
+          <p className="text-lg sm:text-xl text-muted max-w-3xl mx-auto px-4" data-testid="features-description">
             Discover how Professor AI revolutionizes education with cutting-edge artificial intelligence and intuitive design.
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
           {features.map((feature, index) => {
             const IconComponent = feature.icon;
             return (
               <Card 
                 key={index}
-                className={`feature-card bg-gradient-to-br ${feature.gradient} p-8 border ${feature.border} transition-all`}
+                className={`feature-card bg-gradient-to-br ${feature.gradient} p-6 sm:p-8 border ${feature.border} transition-all`}
                 data-testid={`feature-card-${index}`}
               >
                 <CardContent className="p-0">
@@ -93,7 +93,7 @@ export default function FeaturesSection() {
         </div>
         
         {/* Feature Showcase with Image */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <div>
             <img 
               src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&h=600" 
@@ -103,10 +103,10 @@ export default function FeaturesSection() {
             />
           </div>
           <div>
-            <h3 className="text-3xl font-bold text-secondary mb-6" data-testid="features-showcase-title">
+            <h3 className="text-2xl sm:text-3xl font-bold text-secondary mb-4 sm:mb-6" data-testid="features-showcase-title">
               Transform Your Learning Experience
             </h3>
-            <p className="text-lg text-muted mb-8 leading-relaxed" data-testid="features-showcase-description">
+            <p className="text-base sm:text-lg text-muted mb-6 sm:mb-8 leading-relaxed" data-testid="features-showcase-description">
               Professor AI combines the best of artificial intelligence with proven educational methodologies to create a learning experience that's both effective and engaging.
             </p>
             

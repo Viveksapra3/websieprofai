@@ -16,10 +16,10 @@ export default function Navigation() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass-effect" data-testid="main-navigation">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-4">
+        <div className="flex justify-between items-center py-3 sm:py-4">
           <div className="flex items-center" data-testid="logo-brand">
             <Brain className="w-8 h-8 text-accent mr-2" />
-            <span className="text-2xl font-bold text-white">Professor AI</span>
+            <span className="text-xl sm:text-2xl font-bold text-white">Professor AI</span>
           </div>
           
           {/* Desktop Navigation */}

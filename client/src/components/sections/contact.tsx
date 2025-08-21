@@ -42,12 +42,12 @@ export default function ContactSection() {
   return (
     <section id="contact" className="py-20 bg-white" data-testid="contact-section">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
           <div>
-            <h2 className="text-4xl font-bold text-secondary mb-6" data-testid="contact-title">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-secondary mb-4 sm:mb-6" data-testid="contact-title">
               Get in <span className="text-gradient">Touch</span>
             </h2>
-            <p className="text-lg text-muted mb-8" data-testid="contact-description">
+            <p className="text-base sm:text-lg text-muted mb-6 sm:mb-8" data-testid="contact-description">
               Have questions about Professor AI? Our team is here to help you get started on your learning journey.
             </p>
             
@@ -83,7 +83,7 @@ export default function ContactSection() {
               </div>
             </div>
             
-            <div className="mt-12">
+            <div className="mt-8 sm:mt-12">
               <img 
                 src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&h=400" 
                 alt="Customer service support" 
@@ -94,11 +94,11 @@ export default function ContactSection() {
           </div>
           
           <Card className="bg-gradient-to-br from-professor-background to-white shadow-xl" data-testid="contact-form-card">
-            <CardHeader className="p-8">
-              <h3 className="text-2xl font-bold text-secondary">Send us a message</h3>
+            <CardHeader className="p-6 sm:p-8">
+              <h3 className="text-xl sm:text-2xl font-bold text-secondary">Send us a message</h3>
             </CardHeader>
             
-            <CardContent className="p-8 pt-0">
+            <CardContent className="p-6 sm:p-8 pt-0">
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>

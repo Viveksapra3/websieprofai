@@ -12,15 +12,15 @@ export default function HeroSection() {
   return (
     <section id="home" className="relative min-h-screen hero-gradient overflow-hidden" data-testid="hero-section">
       <div className="relative min-h-screen flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
             <div className="text-center lg:text-left">
-              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight" data-testid="hero-title">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6 leading-tight" data-testid="hero-title">
                 Meet Your
                 <span className="text-gradient block">AI Teaching</span>
                 Companion
               </h1>
-              <p className="text-xl text-white text-opacity-90 mb-8 leading-relaxed" data-testid="hero-description">
+              <p className="text-lg sm:text-xl text-white text-opacity-90 mb-6 sm:mb-8 leading-relaxed" data-testid="hero-description">
                 Transform your educational experience with Professor AI - the intelligent teaching assistant that adapts to your learning style and provides personalized guidance 24/7.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -43,20 +43,20 @@ export default function HeroSection() {
                 </Button>
               </div>
               
-              <div className="mt-12 flex items-center justify-center lg:justify-start space-x-6 text-white text-opacity-80">
+              <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-center justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-6 text-white text-opacity-80">
                 <div className="text-center" data-testid="stat-students">
-                  <div className="text-2xl font-bold">50K+</div>
-                  <div className="text-sm">Active Students</div>
+                  <div className="text-xl sm:text-2xl font-bold">50K+</div>
+                  <div className="text-xs sm:text-sm">Active Students</div>
                 </div>
-                <div className="w-px h-8 bg-white bg-opacity-30"></div>
+                <div className="hidden sm:block w-px h-8 bg-white bg-opacity-30"></div>
                 <div className="text-center" data-testid="stat-questions">
-                  <div className="text-2xl font-bold">1M+</div>
-                  <div className="text-sm">Questions Answered</div>
+                  <div className="text-xl sm:text-2xl font-bold">1M+</div>
+                  <div className="text-xs sm:text-sm">Questions Answered</div>
                 </div>
-                <div className="w-px h-8 bg-white bg-opacity-30"></div>
+                <div className="hidden sm:block w-px h-8 bg-white bg-opacity-30"></div>
                 <div className="text-center" data-testid="stat-rating">
-                  <div className="text-2xl font-bold">4.9★</div>
-                  <div className="text-sm">User Rating</div>
+                  <div className="text-xl sm:text-2xl font-bold">4.9★</div>
+                  <div className="text-xs sm:text-sm">User Rating</div>
                 </div>
               </div>
             </div>

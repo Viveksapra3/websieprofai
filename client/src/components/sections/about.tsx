@@ -13,21 +13,21 @@ export default function AboutSection() {
   return (
     <section id="about" className="py-20 bg-gradient-to-br from-professor-background to-white" data-testid="about-section">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           <div>
-            <h2 className="text-4xl font-bold text-secondary mb-6" data-testid="about-title">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-secondary mb-4 sm:mb-6" data-testid="about-title">
               The Future of <span className="text-gradient">AI Education</span>
             </h2>
-            <p className="text-lg text-muted mb-8 leading-relaxed" data-testid="about-description">
+            <p className="text-base sm:text-lg text-muted mb-6 sm:mb-8 leading-relaxed" data-testid="about-description">
               Professor AI represents a breakthrough in educational technology, combining advanced natural language processing with deep learning algorithms to create an intelligent teaching companion that understands and adapts to each student's unique needs.
             </p>
             
-            <div className="grid grid-cols-2 gap-6 mb-8">
+            <div className="grid grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
               {stats.map((stat, index) => (
-                <Card key={index} className="text-center p-6 bg-white shadow-lg" data-testid={`stat-card-${index}`}>
+                <Card key={index} className="text-center p-4 sm:p-6 bg-white shadow-lg" data-testid={`stat-card-${index}`}>
                   <CardContent className="p-0">
-                    <div className={`text-3xl font-bold ${stat.color} mb-2`}>{stat.value}</div>
-                    <div className="text-sm text-muted">{stat.label}</div>
+                    <div className={`text-2xl sm:text-3xl font-bold ${stat.color} mb-1 sm:mb-2`}>{stat.value}</div>
+                    <div className="text-xs sm:text-sm text-muted">{stat.label}</div>
                   </CardContent>
                 </Card>
               ))}
@@ -52,29 +52,29 @@ export default function AboutSection() {
             />
             
             {/* Overlay Cards */}
-            <Card className="absolute -top-8 -left-8 bg-white p-6 shadow-xl" data-testid="overlay-card-ai">
+            <Card className="absolute -top-4 sm:-top-8 -left-4 sm:-left-8 bg-white p-3 sm:p-6 shadow-xl" data-testid="overlay-card-ai">
               <CardContent className="p-0">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                    <CheckCircle className="text-white w-6 h-6" />
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-green-500 rounded-full flex items-center justify-center">
+                    <CheckCircle className="text-white w-4 h-4 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <div className="font-semibold text-secondary">AI Powered</div>
-                    <div className="text-sm text-muted">Smart Learning</div>
+                    <div className="text-sm sm:text-base font-semibold text-secondary">AI Powered</div>
+                    <div className="text-xs sm:text-sm text-muted">Smart Learning</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="absolute -bottom-8 -right-8 bg-white p-6 shadow-xl" data-testid="overlay-card-adaptive">
+            <Card className="absolute -bottom-4 sm:-bottom-8 -right-4 sm:-right-8 bg-white p-3 sm:p-6 shadow-xl" data-testid="overlay-card-adaptive">
               <CardContent className="p-0">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                    <GraduationCap className="text-white w-6 h-6" />
+                <div className="flex items-center space-x-2 sm:space-x-3">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-primary rounded-full flex items-center justify-center">
+                    <GraduationCap className="text-white w-4 h-4 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <div className="font-semibold text-secondary">Adaptive</div>
-                    <div className="text-sm text-muted">Personalized</div>
+                    <div className="text-sm sm:text-base font-semibold text-secondary">Adaptive</div>
+                    <div className="text-xs sm:text-sm text-muted">Personalized</div>
                   </div>
                 </div>
               </CardContent>

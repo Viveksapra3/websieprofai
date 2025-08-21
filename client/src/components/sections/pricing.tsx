@@ -53,22 +53,22 @@ export default function PricingSection() {
   return (
     <section id="pricing" className="py-20 bg-gradient-to-br from-professor-background to-white" data-testid="pricing-section">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-secondary mb-4" data-testid="pricing-title">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-secondary mb-4" data-testid="pricing-title">
             Choose Your <span className="text-gradient">Learning Plan</span>
           </h2>
-          <p className="text-xl text-muted" data-testid="pricing-description">
+          <p className="text-lg sm:text-xl text-muted px-4" data-testid="pricing-description">
             Flexible pricing options designed for learners of all levels
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
           {plans.map((plan, index) => (
             <Card 
               key={index}
               className={`relative ${
                 plan.popular 
-                  ? 'bg-primary text-white transform scale-105 shadow-2xl border-primary' 
+                  ? 'bg-primary text-white transform sm:scale-105 shadow-2xl border-primary' 
                   : 'bg-white border-gray-100 hover:border-primary/30'
               } transition-all`}
               data-testid={`pricing-card-${index}`}
@@ -79,20 +79,20 @@ export default function PricingSection() {
                 </div>
               )}
               
-              <CardHeader className="text-center p-8">
-                <h3 className={`text-2xl font-bold mb-4 ${plan.popular ? 'text-white' : 'text-secondary'}`}>
+              <CardHeader className="text-center p-6 sm:p-8">
+                <h3 className={`text-xl sm:text-2xl font-bold mb-4 ${plan.popular ? 'text-white' : 'text-secondary'}`}>
                   {plan.name}
                 </h3>
-                <div className={`text-4xl font-bold mb-2 ${plan.popular ? 'text-white' : 'text-secondary'}`}>
+                <div className={`text-3xl sm:text-4xl font-bold mb-2 ${plan.popular ? 'text-white' : 'text-secondary'}`}>
                   {plan.price}
-                  {plan.priceUnit && <span className="text-xl">{plan.priceUnit}</span>}
+                  {plan.priceUnit && <span className="text-lg sm:text-xl">{plan.priceUnit}</span>}
                 </div>
                 <p className={plan.popular ? 'text-blue-100' : 'text-muted'}>
                   {plan.description}
                 </p>
               </CardHeader>
               
-              <CardContent className="p-8 pt-0">
+              <CardContent className="p-6 sm:p-8 pt-0">
                 <ul className="space-y-4 mb-8">
                   {plan.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-center space-x-3" data-testid={`feature-${index}-${featureIndex}`}>

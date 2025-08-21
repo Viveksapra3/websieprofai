@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Brain, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import logoPath from "@assets/prof-ai-logo_1755775207766.avif";
 
 export default function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -48,8 +49,11 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-3 sm:py-4">
           <div className="flex items-center" data-testid="logo-brand">
-            <Brain className={`w-8 h-8 mr-2 ${isLightSection ? 'text-primary' : 'text-accent'}`} />
-            <span className={`text-xl sm:text-2xl font-bold ${textColor}`}>Professor AI</span>
+            <img 
+              src={logoPath} 
+              alt="Professor AI Logo" 
+              className="h-8 sm:h-10 w-auto"
+            />
           </div>
           
           {/* Desktop Navigation */}

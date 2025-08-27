@@ -1,5 +1,5 @@
 import Navigation from '@/components/navigation';
-import HeroSection from '@/components/sections/hero';
+import HeroSection from '@/components/sections/hero2';
 import FeaturesSection from '@/components/sections/features';
 import AboutSection from '@/components/sections/about';
 import TestimonialsSection from '@/components/sections/testimonials';
@@ -13,10 +13,10 @@ export default function Home() {
       <Navigation />
       <HeroSection />
       <FeaturesSection />
-      <AboutSection />
+      {/* <AboutSection />
       <TestimonialsSection />
       <PricingSection />
-      <ContactSection />
+      <ContactSection /> */}
       <Footer />
     </div>
   );

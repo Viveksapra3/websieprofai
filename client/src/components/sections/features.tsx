@@ -1,132 +1,131 @@
-import { MessageSquare, TrendingUp, Clock, Users, Brain, Smartphone, CheckCircle } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { CheckCircle } from 'lucide-react';
 
-const features = [
-  {
-    icon: MessageSquare,
-    title: 'Conversational Learning',
-    description: 'Engage in natural conversations with AI that understands context and adapts to your learning pace.',
-    gradient: 'from-primary/5 to-accent/5',
-    border: 'border-primary/10 hover:border-primary/30',
-    iconBg: 'bg-primary',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Progress Tracking',
-    description: 'Monitor your learning journey with detailed analytics and personalized recommendations.',
-    gradient: 'from-accent/5 to-primary/5',
-    border: 'border-accent/10 hover:border-accent/30',
-    iconBg: 'bg-accent',
-  },
-  {
-    icon: Clock,
-    title: '24/7 Availability',
-    description: 'Get instant help and support whenever you need it, from anywhere in the world.',
-    gradient: 'from-green-500/5 to-blue-500/5',
-    border: 'border-green-500/10 hover:border-green-500/30',
-    iconBg: 'bg-green-500',
-  },
-  {
-    icon: Users,
-    title: 'Collaborative Learning',
-    description: 'Connect with peers and participate in group discussions facilitated by AI.',
-    gradient: 'from-orange-500/5 to-red-500/5',
-    border: 'border-orange-500/10 hover:border-orange-500/30',
-    iconBg: 'bg-orange-500',
-  },
-  {
-    icon: Brain,
-    title: 'Adaptive Intelligence',
-    description: 'AI that learns from your interactions and customizes content to your learning style.',
-    gradient: 'from-purple-500/5 to-pink-500/5',
-    border: 'border-purple-500/10 hover:border-purple-500/30',
-    iconBg: 'bg-purple-500',
-  },
-  {
-    icon: Smartphone,
-    title: 'Mobile Ready',
-    description: 'Access your AI teaching companion on any device, anywhere, anytime.',
-    gradient: 'from-indigo-500/5 to-blue-500/5',
-    border: 'border-indigo-500/10 hover:border-indigo-500/30',
-    iconBg: 'bg-indigo-500',
-  },
+const academicBenefits = [
+'Academic Support: In-class/post-class assistance, exam prep, and additional coaching.',
+'Teacher Development: Training programs and skill enhancement workshops.',
+'Career & Placement Guidance: Pre-placement interview training and mentoring.',
+'Library & Resources: Access to materials and referral guidance.',
+'Administrative Support: Admissions, leave management, and non-academic processes.'
 ];
 
-const benefits = [
-  'Personalized Learning Paths - Customized curriculum based on your goals and learning style.',
-  'Instant Feedback - Get immediate responses and corrections to accelerate learning.',
-  'Multi-Subject Support - From mathematics to literature, get help across all subjects.',
+const nonAcademicBenefits = [
+'Admissions & Enrollment: Streamlined admission processes and enrollment support',
+'Student Support Services: Academic assistance, mentoring, and overall student guidance',
+'Counseling & Mental Health: Career guidance, counseling, and wellbeing support',
+'Student Welfare: Scholarships, grievance redressal, and inclusivity programs',
+'Alumni Relations: Networking, mentorship, and alumni contributions'
 ];
 
-export default function FeaturesSection() {
+const sectionVariants = {
+  hidden: { opacity: 0, x: -50 },
+  visible: { 
+    opacity: 1, 
+    x: 0, 
+    transition: {
+      duration: 0.8,
+      ease: "easeOut"
+    }
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut"
+    }
+  },
+};
+
+export default function BenefitsSection() {
+  const [showSection, setShowSection] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const section = document.getElementById('benefits-section');
+      if (section) {
+        const rect = section.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.75) {
+          setShowSection(true);
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <section id="features" className="py-20 bg-white" data-testid="features-section">
+    <section id="benefits-section" className="py-20 bg-gray-50 dark:bg-gray-900" data-testid="benefits-section">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12 sm:mb-16">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-secondary mb-4" data-testid="features-title">
-            Powerful Features for <span className="text-gradient">Modern Learning</span>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            Discover the Benefits of AI-Powered Learning
           </h2>
-          <p className="text-lg sm:text-xl text-muted max-w-3xl mx-auto px-4" data-testid="features-description">
-            Discover how Professor AI revolutionizes education with cutting-edge artificial intelligence and intuitive design.
+          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+            Our AI teaching companion offers a wide range of advantages, both in and out of the classroom.
           </p>
         </div>
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-12 sm:mb-16">
-          {features.map((feature, index) => {
-            const IconComponent = feature.icon;
-            return (
-              <Card 
-                key={index}
-                className={`feature-card bg-gradient-to-br ${feature.gradient} p-6 sm:p-8 border ${feature.border} transition-all`}
-                data-testid={`feature-card-${index}`}
-              >
-                <CardContent className="p-0">
-                  <div className={`w-16 h-16 ${feature.iconBg} rounded-xl flex items-center justify-center mb-6`}>
-                    <IconComponent className="text-white text-2xl w-8 h-8" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-secondary mb-4">{feature.title}</h3>
-                  <p className="text-muted leading-relaxed">{feature.description}</p>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-        
-        {/* Feature Showcase with Image */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          <div>
-            <img 
-              src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&h=600" 
-              alt="Students learning with technology" 
-              className="rounded-2xl shadow-xl"
-              data-testid="features-showcase-image"
-            />
-          </div>
-          <div>
-            <h3 className="text-2xl sm:text-3xl font-bold text-secondary mb-4 sm:mb-6" data-testid="features-showcase-title">
-              Transform Your Learning Experience
-            </h3>
-            <p className="text-base sm:text-lg text-muted mb-6 sm:mb-8 leading-relaxed" data-testid="features-showcase-description">
-              Professor AI combines the best of artificial intelligence with proven educational methodologies to create a learning experience that's both effective and engaging.
-            </p>
-            
-            <div className="space-y-4">
-              {benefits.map((benefit, index) => {
-                const [title, description] = benefit.split(' - ');
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
+          <motion.div
+            variants={sectionVariants}
+            initial="hidden"
+            animate={showSection ? "visible" : "hidden"}
+            className="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 transition-colors"
+          >
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6">Academic</h3>
+            <ul className="space-y-5">
+              {academicBenefits.map((benefit, index) => {
+                const [title, description] = benefit.split(':');
                 return (
-                  <div key={index} className="flex items-start space-x-4" data-testid={`benefit-${index}`}>
-                    <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center mt-1 flex-shrink-0">
-                      <CheckCircle className="text-white text-sm w-4 h-4" />
-                    </div>
+                  <motion.li 
+                    key={index} 
+                    variants={itemVariants} 
+                    className="flex items-start space-x-3"
+                  >
+                    <CheckCircle className="flex-shrink-0 w-6 h-6 text-primary mt-1" />
                     <div>
-                      <h4 className="font-semibold text-secondary">{title}</h4>
-                      <p className="text-muted">{description}</p>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">{title.trim()}</h4>
+                      <p className="text-gray-600 dark:text-gray-400 mt-1">{description.trim()}</p>
                     </div>
-                  </div>
+                  </motion.li>
                 );
               })}
-            </div>
-          </div>
+            </ul>
+          </motion.div>
+
+          <motion.div
+            variants={sectionVariants}
+            initial="hidden"
+            animate={showSection ? "visible" : "hidden"}
+            className="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 transition-colors"
+          >
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6">Non-Academic</h3>
+            <ul className="space-y-5">
+              {nonAcademicBenefits.map((benefit, index) => {
+                const [title, description] = benefit.split(':');
+                return (
+                  <motion.li 
+                    key={index} 
+                    variants={itemVariants} 
+                    className="flex items-start space-x-3"
+                  >
+                    <CheckCircle className="flex-shrink-0 w-6 h-6 text-primary mt-1" />
+                    <div>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">{title.trim()}</h4>
+                      <p className="text-gray-600 dark:text-gray-400 mt-1">{description.trim()}</p>
+                    </div>
+                  </motion.li>
+                );
+              })}
+            </ul>
+          </motion.div>
         </div>
       </div>
     </section>

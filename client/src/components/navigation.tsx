@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'wouter';
 import logoPath from "@assets/prof-ai-logo_1755775207766.avif";
+// import { useNavigate } from "react-router-dom";
 
 export default function Navigation() {
+  // const navigate = useNavigate();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentSection, setCurrentSection] = useState('home');
 
@@ -40,19 +44,19 @@ export default function Navigation() {
 
   const isOnLandingPage = currentSection === 'home';
   const textColor = 'text-white';
-  const hoverColor = 'hover:text-accent';
+  const hoverColor = 'hover:text-white';
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <nav className={`fixed top-2 left-0 right-0 z-50 transition-all duration-300 ${
       isOnLandingPage ? 'bg-transparent' : 'bg-black/80 backdrop-blur-md shadow-lg'
     }`} data-testid="main-navigation">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-3 sm:py-4">
+      <div className="max-w-10xl mx-auto  px-4 sm:px-6 lg:px-10">
+        <div className="flex justify-between items-center py-3 px-6 sm:py-3 bg-black/90 rounded-full">
           <div className="flex items-center" data-testid="logo-brand">
             <img 
               src={logoPath} 
               alt="Professor AI Logo" 
-              className="h-8 sm:h-10 w-auto"
+              className="h-6 sm:h-10 w-auto"
             />
           </div>
           
@@ -60,23 +64,36 @@ export default function Navigation() {
           <div className="hidden md:flex items-center space-x-8">
             <button 
               onClick={() => scrollToSection('home')} 
-              className={`${textColor} ${hoverColor} transition-colors ${currentSection === 'home' ? 'font-semibold' : ''}`}
+              className={`${textColor} ${hoverColor} hover:scale-110 transition-colors ${currentSection === 'home' ? 'font-semibold' : ''}`}
               data-testid="nav-home"
             >
               Home
             </button>
+            <Link href ="/dashboard">
             <button 
-              className={`${textColor} ${hoverColor} transition-colors`}
+              className={`${textColor} ${hoverColor} transition-colors hover:scale-110`}
               data-testid="nav-demo"
-            >
+              >
               Demo
             </button>
-            <Button 
-              className="px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg bg-gradient-to-r from-accent to-primary text-white hover:from-accent/90 hover:to-primary/90 hover:shadow-primary/30"
-              data-testid="button-sign-up"
-            >
-              Sign up
-            </Button>
+            </Link>
+            <Link href="/signup">
+              <Button 
+                className="relative px-8 py-3 border rounded-full font-bold text-lg 
+                          transition-all duration-500 transform 
+                          hover:scale-110 hover:shadow-2xl 
+                          bg-gradient-to-r from-zinc-900 via-stone-950 to-stone-900 
+                          text-white shadow-lg hover:shadow-purple-500/50 
+                          overflow-hidden group"
+                data-testid="button-sign-up"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent 
+                                opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                </div>
+                <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
+                <span className="relative z-10">Sign up</span>
+              </Button>
+            </Link>
           </div>
           
           {/* Mobile Menu Button */}
@@ -105,12 +122,23 @@ export default function Navigation() {
             >
               Demo
             </button>
-            <Button 
-              className="w-full mt-4 px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg bg-gradient-to-r from-accent to-primary text-white hover:from-accent/90 hover:to-primary/90 hover:shadow-primary/30"
-              data-testid="button-mobile-sign-up"
-            >
-              Sign up
-            </Button>
+            <Link href="/signup">
+              <Button 
+                className="relative px-8 py-3 border rounded-full font-bold text-lg 
+                          transition-all duration-500 transform 
+                          hover:scale-110 hover:shadow-2xl 
+                          bg-gradient-to-r from-zinc-900 via-stone-950 to-stone-900 
+                          text-white shadow-lg hover:shadow-purple-500/50 
+                          overflow-hidden group"
+                data-testid="button-sign-up"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent 
+                                opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                </div>
+                <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
+                <span className="relative z-10">Sign up</span>
+              </Button>
+            </Link>
           </div>
         )}
       </div>

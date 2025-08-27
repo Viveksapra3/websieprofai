@@ -24,8 +24,8 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="bg-secondary text-white py-16" data-testid="footer">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <footer className="bg-black text-white py-8 rounded-t-sm" data-testid="footer">
+      <div className="max-w-7xl mx-auto sm:px-6 lg:px-0">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div data-testid="footer-brand">
             <div className="flex items-center mb-6">
@@ -73,9 +73,9 @@ export default function Footer() {
           ))}
         </div>
         
-        <div className="border-t border-gray-700 mt-12 pt-8 text-center" data-testid="footer-bottom">
-          <p className="text-gray-400">
-            © 2024 Professor AI. All rights reserved. | {' '}
+        <div className="border-t border-gray-700 text-center" data-testid="footer-bottom">
+          <p className="text-gray-400" >
+            © 2025 Professor AI. All rights reserved. | {' '}
             <a href="#" className="hover:text-white transition-colors" data-testid="link-privacy">
               Privacy Policy
             </a>{' '}

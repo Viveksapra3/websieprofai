@@ -19,6 +19,23 @@ export default function QuizExam({
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [pendingList, setPendingList] = useState([]);
+  const [serverResult, setServerResult] = useState(null);
+  // If the page re-renders after submit, try hydrating from localStorage
+  useEffect(() => {
+    if (finished && !serverResult) {
+      try {
+        const raw = localStorage.getItem("exam:lastServerResult");
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          console.log("Hydrating serverResult from localStorage:", parsed);
+          if (parsed && (parsed.result || parsed.message)) {
+            setServerResult(parsed);
+            console.log("Successfully hydrated serverResult");
+          }
+        }
+      } catch {}
+    }
+  }, [finished, serverResult]);
 
   useEffect(() => {
     if (questions && questions.length) {
@@ -102,10 +119,107 @@ export default function QuizExam({
     setCurrent(i);
   }
 
-  function handleFinish() {
+  async function handleFinish() {
     clearInterval(timerRef.current);
+    
+    // Prepare payload for submission
+    let quizId = "";
+    try {
+      const metaRaw = localStorage.getItem("exam:quizMeta");
+      if (metaRaw) {
+        const meta = JSON.parse(metaRaw);
+        quizId = String(meta?.quiz_id || "");
+      }
+      // If no quiz ID found, generate a fallback
+      if (!quizId) {
+        quizId = `quiz_${Date.now()}`;
+        console.warn("No quiz ID found, using fallback:", quizId);
+      }
+    } catch {
+      quizId = `quiz_${Date.now()}`;
+      console.warn("Error reading quiz metadata, using fallback:", quizId);
+    }
+
+    // Map selected indices to letters
+    const letters = ["A", "B", "C", "D", "E", "F"];
+    const submitAnswers = {};
+    // Use the displayed order so numbering matches the UI
+    order.forEach((qi, i) => {
+      const q = questions[qi];
+      const val = answers[q.id];
+      // Only single choice expected per the required format
+      if (typeof val === "number" && val >= 0) {
+        const key = `${quizId}_q${i + 1}`;
+        submitAnswers[key] = letters[val] || "";
+      }
+    });
+
+    // Submit to API and wait for result before finishing
+    let serverData = null;
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_NEXT_BACK_API || "";
+      console.log("API_BASE:", API_BASE);
+      console.log("quizId:", quizId);
+      console.log("submitAnswers count:", Object.keys(submitAnswers).length);
+      console.log("submitAnswers:", submitAnswers);
+      console.log("Raw answers state:", answers);
+      console.log("Questions order:", order);
+      console.log("Questions array:", questions);
+      
+      // Force submission even with fallback data for debugging
+      if (API_BASE && (quizId || Object.keys(submitAnswers).length > 0 || Object.keys(answers).length > 0)) {
+        const payload = { quiz_id: quizId, user_id: "userId", answers: submitAnswers };
+        const url = `${API_BASE.replace(/\/$/, "")}/api/quiz/submit`;
+        
+        console.log("Submitting to URL:", url);
+        console.log("Payload being sent:", JSON.stringify(payload, null, 2));
+        
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        });
+        
+        console.log("Response status:", res.status);
+        console.log("Response ok:", res.ok);
+        console.log("Response headers:", Object.fromEntries(res.headers.entries()));
+        
+        const data = await res.json().catch((err) => {
+          console.error("Failed to parse response as JSON:", err);
+          return {};
+        });
+        
+        console.log("Quiz submit result:", { status: res.status, ok: res.ok, data });
+        console.log("Checking server result capture:", { hasResult: !!data.result, hasMessage: !!data.message, data });
+        
+        if (data && (data.result || data.message)) {
+          console.log("Setting serverResult to:", data);
+          serverData = data;
+          try { localStorage.setItem("exam:lastServerResult", JSON.stringify(data)); } catch {}
+        } else {
+          console.log("Server result not captured - missing result or message field");
+        }
+      } else {
+        console.log("Skipping submit: missing API base, quiz_id, or answers");
+        console.log("Debug - API_BASE exists:", !!API_BASE);
+        console.log("Debug - quizId exists:", !!quizId);
+        console.log("Debug - answers exist:", Object.keys(submitAnswers).length > 0);
+      }
+    } catch (e) {
+      console.error("Error submitting quiz:", e);
+      console.error("Error details:", e.message, e.stack);
+    }
+
+    // Set states after API call completes
     setFinished(true);
     setStarted(false);
+    if (serverData) {
+      setServerResult(serverData);
+      console.log("Final serverResult set to:", serverData);
+    }
+
+    // Continue with local result handling
     const result = gradeQuiz(questions, answers);
     onSubmit({ answers, result, submittedAt: new Date().toISOString() });
   }
@@ -189,11 +303,11 @@ export default function QuizExam({
       {started && !finished && (
         <aside className="hidden md:block fixed left-0 top-0 h-screen w-72 bg-gradient-to-b from-blue-700 to-blue-600 rounded-tr-xl rounded-br-xl text-white p-6 z-40 shadow-lg">
           <div className="mb-6 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center font-semibold">S</div>
+            {/* <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center font-semibold">S</div>
             <div>
               <div className="font-semibold">Smart</div>
               <div className="text-xs opacity-80">Student</div>
-            </div>
+            </div> */}
           </div>
 
           <div className="mb-3">
@@ -201,7 +315,7 @@ export default function QuizExam({
             <p className="text-xs text-white/80">Jump to any question</p>
           </div>
 
-          <div className="flex flex-col gap-2 overflow-y-auto pr-1" style={{ maxHeight: 'calc(100vh - 140px)' }}>
+          <div className="grid grid-cols-3 gap-2 overflow-y-auto pr-1" style={{ maxHeight: 'calc(100vh - 140px)' }}>
             {order.map((idx, i) => {
               const ans = answers[questions[idx].id];
               const hasAnswer = ans !== undefined && (Array.isArray(ans) ? ans.length > 0 : true);
@@ -209,13 +323,14 @@ export default function QuizExam({
                 <button
                   key={i}
                   onClick={() => goTo(i)}
-                  className={`w-full h-10 px-3 rounded text-sm text-left border transition-colors ${
+                  className={`w-full aspect-square rounded text-xs flex items-center justify-center border transition-colors ${
                     i === current
                       ? 'bg-transparent text-white border-white/70'
                       : hasAnswer
                       ? 'bg-emerald-50 text-emerald-900'
                       : 'bg-white/10 text-white/90 hover:bg-white/20 border-white/20'
                   }`}
+                  aria-label={`Go to question ${i + 1}`}
                 >
                   {i + 1}
                 </button>
@@ -223,13 +338,13 @@ export default function QuizExam({
             })}
           </div>
 
-          <div className="absolute bottom-6 left-6 right-6">
+          {/* <div className="absolute bottom-6 left-6 right-6">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">G</div>
               <div className="text-sm">Grace</div>
             </div>
             <button className="w-full text-sm py-2 rounded bg-white/10 hover:bg-white/20">Log out</button>
-          </div>
+          </div> */}
         </aside>
       )}
 
@@ -359,33 +474,125 @@ export default function QuizExam({
         )}
 
         {finished && (
-        <div>
-          <h3 className="text-xl font-semibold mb-2">Results</h3>
-          <p className="mb-4">You scored <strong>{gradeQuiz(questions, answers).score.toFixed(2)}</strong> out of {gradeQuiz(questions, answers).maxScore}</p>
-
-            {allowReview && (
-              <div className="space-y-4">
-                {questions.map((qq, i) => {
-                  const u = answers[qq.id];
-                  const correct = qq.correct;
-                  return (
-                    <div key={qq.id} className="p-3 border rounded bg-white">
-                      <div className="font-medium">{i+1}. {qq.title}</div>
-                      {qq.type !== 'text' && (
-                        <div className="mt-2">
-                          <div className="text-sm">Your answer: {String(u)}</div>
-                          <div className="text-sm">Correct: {String(correct)}</div>
+          <div>
+            <h3 className="text-xl font-semibold mb-2">Results</h3>
+            {(() => {
+              console.log("Rendering results - serverResult:", serverResult);
+              return null;
+            })()}
+            {serverResult ? (
+              (() => {
+                const r = serverResult.result || {};
+                const total = Number(r.total_questions || 0);
+                const score = Number(r.score || 0);
+                const pct = Number(r.percentage || (total ? (score / total) * 100 : 0));
+                const passed = !!r.passed;
+                const details = Array.isArray(r.detailed_results) ? r.detailed_results : [];
+                return (
+                  <div className="space-y-6">
+                    <div className="p-6 border rounded-xl bg-white shadow-sm">
+                      <div className="flex items-start justify-between mb-4">
+                        <div>
+                          <div className="text-sm text-slate-500">{serverResult.message || 'Exam Submitted'}</div>
+                          <div className="text-lg font-semibold mt-1">Exam Summary</div>
+                          <div className="text-xs mt-1 text-slate-600">Quiz ID: <span className="font-mono">{r.quiz_id}</span> • User: <span className="font-mono">{r.user_id}</span></div>
                         </div>
-                      )}
-                      {qq.type === 'text' && (
-                        <div className="mt-2">
-                          <div className="text-sm">Your response:</div>
-                          <pre className="whitespace-pre-wrap">{u}</pre>
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${passed ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>{passed ? 'Passed' : 'Failed'}</span>
+                      </div>
+                      <div className="flex items-center gap-6">
+                        <div className="text-4xl font-bold">{pct.toFixed(1)}%</div>
+                        <div className="flex-1">
+                          <div className="h-2 w-full rounded bg-slate-200 overflow-hidden">
+                            <div className="h-2 bg-blue-600" style={{ width: `${Math.min(100, Math.max(0, pct))}%` }} />
+                          </div>
+                          <div className="mt-2 text-xs text-slate-600">Score: {score} / {total}</div>
                         </div>
-                      )}
+                      </div>
+                      
+                      {/* Back to Exam Button */}
+                      <div className="mt-4 flex justify-center">
+                        <button
+                          onClick={() => window.location.href = '/exam'}
+                          className="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
+                        >
+                          Take Another Exam
+                        </button>
+                      </div>
                     </div>
-                  );
-                })}
+
+                    {details.length > 0 && (
+                      <div className="p-0 border rounded-xl bg-white shadow-sm overflow-hidden">
+                        <div className="px-4 py-3 border-b font-medium bg-slate-50">Detailed Results</div>
+                        <div className="overflow-auto" style={{ maxHeight: '60vh' }}>
+                          <table className="min-w-full text-sm">
+                            <thead className="sticky top-0 bg-white z-[1]">
+                              <tr className="text-left border-b">
+                                <th className="p-3">Question</th>
+                                <th className="p-3">Your Answer</th>
+                                <th className="p-3">Correct Answer</th>
+                                <th className="p-3">Result</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {details.map((dr, i) => (
+                                <tr key={dr.question_id || i} className={`${dr.is_correct ? 'bg-emerald-50/40' : 'bg-rose-50/40'} border-b last:border-0`}>
+                                  <td className="p-3 font-mono text-slate-800">{dr.question_id}</td>
+                                  <td className="p-3">{dr.user_answer}</td>
+                                  <td className="p-3">{dr.correct_answer}</td>
+                                  <td className="p-3">
+                                    <span className={`px-2 py-0.5 rounded text-xs font-semibold ${dr.is_correct ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
+                                      {dr.is_correct ? 'Correct' : 'Incorrect'}
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()
+            ) : (
+              <div>
+                <p className="mb-4">You scored <strong>{gradeQuiz(questions, answers).score.toFixed(2)}</strong> out of {gradeQuiz(questions, answers).maxScore}</p>
+                {allowReview && (
+                  <div className="space-y-4">
+                    {questions.map((qq, i) => {
+                      const u = answers[qq.id];
+                      const correct = qq.correct;
+                      return (
+                        <div key={qq.id} className="p-3 border rounded bg-white">
+                          <div className="font-medium">{i+1}. {qq.title}</div>
+                          {qq.type !== 'text' && (
+                            <div className="mt-2">
+                              <div className="text-sm">Your answer: {String(u)}</div>
+                              <div className="text-sm">Correct: {String(correct)}</div>
+                            </div>
+                          )}
+                          {qq.type === 'text' && (
+                            <div className="mt-2">
+                              <div className="text-sm">Your response:</div>
+                              <pre className="whitespace-pre-wrap">{u}</pre>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+                <div className="mt-4 text-xs text-slate-500">Waiting for server result… If this persists, check console for "Quiz submit result" logs.</div>
+                
+                {/* Back to Exam Button for local results */}
+                <div className="mt-6 flex justify-center">
+                  <button
+                    onClick={() => window.location.href = '/exam'}
+                    className="px-6 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
+                  >
+                    Take Another Exam
+                  </button>
+                </div>
               </div>
             )}
           </div>

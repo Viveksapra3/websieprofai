@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Eye, EyeOff, ArrowLeft, Mail, User, Lock } from 'lucide-react';
-import logoPath from "@assets/prof-ai-logo_1755775207766.avif";
+import { Eye, EyeOff, ArrowLeft, Mail, User, Lock, ChevronDown, Check } from 'lucide-react';
+import * as Select from '@radix-ui/react-select';
+import logoPath from "@assets/prof-ai-logo_1755775207766-DKA28TFR.avif";
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,33 +15,118 @@ export default function SignUp() {
     fullName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    role: 'student', // <-- default role
+    // Student fields
+    studentType: '', // 'college' | 'school'
+    collegeName: '',
+    degree: '',
+    schoolClass: '',
+    schoolAffiliation: '',
+    // Terms acceptance
+    termsAccepted: false,
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData(prev => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData(prev => ({ ...prev, [name]: checked }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle signup logic here
-    console.log('Signup form submitted:', formData);
+
+    // basic client validations
+    if (formData.password !== formData.confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+    if (!formData.termsAccepted) {
+      alert('You must agree to the Terms of Use to sign up.');
+      return;
+    }
+    if (formData.role === 'student') {
+      const type = (formData.studentType || '').toLowerCase();
+      if (!type) {
+        alert('Please select whether you are a college or school student.');
+        return;
+      }
+      if (type === 'college') {
+        if (!formData.collegeName || !formData.degree) {
+          alert('Please provide your college name and degree.');
+          return;
+        }
+      }
+      if (type === 'school') {
+        if (!formData.schoolClass || !formData.schoolAffiliation) {
+          alert('Please provide your class and school affiliation.');
+          return;
+        }
+      }
+    }
+
+    try {
+      const payload: any = {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+        termsAccepted: formData.termsAccepted,
+      };
+
+      if (formData.role === 'student') {
+        payload.studentType = formData.studentType || undefined;
+        if ((formData.studentType || '').toLowerCase() === 'college') {
+          payload.collegeName = formData.collegeName || undefined;
+          payload.degree = formData.degree || undefined;
+        } else if ((formData.studentType || '').toLowerCase() === 'school') {
+          payload.schoolClass = formData.schoolClass || undefined;
+          payload.schoolAffiliation = formData.schoolAffiliation || undefined;
+        }
+      }
+
+      const response = await fetch('/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        console.log('Signup successful:', data);
+        const redirectUrl = data?.redirectUrl || (import.meta.env.VITE_AUTH_REDIRECT_URL as string) || '/';
+        // Full page redirect (cross-domain supported)
+        window.location.href = redirectUrl;
+      } else {
+        console.error('Signup failed:', data.error);
+        // Handle error display to user
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-r from-zinc-900 via-stone-950 to-stone-900 flex items-center justify-center p-4" data-testid="signup-page">
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-20"></div>
-      
+
       <div className="relative w-full max-w-md">
         {/* Back to Home Link */}
         <Link href="/">
           <Button 
             variant="ghost" 
-            className="absolute -top-16 left-0 text-white/70 hover:text-white hover:bg-white/10 transition-all"
+            className="absolute z-[100] left-0 text-white/70 hover:text-white hover:scale-110 transition-all"
             data-testid="back-to-home"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -58,9 +144,6 @@ export default function SignUp() {
                 data-testid="signup-logo"
               />
             </div>
-            <CardTitle className="text-2xl font-bold text-white">
-              Join Professor AI
-            </CardTitle>
             <CardDescription className="text-white/70">
               Start your personalized learning journey today
             </CardDescription>
@@ -168,10 +251,138 @@ export default function SignUp() {
                 </div>
               </div>
 
+              {/* Role Dropdown (Student | Teacher) */}
+              <div className="space-y-2">
+                <Label htmlFor="role" className="text-white/90 font-medium">
+                  Sign up as
+                </Label>
+                <div className="relative">
+                  <Select.Root
+                    value={formData.role}
+                    onValueChange={(v) => setFormData((prev) => ({ ...prev, role: v }))}
+                  >
+                    <Select.Trigger
+                      aria-label="Role"
+                      className="w-full inline-flex items-center justify-between pl-4 pr-3 py-2 rounded-md bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:border-accent focus:ring-0 hover:bg-white/10"
+                      data-testid="select-role"
+                    >
+                      <Select.Value />
+                      <Select.Icon>
+                        <ChevronDown className="w-4 h-4 text-white" />
+                      </Select.Icon>
+                    </Select.Trigger>
+                    <Select.Portal>
+                      <Select.Content
+                        sideOffset={6}
+                        className="z-50 overflow-hidden rounded-md border border-white/20 bg-gray/80 backdrop-blur-md text-white shadow-lg"
+                      >
+                        <Select.Viewport className="p-1">
+                          <Select.Item
+                            value="student"
+                            className="select-none rounded px-2 py-1 text-sm outline-none hover:bg-white/10 cursor-pointer"
+                          >
+                            <Select.ItemText>Student</Select.ItemText>
+                          </Select.Item>
+                          <Select.Item
+                            value="teacher"
+                            className="select-none rounded px-2 py-1 text-sm outline-none hover:bg-white/10 cursor-pointer"
+                          >
+                            <Select.ItemText>Teacher</Select.ItemText>
+                          </Select.Item>
+                        </Select.Viewport>
+                      </Select.Content>
+                    </Select.Portal>
+                  </Select.Root>
+                </div>
+              </div>
+
+              {/* Student specific fields */}
+              {formData.role === 'student' && (
+                <div className="space-y-3">
+                  {/* Student Type: College or School */}
+                  <div className="space-y-2">
+                    <Label className="text-white/90 font-medium">Student type</Label>
+                    <div className="relative">
+                      <Select.Root
+                        value={formData.studentType}
+                        onValueChange={(v) => setFormData((prev) => ({ ...prev, studentType: v, collegeName: '', degree: '', schoolClass: '', schoolAffiliation: '' }))}
+                      >
+                        <Select.Trigger
+                          aria-label="Student Type"
+                          className="w-full inline-flex items-center justify-between pl-4 pr-3 py-2 rounded-md bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:border-accent focus:ring-0 hover:bg-white/10"
+                        >
+                          <Select.Value placeholder="Select student type" />
+                          <Select.Icon>
+                            <ChevronDown className="w-4 h-4 text-white" />
+                          </Select.Icon>
+                        </Select.Trigger>
+                        <Select.Portal>
+                          <Select.Content sideOffset={6} className="z-50 overflow-hidden rounded-md border border-white/20 bg-gray/80 backdrop-blur-md text-white shadow-lg">
+                            <Select.Viewport className="p-1">
+                              <Select.Item value="college" className="select-none rounded px-2 py-1 text-sm outline-none hover:bg-white/10 cursor-pointer">
+                                <Select.ItemText>College</Select.ItemText>
+                              </Select.Item>
+                              <Select.Item value="school" className="select-none rounded px-2 py-1 text-sm outline-none hover:bg-white/10 cursor-pointer">
+                                <Select.ItemText>School</Select.ItemText>
+                              </Select.Item>
+                            </Select.Viewport>
+                          </Select.Content>
+                        </Select.Portal>
+                      </Select.Root>
+                    </div>
+                  </div>
+
+                  {/* Conditional inputs */}
+                  {(formData.studentType || '').toLowerCase() === 'college' && (
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="collegeName" className="text-white/90 font-medium">College Name</Label>
+                        <Input id="collegeName" name="collegeName" type="text" placeholder="Enter college name" value={formData.collegeName} onChange={handleInputChange} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-accent focus:ring-accent" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="degree" className="text-white/90 font-medium">Degree</Label>
+                        <Input id="degree" name="degree" type="text" placeholder="e.g. B.Tech, B.Sc, MBA" value={formData.degree} onChange={handleInputChange} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-accent focus:ring-accent" />
+                      </div>
+                    </div>
+                  )}
+
+                  {(formData.studentType || '').toLowerCase() === 'school' && (
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="schoolClass" className="text-white/90 font-medium">Class</Label>
+                        <Input id="schoolClass" name="schoolClass" type="text" placeholder="e.g. 8th, 10th, 12th" value={formData.schoolClass} onChange={handleInputChange} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-accent focus:ring-accent" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="schoolAffiliation" className="text-white/90 font-medium">Affiliation</Label>
+                        <Input id="schoolAffiliation" name="schoolAffiliation" type="text" placeholder="e.g. CBSE, ICSE, State Board" value={formData.schoolAffiliation} onChange={handleInputChange} className="bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:border-accent focus:ring-accent" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              {/* <Check className="w-4 h-4 text-white" /> */}
+              <div className="flex items-center gap-2 text-white/90">
+                <input
+                  id="termsAccepted"
+                  name="termsAccepted"
+                  type="checkbox"
+                  checked={formData.termsAccepted}
+                  onChange={handleCheckboxChange}
+                  className="h-4 w-4 rounded border-white/30 bg-white/10"
+                />
+                <Label htmlFor="termsAccepted" className="text-white/90 select-none">
+                  I agree to the{' '}
+                  <Link href="/terms">
+                    <span className="text-accent hover:text-accent/80 underline cursor-pointer">Terms of Use</span>
+                  </Link>
+                </Label>
+              </div>
+
               {/* Submit Button */}
               <Button 
                 type="submit"
-                className="w-full py-3 text-lg font-semibold bg-gradient-to-r from-accent via-primary to-accent bg-size-200 bg-pos-0 hover:bg-pos-100 transition-all duration-500 transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-accent/30 text-white border-0"
+                className="w-full py-3 text-lg font-semibold bg-gradient-to-r from-accent via-primary to-accent bg-size-200 bg-pos-0 hover:bg-pos-100 transition-all duration-500 transform hover:scale-[1.02] hover:shadow-2xl hover:shadow-accent/30 text-white border-2 border-white/50 disabled:opacity-60 disabled:cursor-not-allowed"
+                disabled={!formData.termsAccepted}
                 data-testid="button-create-account"
               >
                 Create Account
@@ -219,7 +430,7 @@ export default function SignUp() {
             <div className="text-center">
               <p className="text-white/70">
                 Already have an account?{' '}
-                <Link href="/signin">
+                <Link href="/signin/student">
                   <span className="text-accent hover:text-accent/80 font-medium cursor-pointer transition-colors">
                     Sign in
                   </span>

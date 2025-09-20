@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { CheckCircle } from 'lucide-react';
 
 const academicBenefits = [
@@ -24,26 +24,69 @@ const sectionVariants = {
     opacity: 1, 
     x: 0, 
     transition: {
-      duration: 0.8,
+      duration: 1.4,
       ease: "easeOut"
     }
   },
 };
 
+const containerVariants = {
+  hidden: { opacity: 1 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.3,
+      delayChildren: 0.2
+    }
+  }
+};
+
 const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { 
+    opacity: 0, 
+    y: 50,
+    scale: 0.8
+  },
   visible: { 
     opacity: 1, 
     y: 0,
+    scale: 1,
     transition: {
-      duration: 0.5,
-      ease: "easeOut"
+      duration: 1.6,
+      ease: "easeOut",
+      type: "spring",
+      stiffness: 100
     }
   },
+};
+
+// Custom hook for individual item visibility
+const useScrollReveal = () => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { 
+    once: true, 
+    margin: "-100px 0px -100px 0px",
+    amount: 0.3
+  });
+  return [ref, isInView];
 };
 
 export default function BenefitsSection() {
   const [showSection, setShowSection] = useState(false);
+  const academicRef = useRef(null);
+  const nonAcademicRef = useRef(null);
+  
+  const academicInView = useInView(academicRef, { 
+    once: true, 
+    margin: "-50px 0px -50px 0px",
+    amount: 0.2
+  });
+  
+  const nonAcademicInView = useInView(nonAcademicRef, { 
+    once: true, 
+    margin: "-50px 0px -50px 0px",
+    amount: 0.2
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -74,13 +117,19 @@ export default function BenefitsSection() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
           <motion.div
+            ref={academicRef}
             variants={sectionVariants}
             initial="hidden"
             animate={showSection ? "visible" : "hidden"}
-            className="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 transition-colors"
+            className="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 transition-colors drop-shadow-[0_4px_6px_rgba(0,0,0,40%)]"
           >
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6">Academic</h3>
-            <ul className="space-y-5">
+            <motion.ul 
+              className="space-y-5"
+              variants={containerVariants}
+              initial="hidden"
+              animate={academicInView ? "visible" : "hidden"}
+            >
               {academicBenefits.map((benefit, index) => {
                 const [title, description] = benefit.split(':');
                 return (
@@ -97,17 +146,23 @@ export default function BenefitsSection() {
                   </motion.li>
                 );
               })}
-            </ul>
+            </motion.ul>
           </motion.div>
 
           <motion.div
+            ref={nonAcademicRef}
             variants={sectionVariants}
             initial="hidden"
             animate={showSection ? "visible" : "hidden"}
-            className="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 transition-colors"
+            className="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 transition-colors drop-shadow-[0_4px_6px_rgba(0,0,0,40%)]"
           >
             <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-6">Non-Academic</h3>
-            <ul className="space-y-5">
+            <motion.ul 
+              className="space-y-5"
+              variants={containerVariants}
+              initial="hidden"
+              animate={nonAcademicInView ? "visible" : "hidden"}
+            >
               {nonAcademicBenefits.map((benefit, index) => {
                 const [title, description] = benefit.split(':');
                 return (
@@ -124,7 +179,7 @@ export default function BenefitsSection() {
                   </motion.li>
                 );
               })}
-            </ul>
+            </motion.ul>
           </motion.div>
         </div>
       </div>

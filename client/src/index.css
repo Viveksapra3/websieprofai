@@ -159,3 +159,25 @@
     transform: translateY(-5px);
   }
 }
+@keyframes blink {
+  0%, 50%, 100% {
+    opacity: 1;
+  }
+  25%, 75% {
+    opacity: 0;
+  }
+}
+
+.animate-blink {
+  animation: blink 1s infinite;
+}
+
+.custom-select, .custom-select option {
+  background-color: rgba(255,255,255,0.06); /* matches bg-white/10 */
+  color: rgba(255,255,255,0.95);
+}
+
+.custom-select:hover, .custom-select:focus {
+  background-color: rgba(255,255,255,0.08); /* slightly lighter on hover/focus */
+}
+.custom-select::-ms-expand { display: none; }

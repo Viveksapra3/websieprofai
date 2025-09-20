@@ -14,17 +14,20 @@ export default function SignInTeacher() {
     password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
     }));
+    if (authError) setAuthError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setAuthError(null);
     
     try {
       // POST request to sign in as teacher
@@ -48,11 +51,11 @@ export default function SignInTeacher() {
       } else {
         const error = await response.json();
         console.error('Teacher sign-in failed:', error);
-        // Handle error (show error message)
+        setAuthError('Authentication Failed, Please Verify Your Credentials');
       }
     } catch (error) {
       console.error('Network error:', error);
-      // Handle network error
+      setAuthError('Authentication Failed,Please Verify Your Credentials');
     } finally {
       setIsLoading(false);
     }
@@ -149,14 +152,16 @@ export default function SignInTeacher() {
                 </div>
               </div>
 
-              {/* Forgot Password Link */}
-              <div className="text-right">
-                <Link href="/forgot-password">
-                  <span className="text-blue-400 hover:text-blue-300 text-sm cursor-pointer transition-colors">
-                    
-                  </span>
-                </Link>
-              </div>
+              {/* Forgot Password Link (disabled until route exists) */}
+              {false && (
+                <div className="text-right">
+                  <Link href="/forgot-password">
+                    <span className="text-blue-400 hover:text-blue-300 text-sm cursor-pointer transition-colors">
+                      Forgot your password?
+                    </span>
+                  </Link>
+                </div>
+              )}
 
               {/* Submit Button */}
               <Button 
@@ -167,17 +172,22 @@ export default function SignInTeacher() {
               >
                 {isLoading ? 'Signing In...' : 'Sign In as Teacher'}
               </Button>
-            </form>
+              {authError && (
+                <div className="mt-3 text-red-500 text-sm font-medium" data-testid="auth-error">
+                  {authError}
+                </div>
+              )}
 
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-white/20" />
+              {/* Divider */}
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-white/20" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="bg-transparent px-2 text-white/70">Or continue with</span>
+                </div>
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="bg-transparent px-2 text-white/70">Or continue with</span>
-              </div>
-            </div>
+            </form>
 
             {/* Social Sign In Options */}
             <div className="grid grid-cols-2 gap-4">

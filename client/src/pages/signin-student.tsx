@@ -14,17 +14,20 @@ export default function SignInStudent() {
     password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
     }));
+    if (authError) setAuthError(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setAuthError(null);
     
     try {
       // POST request to sign in as student
@@ -48,11 +51,11 @@ export default function SignInStudent() {
       } else {
         const error = await response.json();
         console.error('Student sign-in failed:', error);
-        // Handle error (show error message)
+        setAuthError('Authentication Failed, Please Verify Your Credentials');
       }
     } catch (error) {
       console.error('Network error:', error);
-      // Handle network error
+      setAuthError('Authentication Failed, Please Verify Your Credentials');
     } finally {
       setIsLoading(false);
     }
@@ -167,6 +170,11 @@ export default function SignInStudent() {
               >
                 {isLoading ? 'Signing In...' : 'Sign In as Student'}
               </Button>
+              {authError && (
+                <div className="mt-3 text-red-500 text-sm font-medium" data-testid="auth-error">
+                  {authError}
+                </div>
+              )}
             </form>
 
             {/* Divider */}

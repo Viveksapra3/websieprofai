@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { useRoute, Link, useLocation } from "wouter";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useEffect, useState } from "react";
+import { useRoute, useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { AuthNavbar } from "@/components/auth-navbar";
 
@@ -24,24 +23,21 @@ export default function CoursePage() {
   const [course, setCourse] = useState<CourseDetail | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [lastQuizId, setLastQuizId] = useState<string | null>(null);
+  const [moduleQuizIds, setModuleQuizIds] = useState<Record<string, string | null>>({}); // key: week
+  const [moduleQuizLoading, setModuleQuizLoading] = useState<Record<string, boolean>>({}); // key: week
 
-  // UI state
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [activeView, setActiveView] = useState<any>(null); // holds currently rendered object (course / module / subtopic)
+  const [activeView, setActiveView] = useState<any>(null);
 
-  // Fetch course & session
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        // Verify session
         const authRes = await fetch("/api/session", { credentials: "include" });
         const authData = await authRes.json();
         if (!authRes.ok || !authData?.authenticated) {
           window.location.href = "/post-auth";
           return;
         }
-        // Capture role for role-based UI
         const userRole = String(authData?.user?.role || "").toLowerCase() || null;
         if (!cancelled) setRole(userRole);
 
@@ -55,7 +51,7 @@ export default function CoursePage() {
 
         if (!cancelled) {
           setCourse(data);
-          setActiveView(data); // default view: full course overview
+          setActiveView(data);
         }
       } catch (e: any) {
         if (!cancelled) setError(e?.message || "Failed to load course");
@@ -68,7 +64,6 @@ export default function CoursePage() {
     };
   }, [courseId]);
 
-  // Load last quiz id for this course from localStorage
   useEffect(() => {
     try {
       if (!courseId) return;
@@ -79,7 +74,61 @@ export default function CoursePage() {
     }
   }, [courseId]);
 
-  // Helper: format textual content (simple markdown-like -> html)
+  useEffect(() => {
+    try {
+      if (!courseId || !course || !Array.isArray(course.modules)) return;
+      const nextIds: Record<string, string | null> = {};
+      const nextLoading: Record<string, boolean> = {};
+      course.modules.forEach((mod: any, idx: number) => {
+        const week = String(mod?.week ?? idx + 1);
+        const key = `course:${String(courseId)}:module:${week}:lastQuizId`;
+        const stored = localStorage.getItem(key);
+        nextIds[week] = stored || null;
+        nextLoading[week] = false;
+      });
+      setModuleQuizIds(nextIds);
+      setModuleQuizLoading(nextLoading);
+    } catch {}
+  }, [courseId, course]);
+
+  const handleGenerateModuleQuiz = async (week: number) => {
+    if (!courseId) return;
+    const weekKey = String(week);
+    try {
+      setModuleQuizLoading((s) => ({ ...s, [weekKey]: true }));
+      const base = (import.meta.env.VITE_API_BASE as string | undefined) || "";
+      if (!base) throw new Error("Missing VITE_API_BASE in environment");
+      const url = `${base.replace(/\/$/, "")}/api/quiz/generate-module`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          quiz_type: "module",
+          course_id: String(courseId),
+          module_week: week,
+        }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error || "Failed to generate module quiz");
+      const quiz = data?.quiz;
+      const quizId = quiz?.quiz_id;
+      if (quiz && quizId) {
+        try {
+          localStorage.setItem(`quiz:${quizId}`, JSON.stringify(quiz));
+          localStorage.setItem(`course:${String(courseId)}:module:${weekKey}:lastQuizId`, String(quizId));
+          setModuleQuizIds((ids) => ({ ...ids, [weekKey]: String(quizId) }));
+        } catch {}
+        navigate(`/course/${encodeURIComponent(String(courseId))}/quiz/${encodeURIComponent(String(quizId))}`);
+        return;
+      }
+      alert("Module quiz generated, but no quiz payload was returned.");
+    } catch (e: any) {
+      alert(e?.message || "Failed to generate module quiz");
+    } finally {
+      setModuleQuizLoading((s) => ({ ...s, [weekKey]: false }));
+    }
+  };
+
   const formatContent = (content: string | undefined) => {
     if (!content) return "<div>No content available.</div>";
 
@@ -99,121 +148,12 @@ export default function CoursePage() {
     return formatted;
   };
 
-  // Render helpers (these produce React nodes)
-  const renderSidebar = () => {
-    if (!course) return null;
-    const modules = Array.isArray(course.modules) ? course.modules : [];
-    return (
-      <>
-        <div className="mb-6">
-          {/* <h2 className="text-xl font-bold text-white mb-2">Course Navigation</h2> */}
-          <Link href="/courses" className="text-lg text-blue-300 hover:text-blue-100 transition-colors">← Back to Courses</Link>
-        </div>
-
-        <div className="overflow-y-auto">
-          <div className="space-y-3">
-            {modules.map((module: any, moduleIndex: number) => {
-              const week = module?.week ?? moduleIndex + 1;
-              const moduleTitle = module?.title ?? `Week ${week}`;
-              return (
-                <div key={moduleIndex}>
-                  <button
-                    onClick={() => {
-                      setActiveView(module);
-                      setSidebarOpen(false);
-                    }}
-                    className="block w-full text-left py-2 px-3 rounded bg-gray-700 font-semibold hover:bg-gray-600 transition-colors"
-                  >
-                    Week {week}: {moduleTitle}
-                  </button>
-
-                  {Array.isArray(module?.sub_topics) && module.sub_topics.length > 0 && (
-                    <ul className="pl-4 mt-2 mb-4 space-y-1">
-                      {module.sub_topics.map((subTopic: any, subIdx: number) => (
-                        <li key={subIdx}>
-                          <button
-                            onClick={() => {
-                              setActiveView(subTopic);
-                              setSidebarOpen(false);
-                            }}
-                            className="block w-full text-left py-1 px-3 rounded hover:bg-gray-600 transition-colors text-sm"
-                          >
-                            {subTopic.title ?? `Topic ${subIdx + 1}`}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </>
-    );
-  };
-
-  const renderMainContent = () => {
-    if (!activeView) return null;
-
-    // If activeView is the full course object (has course_title and modules array)
-    if (activeView.course_title && Array.isArray(activeView.modules)) {
-      const data: any = activeView;
-      return (
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-3xl font-bold mb-4 text-blue-800">Course Overview: {data.course_title}</h2>
-          {data.description && typeof data.description === "string" && (
-            <p className="text-lg text-gray-600 mb-4">{data.description}</p>
-          )}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {data.modules.map((mod: any, idx: number) => (
-              <div key={idx} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                <h3 className="font-semibold text-lg text-gray-800">Week {mod.week ?? idx + 1}: {mod.title}</h3>
-                <p className="text-sm text-gray-600 mt-2">{Array.isArray(mod.sub_topics) ? `${mod.sub_topics.length} topics` : "No topics"}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    // If activeView is a module object (has sub_topics)
-    if (Array.isArray(activeView?.sub_topics)) {
-      const mod: any = activeView;
-      return (
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-3xl font-bold mb-6 text-blue-800">Week {mod.week ?? ""}: {mod.title}</h2>
-          {mod.sub_topics.map((st: any, i: number) => (
-            <div key={i} className="mt-6 p-6 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-              <h3 className="text-2xl font-semibold text-blue-700 mb-4">{st.title}</h3>
-              <div
-                className="prose max-w-none text-gray-800"
-                dangerouslySetInnerHTML={{ __html: formatContent(typeof st.content === "string" ? st.content : JSON.stringify(st.content ?? {}, null, 2)) }}
-              />
-            </div>
-          ))}
-        </div>
-      );
-    }
-
-    // Otherwise it's a sub-topic or plain content object
-    const sub: any = activeView;
-    const bodyHtml = typeof sub.content === "string" ? formatContent(sub.content) : formatContent(JSON.stringify(sub, null, 2));
-    return (
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-3xl font-bold mb-6 text-blue-800">{sub.title ?? "Topic"}</h2>
-        <div className="prose max-w-none text-gray-800" dangerouslySetInnerHTML={{ __html: bodyHtml }} />
-      </div>
-    );
-  };
-
   const handleStartClass = () => {
     if (!courseId) return;
     if (!AVI_BASE) {
       alert("Start URL is not configured. Please set VITE_AVI_URL in .env");
       return;
     }
-    // Ensure trailing slash handling and pass return URL
     const base = AVI_BASE.replace(/\/$/, "");
     const returnUrl = window.location.href;
     const target = `${base}/?courseId=${encodeURIComponent(String(courseId))}&return=${encodeURIComponent(returnUrl)}`;
@@ -230,23 +170,17 @@ export default function CoursePage() {
       const res = await fetch(`${apiBase}/api/quiz/generate-course`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          quiz_type: "course",
-          course_id: String(courseId),
-          module_week: 0,
-        }),
+        body: JSON.stringify({ quiz_type: "course", course_id: String(courseId), module_week: 0 }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         throw new Error(data?.error || "Failed to generate quiz");
       }
-      // Persist quiz for the quiz page and navigate to it
       const quiz = data?.quiz;
       const quizId = quiz?.quiz_id;
       if (quiz && quizId) {
         try {
           localStorage.setItem(`quiz:${quizId}`, JSON.stringify(quiz));
-          // Persist mapping so course page can show "View Quiz"
           localStorage.setItem(`course:${String(courseId)}:lastQuizId`, String(quizId));
           setLastQuizId(String(quizId));
         } catch {}
@@ -259,6 +193,138 @@ export default function CoursePage() {
     } finally {
       setQuizLoading(false);
     }
+  };
+
+  const renderCourseOverview = () => {
+    if (!course) return null;
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-3xl font-bold mb-4 text-blue-800">Course Overview: {course.course_title}</h2>
+        {course.description && typeof course.description === "string" && (
+          <p className="text-lg text-gray-600 mb-6">{course.description}</p>
+        )}
+
+        <div className="space-y-4">
+          {Array.isArray(course.modules) &&
+            course.modules.map((mod: any, idx: number) => {
+              const isActive = activeView?.week === mod.week && activeView?.title === mod.title;
+              const week = Number(mod?.week ?? idx + 1);
+              const weekKey = String(week);
+              const existingQuizId = moduleQuizIds[weekKey];
+              const loading = !!moduleQuizLoading[weekKey];
+              return (
+                <div key={idx} className="border rounded-lg overflow-hidden shadow-sm">
+                  <button
+                    onClick={() => setActiveView(isActive ? course : mod)}
+                    className="w-full flex justify-between items-center p-4 bg-gray-100 hover:bg-gray-200 transition"
+                  >
+                    <span className="font-semibold text-lg text-gray-800">
+                      Week {week}: {mod.title}
+                    </span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className={`h-5 w-5 transform transition-transform ${isActive ? "rotate-180" : ""}`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+
+                  {isActive && (
+                    <div className="p-6 bg-white">
+                      <div className="flex justify-between items-center mb-4">
+                        <div className="flex gap-2">
+                          {role === "teacher" && (
+                            existingQuizId ? (
+                              <Button
+                                onClick={() =>
+                                  navigate(`/course/${encodeURIComponent(String(courseId))}/quiz/${encodeURIComponent(String(existingQuizId))}`)
+                                }
+                                className="bg-black text-white hover:bg-gray-900"
+                                disabled={loading}
+                              >
+                                View Quiz (Week {week})
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={() => handleGenerateModuleQuiz(week)}
+                                disabled={loading}
+                                className="bg-black text-white hover:bg-gray-900"
+                              >
+                                {loading ? "Generating..." : `Generate Module Quiz (Week ${week})`}
+                              </Button>
+                            )
+                          )}
+                        </div>
+                        <Button variant="outline" size="sm" onClick={() => setActiveView(course)}>Close</Button>
+                      </div>
+                      {Array.isArray(mod.sub_topics) && mod.sub_topics.length > 0 ? (
+                        mod.sub_topics.map((st: any, i: number) => (
+                          <div key={i} className="mt-6 p-6 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <h3 className="text-2xl font-semibold text-blue-700 mb-4">{st.title}</h3>
+                            <div
+                              className="prose max-w-none text-gray-800"
+                              dangerouslySetInnerHTML={{ __html: formatContent(typeof st.content === "string" ? st.content : JSON.stringify(st.content ?? {}, null, 2)) }}
+                            />
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-gray-600">No topics available.</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+        </div>
+      </div>
+    );
+  };
+
+  const renderModuleFull = (mod: any) => {
+    const week = Number(mod?.week ?? 0);
+    const weekKey = String(week);
+    const existingQuizId = moduleQuizIds[weekKey];
+    const loading = !!moduleQuizLoading[weekKey];
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-bold text-blue-800">Week {mod.week ?? ""}: {mod.title}</h2>
+          <div className="flex items-center gap-3">
+            {role === "teacher" && (
+              existingQuizId ? (
+                <Button
+                  onClick={() =>
+                    navigate(`/course/${encodeURIComponent(String(courseId))}/quiz/${encodeURIComponent(String(existingQuizId))}`)
+                  }
+                  className="bg-black text-white hover:bg-gray-900"
+                  disabled={loading}
+                >
+                  View Quiz (Week {week})
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => handleGenerateModuleQuiz(week)}
+                  disabled={loading}
+                  className="bg-black text-white hover:bg-gray-900"
+                >
+                  {loading ? "Generating..." : `Generate Module Quiz (Week ${week})`}
+                </Button>
+              )
+            )}
+            <Button variant="outline" size="sm" onClick={() => setActiveView(course)}>Close</Button>
+          </div>
+        </div>
+        {mod.sub_topics.map((st: any, i: number) => (
+          <div key={i} className="mt-6 p-6 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
+            <h3 className="text-2xl font-semibold text-blue-700 mb-4">{st.title}</h3>
+            <div className="prose max-w-none text-gray-800" dangerouslySetInnerHTML={{ __html: formatContent(typeof st.content === "string" ? st.content : JSON.stringify(st.content ?? {}, null, 2)) }} />
+          </div>
+        ))}
+      </div>
+    );
   };
 
   if (loading) {
@@ -284,63 +350,46 @@ export default function CoursePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900">
       <AuthNavbar />
-      <div className="flex h-screen overflow-hidden">
-        {/* Sidebar */}
-        <aside
-          id="sidebar"
-          className={`bg-gray-800 text-white w-80 min-w-[280px] flex flex-col p-4 transform ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 fixed md:relative top-0 left-0 h-full z-30 transition-transform`}
-        >
-          {renderSidebar()}
-        </aside>
-
-        {/* Main */}
-        <main className="flex-1 flex flex-col overflow-hidden">
-          <header className="bg-white shadow-md p-4 flex items-center justify-between">
-            <div className="flex items-center">
-              <button
-                id="burgerMenu"
-                onClick={() => setSidebarOpen((v) => !v)}
-                className="md:hidden mr-4 text-gray-600 p-2 rounded hover:bg-gray-100 transition"
-                aria-label="Toggle menu"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={sidebarOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"} />
-                </svg>
-              </button>
-
-              <h1 id="courseTitle" className="text-2xl font-bold text-gray-800">{course?.course_title ?? "Course"}</h1>
-            </div>
-
-            <div className="flex items-center gap-3">
-              {/* <Link href="/courses"><Button variant="secondary">Back to Courses</Button></Link> */}
-              {role === "teacher" ? (
-                lastQuizId ? (
-                  <Button
-                    onClick={() =>
-                      navigate(`/course/${encodeURIComponent(String(courseId))}/quiz/${encodeURIComponent(String(lastQuizId))}`)
-                    }
-                    className="bg-black text-white hover:bg-gray-900"
-                  >
-                    View Quiz
-                  </Button>
-                ) : (
-                  <Button onClick={handleGenerateQuiz} disabled={quizLoading} className="bg-black text-white hover:bg-gray-900">
-                    {quizLoading ? "Generating..." : "Generate Quiz"}
-                  </Button>
-                )
-              ) : (
-                <Button onClick={handleStartClass} className="bg-black text-white hover:bg-gray-900">
-                  Start Class
-                </Button>
-              )}
-            </div>
-          </header>
-
-          <div id="mainContent" className="flex-1 p-8 overflow-y-auto">
-            {renderMainContent()}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <header className="bg-white shadow-md p-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <h1 id="courseTitle" className="text-2xl font-bold text-gray-800">{course?.course_title ?? "Course"}</h1>
           </div>
-        </main>
-      </div>
+          <div className="flex items-center gap-3">
+            <Link href="/courses">
+              <Button variant="secondary" className="flex items-center gap-2 hover:scale-110">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M12.707 15.707a1 1 0 01-1.414 0l-5-5a1 1 0 010-1.414l5-5a1 1 0 111.414 1.414L8.414 9H17a1 1 0 110 2H8.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+                </svg>
+                Back to Courses
+              </Button>
+            </Link>
+            {role === "teacher" ? (
+              lastQuizId ? (
+                <Button onClick={() => navigate(`/course/${encodeURIComponent(String(courseId))}/quiz/${encodeURIComponent(String(lastQuizId))}`)} className="bg-black text-white hover:bg-gray-900">View Quiz</Button>
+              ) : (
+                <Button onClick={handleGenerateQuiz} disabled={quizLoading} className="bg-black text-white hover:bg-gray-900">{quizLoading ? "Generating..." : "Generate Quiz"}</Button>
+              )
+            ) : (
+              <Button onClick={handleStartClass} className="bg-black text-white hover:bg-gray-900">Start Class</Button>
+            )}
+          </div>
+        </header>
+
+        <div id="mainContent" className="flex-1 p-8 overflow-y-auto">
+          {activeView && activeView.course_title && Array.isArray(activeView.modules) && renderCourseOverview()}
+          {activeView && Array.isArray(activeView.sub_topics) && renderModuleFull(activeView)}
+          {activeView && !activeView.course_title && !Array.isArray(activeView.sub_topics) && (
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-3xl font-bold text-blue-800">{activeView.title ?? "Topic"}</h2>
+                <Button variant="outline" size="sm" onClick={() => setActiveView(course)}>Close</Button>
+              </div>
+              <div className="prose max-w-none text-gray-800" dangerouslySetInnerHTML={{ __html: formatContent(typeof activeView.content === "string" ? activeView.content : JSON.stringify(activeView, null, 2)) }} />
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }

@@ -25,6 +25,9 @@ export default function CourseQuizPage() {
 
   const [quiz, setQuiz] = useState<QuizPayload | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [regenLoading, setRegenLoading] = useState(false);
+  const [quizKind, setQuizKind] = useState<"course" | "module" | null>(null);
+  const [moduleWeek, setModuleWeek] = useState<number | null>(null);
 
   useEffect(() => {
     try {
@@ -36,16 +39,105 @@ export default function CourseQuizPage() {
       }
       const parsed = JSON.parse(raw) as QuizPayload;
       setQuiz(parsed);
-      // Persist mapping for course -> lastQuizId for course page CTA state
-      if (courseId && quizId) {
-        try {
-          localStorage.setItem(`course:${String(courseId)}:lastQuizId`, String(quizId));
-        } catch {}
-      }
     } catch (e: any) {
       setError(e?.message || "Failed to load quiz");
     }
+  }, [quizId]);
+
+  // Detect whether the current quiz is course-level or module-level by checking localStorage mappings
+  useEffect(() => {
+    try {
+      if (!courseId || !quizId) return;
+      // 1) Prefer module mapping if any maps to this quizId
+      let foundWeek: number | null = null;
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        const prefix = `course:${courseId}:module:`;
+        if (key.startsWith(prefix) && key.endsWith(":lastQuizId")) {
+          const val = localStorage.getItem(key);
+          if (val === quizId) {
+            const between = key.substring(prefix.length, key.length - ":lastQuizId".length);
+            const weekNum = Number(between.replace(/:/g, ""));
+            if (!Number.isNaN(weekNum)) {
+              foundWeek = weekNum;
+              break;
+            }
+          }
+        }
+      }
+      if (foundWeek != null) {
+        setQuizKind("module");
+        setModuleWeek(foundWeek);
+        return;
+      }
+      // 2) Otherwise, check course-level mapping
+      const courseLast = localStorage.getItem(`course:${courseId}:lastQuizId`);
+      if (courseLast && courseLast === quizId) {
+        setQuizKind("course");
+        setModuleWeek(null);
+        return;
+      }
+      setQuizKind(null);
+      setModuleWeek(null);
+    } catch {}
   }, [courseId, quizId]);
+
+  const handleRegenerate = async () => {
+    if (!courseId || !quizKind) return;
+    try {
+      setRegenLoading(true);
+      const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
+      if (!apiBase) throw new Error("Missing VITE_API_BASE in environment");
+      let url = "";
+      let payload: any = {};
+      if (quizKind === "course") {
+        url = `${apiBase.replace(/\/$/, "")}/api/quiz/generate-course`;
+        payload = {
+          quiz_type: "course",
+          course_id: String(courseId),
+          module_week: 0,
+        };
+      } else {
+        if (moduleWeek == null) throw new Error("Module week not found for this quiz");
+        url = `${apiBase.replace(/\/$/, "")}/api/quiz/generate-module`;
+        payload = {
+          quiz_type: "module",
+          course_id: String(courseId),
+          module_week: moduleWeek,
+        };
+      }
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data?.error || "Failed to regenerate quiz");
+
+      const newQuiz = data?.quiz;
+      const newQuizId = newQuiz?.quiz_id;
+      if (newQuiz && newQuizId) {
+        try {
+          localStorage.setItem(`quiz:${newQuizId}`, JSON.stringify(newQuiz));
+          if (quizKind === "course") {
+            localStorage.setItem(`course:${String(courseId)}:lastQuizId`, String(newQuizId));
+          } else if (moduleWeek != null) {
+            localStorage.setItem(`course:${String(courseId)}:module:${String(moduleWeek)}:lastQuizId`, String(newQuizId));
+          }
+        } catch {}
+        // Navigate to the regenerated quiz
+        window.location.href = `/course/${encodeURIComponent(String(courseId))}/quiz/${encodeURIComponent(String(newQuizId))}`;
+        return;
+      }
+      throw new Error("Regenerated quiz, but no quiz payload was returned");
+    } catch (e: any) {
+      setError(e?.message || "Failed to regenerate quiz");
+    } finally {
+      setRegenLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900">
@@ -63,6 +155,11 @@ export default function CourseQuizPage() {
               <Link href={`/course/${encodeURIComponent(courseId)}`}>
                 <Button variant="secondary">Back to Course</Button>
               </Link>
+            )}
+            {(quizKind === "course" || quizKind === "module") && (
+              <Button onClick={handleRegenerate} disabled={regenLoading} className="bg-black text-white hover:bg-gray-900">
+                {regenLoading ? "Regenerating..." : "Regenerate Quiz"}
+              </Button>
             )}
           </div>
         </div>

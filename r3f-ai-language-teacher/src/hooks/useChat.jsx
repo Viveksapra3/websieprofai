@@ -32,7 +32,9 @@ export const ChatProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('disconnected'); // 'connected', 'connecting', 'disconnected', 'reconnecting'
   const [audioChunks, setAudioChunks] = useState([]);
-  const [chatHistory, setChatHistory] = useState([]); // For Experience component chat display
+  const [chatHistory, setChatHistory] = useState([
+    { role: 'assistant', text: 'Hello! How can I assist you today?' }
+  ]); // For Experience component chat display
   const wsRef = useRef(null);
   const reconnectAttemptsRef = useRef(0);
   const maxReconnectAttempts = 5;
@@ -86,7 +88,7 @@ export const ChatProvider = ({ children }) => {
         // Initialize message data for streaming
         currentMessageDataRef.current = {
           text: data.text || '',
-          animation: data.animation || 'Talking_1',
+          animation: data.animation || 'Idle',
           facialExpression: data.facialExpression || 'smile',
           audioChunks: [],
           lipsync: null,
@@ -100,7 +102,7 @@ export const ChatProvider = ({ children }) => {
           if (!currentMessageDataRef.current) {
             currentMessageDataRef.current = {
               text: data.text,
-              animation: data.animation || 'Talking_1',
+              animation: data.animation || 'Idle',
               facialExpression: data.facialExpression || 'smile',
               audioChunks: [],
               lipsync: null,
@@ -117,7 +119,7 @@ export const ChatProvider = ({ children }) => {
           if (!data.hasAudio && !data.audio_generation_started) {
             const textOnlyMessage = {
               text: data.text,
-              animation: "Talking_1",
+              animation: "Idle",
               facialExpression: data.facialExpression || 'smile',
               lipsync: null,
               audio: null,
@@ -168,7 +170,7 @@ export const ChatProvider = ({ children }) => {
       console.log('🎵 Initializing message data for audio chunk');
       currentMessageDataRef.current = {
         text: '',
-        animation: "Talking_1",
+        animation: "Idle",
         facialExpression: 'smile',
         audioChunks: [],
         lipsync: null,
@@ -198,7 +200,7 @@ export const ChatProvider = ({ children }) => {
     const chunkMessage = {
       type: 'audio_chunk',
       text: currentMessageDataRef.current.text,
-      animation: "Talking_1",
+      animation: "Idle",
       facialExpression: currentMessageDataRef.current.facialExpression || 'smile',
       audio: data.audio_data,
       lipsync: chunkLipsync,

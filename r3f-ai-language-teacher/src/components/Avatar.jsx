@@ -494,7 +494,7 @@ export function Avatar(props) {
   useEffect(() => {
     if (!message) {
       setAnimation("Idle");
-      setFacialExpression("");
+      setFacialExpression("smile");
       setLipsync(null);
       setAudio(null);
       return;

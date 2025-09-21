@@ -55,7 +55,7 @@ export const MessagesList = () => {
           <h2 className="text-8xl font-bold text-white/90 italic">
             Professor AI
             <br />
-            Your personal Teacher
+            Virtual Teaching Assistant
           </h2>
           <h2 className="text-8xl font-bold font-jp text-red-600/90 italic">
             

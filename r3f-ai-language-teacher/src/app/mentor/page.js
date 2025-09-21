@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { SessionGate } from "@/components/SessionGate";
 
 // Resolve backend API base URL (NEXT_PUBLIC_NEXT_BACK_API) with safe local fallback
@@ -22,6 +23,7 @@ const LANGUAGE_OPTIONS = [
 ];
 
 export default function MentorPage() {
+  const router = useRouter();
   const [latestResult, setLatestResult] = useState(null);
   const [messages, setMessages] = useState([
     { id: 1, role: "assistant", text: "Hi! I'm your mentor. How can I help you today?" },
@@ -112,6 +114,29 @@ export default function MentorPage() {
     inputRef.current?.focus();
   }
 
+  function handleBackNavigation() {
+    try {
+      // Check if there's an active course ID and return URL in sessionStorage
+      const activeCourseId = sessionStorage.getItem("activeCourseId");
+      const returnUrl = sessionStorage.getItem("returnUrl");
+      
+      if (activeCourseId) {
+        // Navigate to the authenticated session page with courseId parameter
+        const params = new URLSearchParams({ courseId: activeCourseId });
+        if (returnUrl) {
+          params.set("return", returnUrl);
+        }
+        router.push(`/?${params.toString()}`);
+      } else {
+        // No active course, just go to the main page
+        router.push("/");
+      }
+    } catch (error) {
+      // Fallback to main page if sessionStorage access fails
+      router.push("/");
+    }
+  }
+
   return (
     <SessionGate>
     <div className="min-h-screen w-full bg-slate-950 text-white">
@@ -119,7 +144,12 @@ export default function MentorPage() {
       <div className="sticky top-0 z-20 border-b border-white/10 bg-slate-950/70 backdrop-blur">
         <div className="mx-auto max-w-7xl px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Link href="/" className="text-sm text-white/80 hover:text-white">← Back</Link>
+            <button 
+              onClick={handleBackNavigation}
+              className="text-sm text-white/80 hover:text-white cursor-pointer"
+            >
+              ← Back
+            </button>
             <div className="text-lg font-semibold">Mentor</div>
           </div>
           <div className="text-xs text-white/60">Live guidance & Q&A</div>

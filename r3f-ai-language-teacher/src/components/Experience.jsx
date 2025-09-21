@@ -54,6 +54,12 @@ export const Experience = () => {
   // Chat UI state
   const [selectedLanguage, setSelectedLanguage] = useState("en-IN");
   const [question, setQuestion] = useState("");
+  const [isChatVisible, setIsChatVisible] = useState(true);
+  const [isRecording, setIsRecording] = useState(false);
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [coursesLoading, setCoursesLoading] = useState(false);
 
   const selectedLanguageLabel = useMemo(() => {
     return SUPPORTED_LANGUAGES.find((l) => l.code === selectedLanguage)?.name || "English";
@@ -74,21 +80,176 @@ export const Experience = () => {
     }
   };
 
+  // // Fetch courses and user session on component mount
+  // useEffect(() => {
+  //   const fetchCoursesAndSession = async () => {
+  //     setCoursesLoading(true);
+  //     try {
+  //       const apiBase = process.env.NEXT_PUBLIC_NEXT_WEB_API || 'http://localhost:3000';
+        
+  //       // First, get user session to get course ID
+  //       const sessionResponse = await fetch(`${apiBase}/api/session`, { 
+  //         credentials: 'include' 
+  //       });
+        
+  //       if (sessionResponse.ok) {
+  //         const sessionData = await sessionResponse.json();
+  //         const userCourseId = sessionData?.user?.courseId;
+          
+  //         if (userCourseId) {
+  //           // Fetch the specific course for this user
+  //           const courseResponse = await fetch(`${apiBase}/api/course/${userCourseId}`, {
+  //             credentials: 'include'
+  //           });
+            
+  //           if (courseResponse.ok) {
+  //             const courseData = await courseResponse.json();
+  //             setCourses([courseData]); // Set as array with single course
+  //             setSelectedCourse(courseData); // Auto-select the user's course
+  //           }
+  //         } else {
+  //           // Fallback: fetch all courses if no specific course ID in session
+  //           const coursesResponse = await fetch(`${apiBase}/api/courses`, {
+  //             credentials: 'include'
+  //           });
+            
+  //           if (coursesResponse.ok) {
+  //             const coursesData = await coursesResponse.json();
+  //             setCourses(coursesData);
+  //           }
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching courses and session:', error);
+  //     } finally {
+  //       setCoursesLoading(false);
+  //     }
+  //   };
+
+  //   fetchCoursesAndSession();
+  // }, []);
+
+  // // Fetch course details when a course is selected (if not already loaded)
+  // useEffect(() => {
+  //   if (selectedCourse && selectedCourse.id && !selectedCourse.modules) {
+  //     const fetchCourseDetails = async () => {
+  //       try {
+  //         const apiBase = process.env.NEXT_PUBLIC_NEXT_WEB_API || 'http://localhost:3000';
+  //         const response = await fetch(`${apiBase}/api/course/${selectedCourse.id}`, {
+  //           credentials: 'include'
+  //         });
+  //         if (response.ok) {
+  //           const courseDetails = await response.json();
+  //           setSelectedCourse(courseDetails);
+  //         }
+  //       } catch (error) {
+  //         console.error('Error fetching course details:', error);
+  //       }
+  //     };
+
+  //     fetchCourseDetails();
+  //   }
+  // }, [selectedCourse]);
+
+  // Voice recording functions using Web Speech API
+  const startRecording = async () => {
+    try {
+      // Check if Web Speech API is supported
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Speech recognition not supported in this browser. Please use Chrome or Edge.');
+        return;
+      }
+
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = selectedLanguage || 'en-US';
+
+      recognition.onstart = () => {
+        setIsRecording(true);
+        console.log('Speech recognition started');
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        console.log('Speech recognition result:', transcript);
+        setQuestion(transcript);
+        setIsRecording(false);
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsRecording(false);
+        alert(`Speech recognition error: ${event.error}`);
+      };
+
+      recognition.onend = () => {
+        console.log('Speech recognition ended');
+        setIsRecording(false);
+      };
+
+      // Start recognition
+      recognition.start();
+      setMediaRecorder(recognition);
+    } catch (error) {
+      console.error('Error starting speech recognition:', error);
+      alert('Could not start speech recognition. Please check permissions.');
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && typeof mediaRecorder.stop === 'function') {
+      mediaRecorder.stop();
+      setIsRecording(false);
+      setMediaRecorder(null);
+    }
+  };
+
+
   return (
     <>
-      {/* <CourseDropdown /> */}
+      <CourseDropdown />
+
+      {/* Chat toggle button (when hidden) */}
+      {!isChatVisible && (
+        <button
+          onClick={() => setIsChatVisible(true)}
+          className="fixed top-4 right-4 z-20 bg-blue-500/80 hover:bg-blue-500 text-white p-3 rounded-full shadow-lg backdrop-blur-sm border border-white/20 transition-all"
+          title="Show Chat"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-3.582 8-8 8a8.955 8.955 0 01-4.126-.98L3 21l1.98-5.874A8.955 8.955 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z" />
+          </svg>
+        </button>
+      )}
+
       {/* Right sidebar: Language select, Chat history, and Input */}
-      <div className="z-10 fixed top-0 right-0 h-screen w-full sm:w-[380px] md:w-[420px] flex">
-        <div className="flex h-full w-full flex-col bg-white/10 border-l border-white/20 backdrop-blur-md shadow-xl">
-          {/* Controls row */}
-          <div className="p-4 border-b border-white/10">
-            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-              <div className="flex items-center gap-2">
-                <label className="text-white/80 text-sm">Language:</label>
-                <select
-                  className="bg-slate-900/60 text-white px-3 py-2 rounded-md border border-white/20"
-                  value={selectedLanguage}
-                  onChange={(e) => setSelectedLanguage(e.target.value)}
+      {isChatVisible && (
+        <div className="z-10 fixed top-4 right-4 bottom-4 w-full sm:w-[380px] md:w-[420px] flex">
+          <div className="flex h-full w-full flex-col bg-gradient-to-tr from-slate-600 via-gray-600 to-slate-600 border border-slate-100 shadow-xl rounded-xl">
+            {/* Controls row with hide button */}
+            <div className="p-4 border-b border-white/10">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-white/90 text-lg font-semibold">Chat</h3>
+                <button
+                  onClick={() => setIsChatVisible(false)}
+                  className="text-white/60 hover:text-white/90 p-1 rounded transition-colors"
+                  title="Hide Chat"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <label className="text-white/80 text-sm">Language:</label>
+                  <select
+                    className="bg-slate-900/60 text-white px-3 py-2 rounded-md border border-white/20"
+                    value={selectedLanguage}
+                    onChange={(e) => setSelectedLanguage(e.target.value)}
                 >
                   {SUPPORTED_LANGUAGES.map((lang) => (
                     <option key={lang.code} value={lang.code}>
@@ -99,7 +260,6 @@ export const Experience = () => {
                 {/* <span className="text-xs text-white/60">Selected: {selectedLanguageLabel}</span> */}
               </div>
               <div className="text-xs text-white/60 hidden sm:block">
-                Disclaimer: Enter minimum 5 words.
               </div>
             </div>
           </div>
@@ -130,6 +290,27 @@ export const Experience = () => {
 
           {/* Input row (sticks to bottom) */}
           <div className="p-3 flex gap-2 items-center">
+            {/* Microphone button */}
+            <button
+              className={`p-2 rounded-full border border-white/20 transition-all ${
+                isRecording 
+                  ? "bg-red-500/80 text-white animate-pulse" 
+                  : "bg-slate-800/60 text-white/70 hover:text-white hover:bg-slate-700/60"
+              }`}
+              onClick={isRecording ? stopRecording : startRecording}
+              title={isRecording ? "Stop Recording" : "Start Voice Recording"}
+            >
+              {isRecording ? (
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M6 6h12v12H6z"/>
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+              )}
+            </button>
+            
             <input
               className="flex-grow bg-slate-800/60 p-2 px-4 rounded-full text-white placeholder:text-white/50 shadow-inner shadow-slate-900/60 focus:outline focus:outline-white/60"
               placeholder="Type your question..."
@@ -146,8 +327,9 @@ export const Experience = () => {
               {loading ? "Sending..." : "Ask"}
             </button>
           </div>
+          </div>
         </div>
-      </div>
+      )}
       <Leva hidden={true}   />
       <Loader />
       <Canvas
@@ -162,25 +344,43 @@ export const Experience = () => {
 
         <Suspense>
           <Float speed={1} floatIntensity={0.2} rotationIntensity={0}>
-            <Html
+            {/* Logo anchored to the board position and lifted above it */}
+            <group {...itemPlacement[classroom].board}>
+              <Html
+                transform
+                position={[0, .85, 0]}
+                distanceFactor={1}
+                zIndexRange={[100, 100]}
+                scale={1.3}
+                style={{ pointerEvents: 'none' }}
+              >
+                <img
+                  src="/prof-ai-logo_1755775207766.avif"
+                  alt="professor ai logo"
+                  className="h-12 sm:h-16 object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)] select-none"
+                />
+              </Html>
+            </group>
+            {/* <Html
               transform
+              position={[0, 1, 0]}
               {...itemPlacement[classroom].board}
               distanceFactor={1}
             >
               <MessagesList />
-              {/* <BoardSettings /> */}
-            </Html>
+              <BoardSettings />
+            </Html> */}
             
             {/* LastChat positioned on the right side */}
-            <Html
-              position={[0, 0, 0]}
+            {/* <Html
+              position={[0, 1, 0]}
               transform
               distanceFactor={1}
             >
               <div style={{ width: '300px' }}>
-                {/* <LastChat /> */}
+                <LastChat />
               </div>
-            </Html>
+            </Html> */}
             <Environment preset="sunset" background={false}/>
             <ambientLight intensity={0.8} color="pink" />
 
@@ -198,9 +398,9 @@ export const Experience = () => {
           </Float>
           
           {/* Avatar outside Float to prevent animation conflicts */}
-          <Avatar position={[-1,-1.2,-1.2]}
+          <Avatar position={[0,-1.3,-0.7]}
           scale={0.85}
-          rotation-y={degToRad(38)}
+          rotation-y={degToRad(0)}
           />
         </Suspense>
       </Canvas>
@@ -209,7 +409,7 @@ export const Experience = () => {
 };
 
 const CAMERA_POSITIONS = {
-  default: [0, 6.123233995736766e-21, 0.0001],
+  default: [2, 6.123233995736766e-21, 0.0001],
   loading: [
     0.00002621880610890309, 0.00000515037441056466, 0.00009636414192870058,
   ],

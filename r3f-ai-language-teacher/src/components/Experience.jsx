@@ -44,95 +44,79 @@ const itemPlacement = {
   },
 };
 
-import { useChat } from "@/hooks/useChat";
-
-// Language options: code -> display label
-const LANGUAGE_OPTIONS = [
-  { code: "en", label: "English" },
-  { code: "ja", label: "Japanese" },
-  { code: "es", label: "Spanish" },
-  { code: "fr", label: "French" },
-  { code: "de", label: "German" },
-  { code: "hi", label: "Hindi" },
-  { code: "zh", label: "Chinese (Mandarin)" },
-  { code: "ko", label: "Korean" },
-  { code: "it", label: "Italian" },
-  { code: "pt", label: "Portuguese" },
-];
+import { useChat, SUPPORTED_LANGUAGES } from "@/hooks/useChat";
 
 export const Experience = () => {
   const teacher = useAITeacher((state) => state.teacher);
   const classroom = useAITeacher((state) => state.classroom);
-  const { chat, loading } = useChat();
+  const { chat, loading, chatHistory, setChatHistory } = useChat();
 
   // Chat UI state
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const [selectedLanguage, setSelectedLanguage] = useState("en-IN");
   const [question, setQuestion] = useState("");
-  const [history, setHistory] = useState([]); // {role: 'user' | 'assistant', text: string}
 
   const selectedLanguageLabel = useMemo(() => {
-    return LANGUAGE_OPTIONS.find((l) => l.code === selectedLanguage)?.label || "English";
+    return SUPPORTED_LANGUAGES.find((l) => l.code === selectedLanguage)?.name || "English";
   }, [selectedLanguage]);
 
   const sendQuestion = async () => {
     const q = question.trim();
     if (!q) return;
-    // show user bubble immediately
-    setHistory((h) => [...h, { role: "user", text: q }]);
+    
     setQuestion("");
-    // call backend via useChat with selected language
-    const replies = await chat(q, selectedLanguage);
-    // append assistant replies for display (support array or single)
-    const assistantTexts = (Array.isArray(replies) ? replies : [replies])
-      .filter(Boolean)
-      .map((m) => (typeof m === "string" ? m : m?.text || m?.content || ""))
-      .filter(Boolean);
-    if (assistantTexts.length) {
-      setHistory((h) => [...h, ...assistantTexts.map((t) => ({ role: "assistant", text: t }))]);
+    
+    // Call backend via useChat with selected language
+    // The chat function now handles adding messages to chatHistory automatically
+    try {
+      await chat(q, selectedLanguage);
+    } catch (error) {
+      console.error('Error sending question:', error);
     }
   };
 
   return (
     <>
       {/* <CourseDropdown /> */}
-      {/* Bottom panel: Language select, Chat history, and Input */}
-      <div className="z-10 fixed bottom-4 left-4 right-4 md:justify-center flex">
-        <div className="w-full max-w-3xl bg-white/10 border border-white/20 backdrop-blur-md rounded-2xl p-4 shadow-xl">
+      {/* Right sidebar: Language select, Chat history, and Input */}
+      <div className="z-10 fixed top-0 right-0 h-screen w-full sm:w-[380px] md:w-[420px] flex">
+        <div className="flex h-full w-full flex-col bg-white/10 border-l border-white/20 backdrop-blur-md shadow-xl">
           {/* Controls row */}
-          <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-            <div className="flex items-center gap-2">
-              <label className="text-white/80 text-sm">Language:</label>
-              <select
-                className="bg-slate-900/60 text-white px-3 py-2 rounded-md border border-white/20"
-                value={selectedLanguage}
-                onChange={(e) => setSelectedLanguage(e.target.value)}
-              >
-                {LANGUAGE_OPTIONS.map((opt) => (
-                  <option key={opt.code} value={opt.code}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-              <span className="text-xs text-white/60">Selected: {selectedLanguageLabel}</span>
-            </div>
-            <div className="text-xs text-white/60 hidden sm:block">
-              Tip: Your questions will be answered in the selected language.
+          <div className="p-4 border-b border-white/10">
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+              <div className="flex items-center gap-2">
+                <label className="text-white/80 text-sm">Language:</label>
+                <select
+                  className="bg-slate-900/60 text-white px-3 py-2 rounded-md border border-white/20"
+                  value={selectedLanguage}
+                  onChange={(e) => setSelectedLanguage(e.target.value)}
+                >
+                  {SUPPORTED_LANGUAGES.map((lang) => (
+                    <option key={lang.code} value={lang.code}>
+                      {lang.name}
+                    </option>
+                  ))}
+                </select>
+                {/* <span className="text-xs text-white/60">Selected: {selectedLanguageLabel}</span> */}
+              </div>
+              <div className="text-xs text-white/60 hidden sm:block">
+                Disclaimer: Enter minimum 5 words.
+              </div>
             </div>
           </div>
 
-          {/* Chat history */}
-          <div className="mt-4 h-56 overflow-y-auto bg-black/20 rounded-lg p-3 border border-white/10">
-            {history.length === 0 ? (
+          {/* Chat history (fills available space) */}
+          <div className="flex-1 overflow-y-auto bg-black/20 p-3 border-b border-white/10">
+            {chatHistory.length === 0 ? (
               <div className="text-white/50 text-sm">No messages yet. Ask something below.</div>
             ) : (
               <div className="flex flex-col gap-2">
-                {history.map((m, idx) => (
+                {chatHistory.map((m, idx) => (
                   <div
                     key={idx}
                     className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     <div
-                      className={`max-w-[75%] px-3 py-2 rounded-xl text-sm shadow border
+                      className={`max-w-[85%] px-3 py-2 rounded-xl text-sm shadow border
                         ${m.role === "user" ? "bg-emerald-500/80 text-white border-emerald-300/30" : "bg-white/10 text-white border-white/10"}
                       `}
                     >
@@ -144,8 +128,8 @@ export const Experience = () => {
             )}
           </div>
 
-          {/* Input row */}
-          <div className="mt-3 flex gap-2 items-center">
+          {/* Input row (sticks to bottom) */}
+          <div className="p-3 flex gap-2 items-center">
             <input
               className="flex-grow bg-slate-800/60 p-2 px-4 rounded-full text-white placeholder:text-white/50 shadow-inner shadow-slate-900/60 focus:outline focus:outline-white/60"
               placeholder="Type your question..."

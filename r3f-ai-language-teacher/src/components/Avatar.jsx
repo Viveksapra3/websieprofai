@@ -493,20 +493,106 @@ export function Avatar(props) {
 
   useEffect(() => {
     if (!message) {
-      // reset to single Idle
       setAnimation("Idle");
-      setFacialExpression("smile");
+      setFacialExpression("");
+      setLipsync(null);
+      setAudio(null);
       return;
     }
-    // message may contain .animation (string or array), .facialExpression, .lipsync, .audio
-    setAnimation(message.animation);
-    setFacialExpression(message.facialExpression);
+    
+    console.log('🎭 Avatar received message:', message);
+    
+    // Handle chunk-based messages (new approach)
+    if (message.isChunk) {
+      console.log('🎵 Processing audio chunk:', message.sequence);
+      
+      // Set animation and expression for this chunk
+      setAnimation(message.animation || "Talking_1");
+      setFacialExpression(message.facialExpression || "smile");
+      setLipsync(message.lipsync);
+      
+      // Play audio chunk immediately
+      if (message.audio) {
+        try {
+          const audio = new Audio("data:audio/mp3;base64," + message.audio);
+          console.log('🔊 Playing audio chunk:', message.sequence);
+          
+          audio.oncanplaythrough = () => {
+            audio.play().catch(e => {
+              console.error('Audio chunk play failed:', e);
+              onMessagePlayed();
+            });
+          };
+          
+          audio.onended = () => {
+            console.log('🔊 Audio chunk ended:', message.sequence);
+            // Don't reset animation/lipsync immediately for chunks
+            // Let the next chunk or completion handle it
+            onMessagePlayed();
+          };
+          
+          audio.onerror = (e) => {
+            console.error('Audio chunk error:', e);
+            onMessagePlayed();
+          };
+          
+          setAudio(audio);
+        } catch (error) {
+          console.error('Error creating audio chunk:', error);
+          onMessagePlayed();
+        }
+      } else {
+        // No audio in this chunk, just update visuals
+        onMessagePlayed();
+      }
+      return;
+    }
+    
+    // Handle complete messages (legacy approach)
+    setAnimation(message.animation || "Talking_1");
+    setFacialExpression(message.facialExpression || "smile");
     setLipsync(message.lipsync);
-    const audio = new Audio("data:audio/mp3;base64," + message.audio);
-    audio.play();
-    setAudio(audio);
-    audio.onended = onMessagePlayed;
-  }, [message]);
+    
+    // Handle audio playback for complete messages
+    if (message.audio && !message.isTextOnly) {
+      try {
+        const audio = new Audio("data:audio/mp3;base64," + message.audio);
+        console.log('🔊 Playing complete audio message');
+        
+        audio.oncanplaythrough = () => {
+          audio.play().catch(e => {
+            console.error('Audio play failed:', e);
+            setTimeout(onMessagePlayed, 2000);
+          });
+        };
+        
+        audio.onended = () => {
+          console.log('🔊 Complete audio ended, calling onMessagePlayed');
+          setAnimation("Idle");
+          setLipsync(null);
+          onMessagePlayed();
+        };
+        
+        audio.onerror = (e) => {
+          console.error('Audio error:', e);
+          setTimeout(onMessagePlayed, 1000);
+        };
+        
+        setAudio(audio);
+      } catch (error) {
+        console.error('Error creating audio:', error);
+        setTimeout(onMessagePlayed, 1000);
+      }
+    } else {
+      // For text-only messages, auto-complete after a short delay
+      console.log('📝 Text-only message, auto-completing');
+      setTimeout(() => {
+        setAnimation("Idle");
+        setLipsync(null);
+        onMessagePlayed();
+      }, 2000);
+    }
+  }, [message, onMessagePlayed]);
 
   const { animations } = useGLTF("/models/animations.glb");
 
@@ -691,21 +777,28 @@ export function Avatar(props) {
     }
 
     const appliedMorphTargets = [];
-    if (message && lipsync && audio) {
+    if (message && lipsync && lipsync.mouthCues && audio && !audio.paused && !audio.ended) {
       const currentAudioTime = audio.currentTime;
+      console.log(`🎵 Lipsync: currentTime=${currentAudioTime.toFixed(2)}s, mouthCues=${lipsync.mouthCues.length}`);
+      
       for (let i = 0; i < lipsync.mouthCues.length; i++) {
         const mouthCue = lipsync.mouthCues[i];
         if (
           currentAudioTime >= mouthCue.start &&
           currentAudioTime <= mouthCue.end
         ) {
-          appliedMorphTargets.push(corresponding[mouthCue.value]);
-          lerpMorphTarget(corresponding[mouthCue.value], 1, 0.2);
+          const viseme = corresponding[mouthCue.value];
+          if (viseme) {
+            appliedMorphTargets.push(viseme);
+            lerpMorphTarget(viseme, 1, 0.2);
+            console.log(`👄 Applying viseme: ${mouthCue.value} -> ${viseme} at ${currentAudioTime.toFixed(2)}s`);
+          }
           break;
         }
       }
     }
 
+    // Reset all mouth shapes that aren't currently active
     Object.values(corresponding).forEach((value) => {
       if (appliedMorphTargets.includes(value)) {
         return;

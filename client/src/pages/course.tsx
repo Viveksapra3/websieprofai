@@ -148,16 +148,88 @@ export default function CoursePage() {
     return formatted;
   };
 
-  const handleStartClass = () => {
-    if (!courseId) return;
-    if (!AVI_BASE) {
-      alert("Start URL is not configured. Please set VITE_AVI_URL in .env");
+  const handleStartClass = async () => {
+    console.log('handleStartClass called with courseId:', courseId);
+    console.log('Current URL params:', params);
+    console.log('AVI_BASE:', AVI_BASE);
+    
+    if (!courseId) {
+      console.error('No courseId available');
+      alert('Course ID is missing. Please refresh the page and try again.');
       return;
     }
-    const base = AVI_BASE.replace(/\/$/, "");
-    const returnUrl = window.location.href;
-    const target = `${base}/?courseId=${encodeURIComponent(String(courseId))}&return=${encodeURIComponent(returnUrl)}`;
-    window.location.href = target;
+    
+    // Use a default URL if VITE_AVI_URL is not set
+    let targetBase = AVI_BASE;
+    if (!targetBase) {
+      // Default to localhost:3001 for the r3f project
+      targetBase = "http://localhost:3001";
+      console.warn('VITE_AVI_URL not set, using default:', targetBase);
+    }
+    
+    try {
+      // Get current session info
+      const authRes = await fetch("/api/session", { credentials: "include" });
+      const authData = await authRes.json();
+      
+      if (!authRes.ok || !authData?.authenticated) {
+        alert("Session expired. Please refresh and try again.");
+        return;
+      }
+      
+      const base = targetBase.replace(/\/$/, "");
+      const returnUrl = window.location.href;
+      
+      // Prepare session transfer data - include both userInfo and sessionToken
+      const userInfo = {
+        id: authData.user?.id,
+        username: authData.user?.username,
+        email: authData.user?.email,
+        role: authData.user?.role
+      };
+      
+      // Create a session token from the current session data
+      const sessionToken = btoa(JSON.stringify({
+        userId: authData.user?.id,
+        timestamp: Date.now(),
+        source: 'profai-coach'
+      }));
+      
+      // Create target URL with session transfer data
+      const params = new URLSearchParams({
+        courseId: String(courseId),
+        userInfo: JSON.stringify(userInfo),
+        sessionToken: sessionToken,
+        return: returnUrl,
+        timestamp: String(Date.now())
+      });
+      
+      const target = `${base}/?${params.toString()}`;
+      
+      console.log('Redirecting to r3f project with session data:', {
+        courseId: String(courseId),
+        userInfo: userInfo,
+        sessionToken: sessionToken.substring(0, 20) + '...',
+        fullTarget: target,
+        params: Object.fromEntries(params.entries())
+      });
+      
+      // Verify courseId is in the URL
+      if (!target.includes(`courseId=${encodeURIComponent(String(courseId))}`)) {
+        console.error('CourseId missing from target URL!', {
+          courseId,
+          target,
+          params: params.toString()
+        });
+        alert('Error: Course ID not properly included in redirect URL. Please try again.');
+        return;
+      }
+      
+      window.location.href = target;
+    } catch (error) {
+      console.error('Error starting class:', error);
+      alert('Failed to start class. Please try again.');
+    }
   };
 
   const [quizLoading, setQuizLoading] = useState(false);

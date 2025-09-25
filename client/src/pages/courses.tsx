@@ -191,13 +191,8 @@ export default function CoursesPage() {
               >
                 {/* Image */}
                 <div className="h-40 bg-gray-100 flex items-center justify-center overflow-hidden">
-                  {c.image ? (
-                    <img src={c.image} alt={c.title} className="object-cover w-full h-full group-hover:scale-105 transition-transform" />
-                  ) : (
-                    <div className="w-16 h-16 flex items-center justify-center rounded-full bg-gradient-to-r from-gray-200 to-gray-300 text-gray-700 font-bold text-lg">
-                      {c.title.slice(0, 1).toUpperCase()}
-                    </div>
-                  )}
+                    <img src={`https://picsum.photos/seed/${encodeURIComponent(c.title)}/800/600`} alt={c.title} className="object-cover w-full h-full group-hover:scale-105 transition-transform" />
+                 
                 </div>
 
                 {/* Content */}

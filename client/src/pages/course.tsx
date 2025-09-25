@@ -204,7 +204,9 @@ export default function CoursePage() {
         timestamp: String(Date.now())
       });
       
-      const target = `${base}/?${params.toString()}`;
+      const targetUrl = new URL(base);
+      targetUrl.search = params.toString();
+      const target = targetUrl.href;
       
       console.log('Redirecting to r3f project with session data:', {
         courseId: String(courseId),
@@ -225,7 +227,7 @@ export default function CoursePage() {
         return;
       }
       
-      window.location.href = target;
+      window.location.assign(target);
     } catch (error) {
       console.error('Error starting class:', error);
       alert('Failed to start class. Please try again.');

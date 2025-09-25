@@ -158,7 +158,7 @@ app.use((req, res, next) => {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
   const port = parseInt(process.env.PORT || "5000", 10);
-  const host = "127.0.0.1";
+  const host = "0.0.0.0";
 
   // Create a single HTTP server so Vite can hook into HMR in development
   const httpServer = createServer(app);

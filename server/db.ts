@@ -7,16 +7,53 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL environment variable is required");
 }
 
-// For local Postgres on localhost:5432, no SSL by default
+// Optimized connection pool for faster database connectivity
 export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: false,
+  // Connection pool optimization
+  min: 2,                    // Minimum connections to keep alive
+  max: 20,                   // Maximum connections in pool
+  idleTimeoutMillis: 30000,  // Close idle connections after 30s
+  connectionTimeoutMillis: 5000, // Timeout for new connections
+  // Performance optimizations
+  keepAlive: true,           // Keep TCP connections alive
+  keepAliveInitialDelayMillis: 10000,
+  // Query optimization
+  statement_timeout: 10000,  // 10 second query timeout
+  query_timeout: 10000,      // 10 second query timeout
 });
 
 export const db = drizzle(pool, { schema });
 
+// Connection monitoring for performance insights
+pool.on('connect', (client) => {
+  console.log(`[DB] New client connected (total: ${pool.totalCount}, idle: ${pool.idleCount})`);
+});
+
+pool.on('error', (err, client) => {
+  console.error('[DB] Unexpected error on idle client', err);
+});
+
 export async function testDbConnection() {
-  await pool.query("select 1");
+  const start = Date.now();
+  try {
+    await pool.query("SELECT 1");
+    const duration = Date.now() - start;
+    console.log(`[DB] Connection test successful in ${duration}ms`);
+  } catch (error) {
+    console.error('[DB] Connection test failed:', error);
+    throw error;
+  }
+}
+
+// Get connection pool stats for monitoring
+export function getPoolStats() {
+  return {
+    totalCount: pool.totalCount,
+    idleCount: pool.idleCount,
+    waitingCount: pool.waitingCount,
+  };
 }
 
 export async function ensureSchema() {

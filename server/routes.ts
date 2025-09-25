@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
-import { db } from "./db";
+import { db, pool } from "./db";
 import { users } from "@shared/schema";
-import { eq, or } from "drizzle-orm";
+import { eq, or, sql } from "drizzle-orm";
 import crypto from "crypto";
 import multer from "multer";
 import path from "path";
@@ -28,6 +28,34 @@ export async function registerRoutes(app: Express): Promise<void> {
     res.json({ status: "ok", message: "API is running" });
   });
 
+  // Database health check with performance metrics
+  app.get("/api/health/db", async (_req: Request, res: Response) => {
+    const start = Date.now();
+    try {
+      await db.execute(sql`SELECT 1`);
+      const duration = Date.now() - start;
+      const poolStats = {
+        totalCount: pool.totalCount,
+        idleCount: pool.idleCount,
+        waitingCount: pool.waitingCount,
+      };
+      res.json({ 
+        status: "ok", 
+        message: "Database is connected",
+        responseTime: `${duration}ms`,
+        connectionPool: poolStats
+      });
+    } catch (error) {
+      const duration = Date.now() - start;
+      res.status(500).json({ 
+        status: "error", 
+        message: "Database connection failed",
+        responseTime: `${duration}ms`,
+        error: (error as Error).message
+      });
+    }
+  });
+
   // --- File uploads (teacher courses) ---
   const __routesDir = path.dirname(fileURLToPath(import.meta.url));
   const uploadsDir = path.resolve(__routesDir, "..", "uploads");
@@ -37,7 +65,12 @@ export async function registerRoutes(app: Express): Promise<void> {
   // Persist uploaded courses metadata to a JSON file inside uploadsDir
   const coursesJsonPath = path.join(uploadsDir, "courses.json");
 
-  function readUploadedCourses(): any[] {
+  // In-memory cache for courses to avoid repeated file I/O
+  let coursesCache: any[] | null = null;
+  let cacheTimestamp = 0;
+  const CACHE_TTL = 30000; // 30 seconds cache
+
+  function readUploadedCoursesFromDisk(): any[] {
     try {
       const raw = fs.readFileSync(coursesJsonPath, "utf-8");
       const parsed = JSON.parse(raw);
@@ -47,9 +80,30 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   }
 
+  function readUploadedCourses(): any[] {
+    const now = Date.now();
+    
+    // Return cached data if it's still fresh
+    if (coursesCache !== null && (now - cacheTimestamp) < CACHE_TTL) {
+      return coursesCache;
+    }
+    
+    // Cache is stale or doesn't exist, read from disk and update cache
+    coursesCache = readUploadedCoursesFromDisk();
+    cacheTimestamp = now;
+    return coursesCache;
+  }
+
+  function invalidateCoursesCache(): void {
+    coursesCache = null;
+    cacheTimestamp = 0;
+  }
+
   function writeUploadedCourses(courses: any[]): void {
     try {
       fs.writeFileSync(coursesJsonPath, JSON.stringify(courses, null, 2), "utf-8");
+      // Invalidate cache after writing new data
+      invalidateCoursesCache();
     } catch (e) {
       // swallow write error; endpoint will still respond with upload info
     }

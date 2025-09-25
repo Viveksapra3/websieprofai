@@ -111,17 +111,12 @@ export default function Navigation() {
                 </HoverCardTrigger>
                 <HoverCardContent className="w-64 bg-black/90 text-white border border-white/20">
                   <div className="space-y-1 text-sm">
-                    {/* <div className="opacity-70">Signed in as</div>
-                    <div className="font-medium">{sessionUser.username}</div>
-                    {sessionUser.email && (
-                      <div className="mt-1 text-white/80">{sessionUser.email}</div>
-                    )} */}
-                    <div className="mt-3">
+                    <div className="mt-1">
                       <Link href="/courses">
                         <Button size="sm" className="w-full">Go to Courses</Button>
                       </Link>
                     </div>
-                    <div className="mt-2">
+                    <div className="mt-1">
                       <Button
                         size="sm"
                         variant="destructive"

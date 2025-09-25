@@ -61,6 +61,9 @@ app.use(
       tableName: "session",
       // create the table automatically if it does not exist
       createTableIfMissing: true as any, // type not in older defs
+      // Performance optimizations for session store
+      pruneSessionInterval: 60 * 15, // Clean up expired sessions every 15 minutes
+      errorLog: (error: Error) => console.error('[Session Store]', error),
     }) as any,
     name: process.env.SESSION_NAME || "sid",
     secret: process.env.SESSION_SECRET || "dev-secret-change-me",

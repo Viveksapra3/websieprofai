@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Unlock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "wouter";
@@ -29,6 +30,7 @@ export default function CoursesPage() {
         }
         setIsTeacher(String(authData?.user?.role || "").toLowerCase() === "teacher");
 
+        // Get external API base URL from environment
         const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
         let normalized: Course[] = [];
 
@@ -66,15 +68,20 @@ export default function CoursesPage() {
           }));
         };
 
+        // Try external API first, fallback to local if needed
         try {
-          if (!apiBase) throw new Error("Missing VITE_API_BASE");
-          normalized = await fetchAndNormalize(`${apiBase}/api/courses`);
+          if (apiBase) {
+            console.log(`[Courses] Fetching from external API: ${apiBase}/api/courses`);
+            normalized = await fetchAndNormalize(`${apiBase}/api/courses`);
+          } else {
+            throw new Error("VITE_API_BASE not configured");
+          }
         } catch (err) {
-          console.warn("Primary API failed, trying fallback /api/courses", err);
+          console.warn("External API failed, trying local fallback:", err);
           try {
             normalized = await fetchAndNormalize(`/api/courses`, { method: "POST", credentials: "include" });
           } catch (err2) {
-            console.error("Fallback API also failed", err2);
+            console.error("Both external and local APIs failed:", err2);
             throw err2;
           }
         }
@@ -165,10 +172,17 @@ export default function CoursesPage() {
             </Select>
           </div>
 
-          {isTeacher && (
+          {isTeacher ? (
             <Link href="/teacher/upload">
               <Button className="bg-black text-white hover:scale-105 hover:bg-gray-900 transition-all">
                 + Add Course
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/unlock-course">
+              <Button className="bg-black text-white hover:scale-105 hover:bg-gray-900 transition-all flex items-center gap-2">
+                <Unlock className="h-4 w-4" />
+                <span>Unlock Course</span>
               </Button>
             </Link>
           )}

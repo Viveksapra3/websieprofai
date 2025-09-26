@@ -2,6 +2,7 @@ node_modules
 dist
 .DS_Store
 .env
+client/.env.production
 server/public
 vite.config.ts.*
 *.tar.gz

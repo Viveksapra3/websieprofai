@@ -172,20 +172,22 @@ export default function CoursesPage() {
             </Select>
           </div>
 
-          {isTeacher ? (
+          {isTeacher && (
             <Link href="/teacher/upload">
               <Button className="bg-black text-white hover:scale-105 hover:bg-gray-900 transition-all">
                 + Add Course
               </Button>
             </Link>
-          ) : (
-            <Link href="/unlock-course">
-              <Button className="bg-black text-white hover:scale-105 hover:bg-gray-900 transition-all flex items-center gap-2">
-                <Unlock className="h-4 w-4" />
-                <span>Unlock Course</span>
-              </Button>
-            </Link>
-          )}
+          ) 
+          // : (
+          //   <Link href="/unlock-course">
+          //     <Button className="bg-black text-white hover:scale-105 hover:bg-gray-900 transition-all flex items-center gap-2">
+          //       <Unlock className="h-4 w-4" />
+          //       <span>Unlock Course</span>
+          //     </Button>
+          //   </Link>
+          // )
+          }
         </div>
 
         {/* Courses Grid */}

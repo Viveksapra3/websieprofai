@@ -75,7 +75,7 @@ export default function Footer() {
         
         <div className="border-t border-gray-700 text-center" data-testid="footer-bottom">
           <p className="text-gray-400" >
-            © 2025 Professor AI. All rights reserved. | {' '}
+            © 2025 Professor AI. All rights reserved @iPredictt Data Labs Pvt. Ltd.| {' '}
             <a href="#" className="hover:text-white transition-colors" data-testid="link-privacy">
               Privacy Policy
             </a>{' '}

@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Play, Video, ChevronDown ,Sparkles} from 'lucide-react';
+import { Link } from 'wouter';
 import courseVideo from '@assets/video (2).mp4';
 import { useTypingAnimation } from '@/hooks/useTypingAnimation';
 
@@ -65,28 +66,31 @@ export default function HeroSection() {
                 Learning Companion
               </div>
             </h1>
-
-            <p className="text-sm xs:text-base sm:text-lg md:text-xl lg:text-2xl text-white text-opacity-90 mb-6 sm:mb-8 drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)] leading-relaxed max-w-3xl mx-auto lg:mx-0" data-testid="hero-description">
+            <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-6 sm:mb-8 max-w-2xl mx-auto lg:mx-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
               Transform your educational experience with Professor AI - an intelligent learning companion that personalizes your training, and becomes your guide, mentor, and coach anytime, anywhere.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center lg:items-start justify-center lg:justify-start">
-              <Button 
-                className="border relative px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold text-sm sm:text-base lg:text-lg transition-all duration-500 transform hover:scale-110 hover:shadow-2xl bg-gradient-to-r from-zinc-900 via-stone-950 to-stone-900 text-white shadow-lg hover:shadow-purple-500/50 overflow-hidden group w-full sm:w-auto"
-                data-testid="button-sign-up"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
-                <span className="relative z-10">Start Learning</span>
-              </Button>
-              <Button 
-                variant="outline"
-                size="lg"
-                className="border-2 border-white text-black bg-white px-6 sm:px-8 py-2.5 sm:py-4 rounded-full font-semibold hover:scale-110 hover:bg-white transition-all text-sm sm:text-base lg:text-lg w-full sm:w-auto"
-                data-testid="button-watch-demo"
-              >
-                <Video className="w-5 h-5 mr-2" />
-                Watch Demo
-              </Button>
+              <Link href="/courses">
+                <Button 
+                  className="border relative px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold text-sm sm:text-base lg:text-lg transition-all duration-500 transform hover:scale-110 hover:shadow-2xl bg-gradient-to-r from-zinc-900 via-stone-950 to-stone-900 text-white shadow-lg hover:shadow-purple-500/50 overflow-hidden group w-full sm:w-auto"
+                  data-testid="button-sign-up"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-300" />
+                  <span className="relative z-10">Start Learning</span>
+                </Button>
+              </Link>
+              <Link href="/how-it-works">
+                <Button 
+                  variant="outline"
+                  size="lg"
+                  className="border-2 border-white text-black bg-white px-6 sm:px-8 py-2.5 sm:py-4 rounded-full font-semibold hover:scale-110 hover:bg-white transition-all text-sm sm:text-base lg:text-lg w-full sm:w-auto"
+                  data-testid="button-watch-demo"
+                >
+                  <Video className="w-5 h-5 mr-2" />
+                  How It Works
+                </Button>
+              </Link>
             </div>
           </div>
           

@@ -16,6 +16,9 @@ import CoursePage from "@/pages/course";
 import TermsPage from "@/pages/terms";
 import CourseQuizPage from "@/pages/course-quiz";
 import UnlockCoursePage from "@/pages/unlock-course";
+import HowItWorks from "@/pages/how-it-works";
+import OrganizationContact from "@/pages/organization-contact";
+import PaymentPage from "@/pages/payment";
 
 function Router() {
   return (
@@ -28,6 +31,10 @@ function Router() {
       <Route path="/post-auth" component={PostAuthPage} />
       <Route path="/courses" component={CoursesPage} />
       <Route path="/teacher/upload" component={TeacherUploadPage} />
+      <Route path="/teacher-upload" component={TeacherUploadPage} />
+      <Route path="/how-it-works" component={HowItWorks} />
+      <Route path="/organization-contact" component={OrganizationContact} />
+      <Route path="/payment" component={PaymentPage} />
       <Route path="/course/:id" component={CoursePage} />
       <Route path="/unlock-course" component={UnlockCoursePage} />
       <Route path="/course/:id/quiz/:quizId" component={CourseQuizPage} />

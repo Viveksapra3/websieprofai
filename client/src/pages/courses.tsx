@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Unlock } from "lucide-react";
@@ -10,6 +11,7 @@ import { AuthNavbar } from "@/components/auth-navbar";
 type Course = { id: string; title: string; level: string; tag?: string; description?: string; image?: string };
 
 export default function CoursesPage() {
+  const [location] = useLocation();
   const [loading, setLoading] = useState(true);
   const [courses, setCourses] = useState<Course[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -17,6 +19,24 @@ export default function CoursesPage() {
 
   const [query, setQuery] = useState("");
   const [levelFilter, setLevelFilter] = useState<"all" | "beginner" | "intermediate" | "advanced">("all");
+
+  // Get course type from URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const courseType = urlParams.get('type');
+  
+  // Determine page title based on course type
+  const getPageTitle = () => {
+    switch (courseType) {
+      case 'undergrad':
+        return 'Undergrad Courses';
+      case 'high-school':
+        return 'High School Courses';
+      case 'skill-development':
+        return 'Skill Development Courses';
+      default:
+        return 'Available Courses';
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -149,7 +169,7 @@ export default function CoursesPage() {
       <div className="max-w-6xl mx-auto py-10 px-4 space-y-8">
         {/* Header + Filters */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <h1 className="text-2xl font-bold text-gray-900">Available Courses</h1>
+          <h1 className="text-2xl font-bold text-gray-900">{getPageTitle()}</h1>
 
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <Input

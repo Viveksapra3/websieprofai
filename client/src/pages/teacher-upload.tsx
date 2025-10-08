@@ -76,13 +76,13 @@ export default function TeacherUploadPage() {
           {/* Header */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center mb-6">
-              <div className="p-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+              {/* <div className="p-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white">
                 <Upload className="w-8 h-8" />
-              </div>
+              </div> */}
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            {/* <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Transform Your Content with AI
-            </h1>
+            </h1> */}
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Upload your PDF materials and let Professor AI create engaging, structured courses automatically.
             </p>

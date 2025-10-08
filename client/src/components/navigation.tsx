@@ -16,7 +16,7 @@ export default function Navigation() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['home', 'features', 'about', 'pricing', 'contact'];
+      const sections = ['home', 'courses', 'avatar-teaching', 'features', 'how-it-works', 'partners', 'about', 'pricing', 'contact'];
       const scrollPosition = window.scrollY + 100;
 
       for (const sectionId of sections) {
@@ -66,9 +66,7 @@ export default function Navigation() {
   const hoverColor = 'hover:text-white';
 
   return (
-    <nav className={`fixed top-2 left-0 right-0 z-50 transition-all duration-300 ${
-      isOnLandingPage ? 'bg-transparent' : 'bg-black/80 backdrop-blur-md shadow-lg'
-    }`} data-testid="main-navigation">
+    <nav className={`fixed top-2 left-0 right-0 z-50 transition-all duration-300 bg-transparent`} data-testid="main-navigation">
       <div className="max-w-10xl mx-auto  px-4 sm:px-6 lg:px-10">
         <div className="flex justify-between items-center py-3 px-6 sm:py-3 bg-black/90 rounded-full">
           <div className="flex items-center" data-testid="logo-brand">
@@ -250,7 +248,7 @@ export default function Navigation() {
                 
                 <Link href="/signin/teacher">
                   <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer border-b border-white/10">
-                    <div className="text-white font-semibold">Academia</div>
+                    <div className="text-white font-semibold">Teacher</div>
                     {/* <div className="text-white/70 text-sm mt-1">Access teaching tools and student management</div> */}
                   </div>
                 </Link>

@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Brain, MessageCircle, Users, Zap, CheckCircle, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import IMGADD from "@assets/prof_action.jpg";
 
 const features = [
   {
@@ -118,18 +119,23 @@ export default function AvatarTeachingSection() {
           >
             {/* Video Container */}
             <div className="relative bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl p-8 shadow-2xl">
-              {/* Placeholder for Avatar Video */}
+              {/* Prof Action Image */}
               <div className="relative bg-black/20 rounded-xl overflow-hidden aspect-video flex items-center justify-center">
-                {/* Video Placeholder */}
-                <div className="absolute inset-0 bg-gradient-to-br from-purple-600/30 to-blue-600/30 flex items-center justify-center">
-                  <div className="text-center text-white">
-                    <div className="w-24 h-24 mx-auto mb-4 bg-white/20 rounded-full flex items-center justify-center">
-                      <Play className="w-12 h-12 text-white ml-1" />
+                {/* Prof Action Image */}
+                <img 
+                  src={IMGADD} 
+                  alt="AI Professor in Action" 
+                  className="w-full h-full object-cover rounded-xl"
+                />
+                {/* Overlay with play button */}
+                {/* <div className="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-blue-600/20 flex items-center justify-center group-hover:bg-black/30 transition-all duration-300">
+                  <div className="text-center text-white opacity-80 hover:opacity-100 transition-opacity duration-300">
+                    <div className="w-16 h-16 mx-auto mb-2 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                      <Play className="w-8 h-8 text-white ml-1" />
                     </div>
-                    <p className="text-lg font-semibold">AI Avatar Demo</p>
-                    <p className="text-sm opacity-80">Interactive Teaching Experience</p>
+                    <p className="text-sm font-semibold">Watch Demo</p>
                   </div>
-                </div>
+                </div> */}
                 
                 {/* Animated Elements */}
                 <div className="absolute top-4 left-4 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>

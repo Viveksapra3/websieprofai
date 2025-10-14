@@ -6,20 +6,20 @@ import { Link } from 'wouter';
 
 const courseCategories = [
   {
-    title: 'Undergraduate Courses',
-    description: 'Comprehensive degree programs with AI-powered personalized learning paths',
-    icon: BookOpen,
-    courses: ['Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology'],
-    color: 'from-blue-500 to-purple-600',
-    href: '/courses?type=undergrad'
-  },
-  {
     title: 'High School Courses',
     description: 'Interactive learning experiences for secondary education students',
     icon: Users,
     courses: ['Advanced Math', 'Science', 'Literature', 'History', 'Languages'],
     color: 'from-green-500 to-teal-600',
     href: '/courses?type=high-school'
+  },
+  {
+    title: 'Undergraduate Courses',
+    description: 'Comprehensive degree programs with AI-powered personalized learning paths',
+    icon: BookOpen,
+    courses: ['Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology'],
+    color: 'from-blue-500 to-purple-600',
+    href: '/courses?type=undergrad'
   },
   {
     title: 'Skill Development',

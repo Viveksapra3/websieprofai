@@ -3,6 +3,7 @@ import HeroSection from '@/components/sections/hero2';
 import CoursesSection from '@/components/sections/courses';
 import AvatarTeachingSection from '@/components/sections/avatar-teaching';
 import FeaturesSection from '@/components/sections/features';
+import LLMComparisonSection from '@/components/sections/llm-comparison';
 import HowItWorksSection from '@/components/sections/how-it-works';
 import PartnersSection from '@/components/sections/partners';
 import AboutSection from '@/components/sections/about';
@@ -18,6 +19,7 @@ export default function Home() {
       <HeroSection />
       <CoursesSection />
       <AvatarTeachingSection />
+      <LLMComparisonSection />
       <FeaturesSection />
       <HowItWorksSection />
       <PartnersSection />

@@ -55,7 +55,7 @@ export default function HeroSection() {
 
               {/* Subheading */}
               <div className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold mt-2 sm:mt-4 text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]">
-                with AI Assistant
+                with AI Co-Pilot
               </div>
 
               <div className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium mt-1 sm:mt-2 text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]">

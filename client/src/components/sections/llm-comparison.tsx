@@ -243,7 +243,7 @@ export default function LLMComparisonSection() {
         </div>
 
         {/* Call to Action */}
-        <motion.div
+        {/* <motion.div
           variants={itemVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
@@ -266,7 +266,7 @@ export default function LLMComparisonSection() {
               </button>
             </div>
           </div>
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   );

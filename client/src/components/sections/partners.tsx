@@ -187,7 +187,7 @@ export default function PartnersSection() {
 
 
         {/* CTA */}
-        <motion.div
+        {/* <motion.div
           variants={sectionVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
@@ -202,7 +202,7 @@ export default function PartnersSection() {
               Become a Partner
             </button>
           </div>
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   );

@@ -19,6 +19,9 @@ import UnlockCoursePage from "@/pages/unlock-course";
 import HowItWorks from "@/pages/how-it-works";
 import OrganizationContact from "@/pages/organization-contact";
 import PaymentPage from "@/pages/payment";
+import TeachPage from "@/pages/teach";
+import ProfAIBusinessPage from "@/pages/profai-business";
+import CareerGPTPage from "@/pages/career-gpt";
 
 function Router() {
   return (
@@ -35,6 +38,9 @@ function Router() {
       <Route path="/how-it-works" component={HowItWorks} />
       <Route path="/organization-contact" component={OrganizationContact} />
       <Route path="/payment" component={PaymentPage} />
+      <Route path="/teach" component={TeachPage} />
+      <Route path="/profai-business" component={ProfAIBusinessPage} />
+      <Route path="/career-gpt" component={CareerGPTPage} />
       <Route path="/course/:id" component={CoursePage} />
       <Route path="/unlock-course" component={UnlockCoursePage} />
       <Route path="/course/:id/quiz/:quizId" component={CourseQuizPage} />

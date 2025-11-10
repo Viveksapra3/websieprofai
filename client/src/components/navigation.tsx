@@ -81,17 +81,27 @@ export default function Navigation() {
           
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center justify-center flex-1 space-x-8">
-            {/* Courses Dropdown */}
+            {/* Teach Link */}
+            <Link href="/teach">
+              <button 
+                className={`${textColor} ${hoverColor} transition-colors hover:scale-110`}
+                data-testid="nav-teach"
+              >
+                Teach
+              </button>
+            </Link>
+
+            {/* Learn Dropdown */}
             <div className="relative group">
               <button
                 className={`${textColor} ${hoverColor} transition-colors hover:scale-110 flex items-center`}
-                data-testid="nav-courses"
+                data-testid="nav-learn"
               >
-                Courses
+                Learn
                 <ChevronDown className="w-4 h-4 ml-1 transition-transform duration-200 group-hover:rotate-180" />
               </button>
               
-              {/* Courses Dropdown Menu */}
+              {/* Learn Dropdown Menu */}
               <div className="absolute top-full left-0 mt-2 w-56 bg-black/90 backdrop-blur-md 
                 rounded-lg shadow-2xl border border-white/20 overflow-hidden z-50 
                 opacity-0 invisible group-hover:opacity-100 group-hover:visible 
@@ -108,12 +118,37 @@ export default function Navigation() {
                   </div>
                 </Link>
                 <Link href="/courses?type=skill-development">
+                  <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer border-b border-white/10">
+                    <div className="text-white font-semibold">Skill Development</div>
+                  </div>
+                </Link>
+                <Link href="/courses">
                   <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer">
-                    <div className="text-white font-semibold">Skill Development Courses</div>
+                    <div className="text-white font-semibold">All Courses</div>
                   </div>
                 </Link>
               </div>
             </div>
+
+            {/* ProfAI Business Link */}
+            <Link href="/profai-business">
+              <button 
+                className={`${textColor} ${hoverColor} transition-colors hover:scale-110`}
+                data-testid="nav-business"
+              >
+                ProfAI Business
+              </button>
+            </Link>
+
+            {/* Career GPT Link */}
+            <Link href="/career-gpt">
+              <button 
+                className={`${textColor} ${hoverColor} transition-colors hover:scale-110`}
+                data-testid="nav-career-gpt"
+              >
+                Career GPT
+              </button>
+            </Link>
             
             {/* Curriculum Builder Dropdown */}
             <div className="relative group">
@@ -284,9 +319,16 @@ export default function Navigation() {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="md:hidden rounded-lg mt-2 p-4 bg-black/90 backdrop-blur-md shadow-lg transition-all" data-testid="mobile-menu">
-            {/* Mobile Courses Section */}
+            {/* Mobile Teach Link */}
+            <Link href="/teach">
+              <button className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left border-b border-white/20 pb-2 mb-2`}>
+                Teach
+              </button>
+            </Link>
+
+            {/* Mobile Learn Section */}
             <div className="border-b border-white/20 pb-2 mb-2">
-              <div className="text-white font-semibold mb-2">Courses</div>
+              <div className="text-white font-semibold mb-2">Learn</div>
               <Link href="/courses?type=undergrad">
                 <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
                   Undergrad Courses
@@ -299,10 +341,29 @@ export default function Navigation() {
               </Link>
               <Link href="/courses?type=skill-development">
                 <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
-                  Skill Development Courses
+                  Skill Development
+                </button>
+              </Link>
+              <Link href="/courses">
+                <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
+                  All Courses
                 </button>
               </Link>
             </div>
+
+            {/* Mobile ProfAI Business Link */}
+            <Link href="/profai-business">
+              <button className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left border-b border-white/20 pb-2 mb-2`}>
+                ProfAI Business
+              </button>
+            </Link>
+
+            {/* Mobile Career GPT Link */}
+            <Link href="/career-gpt">
+              <button className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left border-b border-white/20 pb-2 mb-2`}>
+                Career GPT
+              </button>
+            </Link>
             
             {/* Mobile Curriculum Builder Section */}
             <div className="border-b border-white/20 pb-2 mb-2">

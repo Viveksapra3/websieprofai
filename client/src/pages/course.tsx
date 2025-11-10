@@ -42,6 +42,37 @@ export default function CoursePage() {
         if (!cancelled) setRole(userRole);
 
         if (!courseId) throw new Error("Invalid course id");
+
+        // Check course access first
+        const accessRes = await fetch(`/api/course/${encodeURIComponent(courseId)}/access`, {
+          credentials: "include"
+        });
+        
+        if (!accessRes.ok) {
+          const accessData = await accessRes.json().catch(() => ({}));
+          console.error("Course access check failed:", accessRes.status, accessData);
+          
+          if (accessRes.status === 401) {
+            // User not authenticated, redirect to login
+            window.location.href = "/post-auth";
+            return;
+          }
+          
+          throw new Error(accessData?.error || `Failed to check course access (${accessRes.status})`);
+        }
+
+        const accessData = await accessRes.json();
+        console.log("Course access data:", accessData);
+
+        if (!accessData.hasAccess) {
+          // Redirect to courses page with payment prompt
+          console.log("Access denied, redirecting to payment");
+          window.location.href = `/courses?needsPayment=${encodeURIComponent(courseId)}`;
+          return;
+        }
+
+        console.log("Access granted, loading course content");
+
         const apiBase = import.meta.env.VITE_API_BASE;
         if (!apiBase) throw new Error("Missing VITE_API_BASE in environment");
 

@@ -1,12 +1,18 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db, pool } from "./db";
-import { users } from "@shared/schema";
-import { eq, or, sql } from "drizzle-orm";
+import { users, coursePricing, userPurchases } from "@shared/schema";
+import { eq, or, sql, and, asc } from "drizzle-orm";
 import crypto from "crypto";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import axios from "axios";
 import { fileURLToPath } from "url";
+import { paymentService } from "./payment-service";
+
+
+
+
 
 function hashPassword(password: string): string {
   const salt = crypto.randomBytes(16).toString("hex");
@@ -406,6 +412,260 @@ export async function registerRoutes(app: Express): Promise<void> {
         stats: { students: 120, courses: 8 },
       };
       return res.json(exampleData);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Debug endpoint to test pricing without authentication
+  app.get("/api/debug/pricing/:courseId", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { courseId } = req.params;
+      const pricing = await paymentService.getCoursePricing(courseId);
+      const hasAccess = await paymentService.hasAccess('debug-user', courseId);
+      
+      return res.json({
+        courseId,
+        pricing,
+        hasAccess,
+        message: "Debug endpoint - no auth required"
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // PAYMENT ROUTES
+
+  // Initialize course pricing (admin endpoint)
+  app.post("/api/admin/course-pricing", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = (req.session as any)?.user;
+      if (!user || user.role !== "teacher") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { courses } = req.body;
+      if (!Array.isArray(courses)) {
+        return res.status(400).json({ error: "Courses array is required" });
+      }
+
+      // Set first 3 courses as free, rest as paid
+      for (let i = 0; i < courses.length; i++) {
+        const course = courses[i];
+        const isFree = i < 3;
+        const price = isFree ? 0 : (course.price || 999); // Default price 999 INR
+        
+        await paymentService.setCoursePricing(
+          course.id,
+          price,
+          isFree,
+          i + 1 // display order
+        );
+      }
+
+      return res.json({ message: "Course pricing updated successfully" });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Get course pricing and access info
+  app.get("/api/courses-with-pricing", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = (req.session as any)?.user;
+      if (!user) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      // Get courses from external API or fallback to local
+      const apiBase = process.env.VITE_API_BASE as string | undefined;
+      let courses: any[] = [];
+
+      if (apiBase) {
+        try {
+          const response = await fetch(`${apiBase}/api/courses`);
+          const data = await response.json();
+          courses = Array.isArray(data.courses) ? data.courses : Array.isArray(data) ? data : [];
+        } catch (error) {
+          console.error("Failed to fetch courses from external API:", error);
+        }
+      }
+
+      // If no courses from external API, use fallback data
+      if (courses.length === 0) {
+        courses = [
+          { id: "s-101", title: "Study Skills Fundamentals", level: "Beginner", modules: 5 },
+          { id: "s-201", title: "Math with AI Tutors", level: "Intermediate", modules: 8 },
+          { id: "s-310", title: "Creative Coding with Three.js", level: "Intermediate", modules: 12 },
+          { id: "s-320", title: "Intro to Data Science", level: "Beginner", modules: 10 },
+          { id: "course_1", title: "Advanced Programming", level: "Advanced", modules: 15 },
+          { id: "course_2", title: "Machine Learning Basics", level: "Intermediate", modules: 20 }
+        ];
+      }
+
+      // Get pricing information
+      const pricingData = await db
+        .select()
+        .from(coursePricing)
+        .orderBy(asc(coursePricing.displayOrder));
+
+      // Get user's purchases
+      const userPurchases = await paymentService.getUserPurchases(user.id);
+      const purchasedCourseIds = new Set(
+        userPurchases
+          .filter(p => p.status === "completed")
+          .map(p => p.courseId)
+      );
+
+      // Combine course data with pricing and access info
+      const coursesWithPricing = courses.map((course, index) => {
+        const courseId = String(course.course_id || course.id);
+        const pricing = pricingData.find(p => p.courseId === courseId);
+        
+        // Default: first 3 courses are free, or if explicitly marked as free
+        const isFree = index < 3 || (pricing?.isFree ?? (index < 3));
+        const price = pricing?.price || (isFree ? "0.00" : "999.00");
+        const hasAccess = isFree || purchasedCourseIds.has(courseId);
+
+        return {
+          id: courseId,
+          title: course.course_title || course.title || "Untitled Course",
+          level: course.level || "Beginner",
+          description: course.description || `${course.modules || 0} modules`,
+          tag: course.tag,
+          price: parseFloat(price),
+          currency: pricing?.currency || "INR",
+          isFree,
+          hasAccess,
+          displayOrder: pricing?.displayOrder || (index + 1),
+        };
+      });
+
+      return res.json({ courses: coursesWithPricing });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Check course access
+  app.get("/api/course/:courseId/access", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = (req.session as any)?.user;
+      if (!user) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const { courseId } = req.params;
+      const hasAccess = await paymentService.hasAccess(user.id, courseId);
+      const pricing = await paymentService.getCoursePricing(courseId);
+
+      // Debug logging
+      console.log(`[DEBUG] Course access check for ${courseId}:`, {
+        userId: user.id,
+        hasAccess,
+        pricing: pricing ? { isFree: pricing.isFree, price: pricing.price } : null
+      });
+
+      return res.json({
+        hasAccess,
+        pricing: pricing || { price: "999.00", currency: "INR", isFree: false },
+      });
+    } catch (err) {
+      console.error(`[ERROR] Course access check failed for ${req.params.courseId}:`, err);
+      next(err);
+    }
+  });
+
+  // Initialize payment
+  app.post("/api/payment/initialize", async (req: Request, res: Response, next: NextFunction) => {
+    // try {
+    //   const user = (req.session as any)?.user;
+    //   if (!user) {
+    //     return res.status(401).json({ error: "Not authenticated" });
+    //   }
+
+    //   const { courseId } = req.body;
+    //   if (!courseId) {
+    //     return res.status(400).json({ error: "Course ID is required" });
+    //   }
+
+    //   // Check if user already has access
+    //   const hasAccess = await paymentService.hasAccess(user.id, courseId);
+    //   if (hasAccess) {
+    //     return res.status(400).json({ error: "You already have access to this course" });
+    //   }
+
+    //   const paymentData = await paymentService.initializePayment(user.id, courseId, user);
+    //   return res.json(paymentData);
+    // } catch (err) {
+    //   console.error("Payment initialization error:", err);
+    //   return res.status(500).json({ error: err instanceof Error ? err.message : "Payment initialization failed" });
+    // }
+
+    try {
+    const user = (req.session as any)?.user;
+    if (!user) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+
+    const { courseId } = req.body;
+    if (!courseId) {
+      return res.status(400).json({ error: "Course ID is required" });
+    }
+
+    // Check if user already has access
+    const hasAccess = await paymentService.hasAccess(user.id, courseId);
+    if (hasAccess) {
+      return res.status(400).json({ error: "You already have access to this course" });
+    }
+
+    // Initialize payment
+    const paymentData = await paymentService.initializePayment(user.id, courseId, user);
+
+    // Return data for frontend form rendering
+    return res.json(paymentData);
+  } catch (err) {
+    console.error("Payment initialization error:", err);
+    return res.status(500).json({
+      error: err instanceof Error ? err.message : "Payment initialization failed",
+    });
+  }
+  });
+
+  // Payment callback from CCAvenue
+  app.post("/api/payment/callback", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { encResp } = req.body;
+      if (!encResp) {
+        return res.status(400).json({ error: "Invalid payment response" });
+      }
+
+      const result = await paymentService.handlePaymentCallback(encResp);
+      
+      if (result.success) {
+        // Redirect to success page
+        return res.redirect(`/payment/success?orderId=${result.orderId}&courseId=${result.courseId}`);
+      } else {
+        // Redirect to failure page
+        return res.redirect(`/payment/failure?orderId=${result.orderId}`);
+      }
+    } catch (err) {
+      console.error("Payment callback error:", err);
+      return res.redirect("/payment/failure");
+    }
+  });
+
+  // Get user purchases
+  app.get("/api/user/purchases", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = (req.session as any)?.user;
+      if (!user) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const purchases = await paymentService.getUserPurchases(user.id);
+      return res.json({ purchases });
     } catch (err) {
       next(err);
     }

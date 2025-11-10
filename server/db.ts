@@ -81,6 +81,55 @@ export async function ensureSchema() {
     ALTER TABLE users ADD COLUMN IF NOT EXISTS school_class text;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS school_affiliation text;
     ALTER TABLE users ADD COLUMN IF NOT EXISTS terms_accepted boolean NOT NULL DEFAULT false;
+
+    -- Course pricing table
+    CREATE TABLE IF NOT EXISTS course_pricing (
+      id text PRIMARY KEY DEFAULT gen_random_uuid()::text,
+      course_id text NOT NULL UNIQUE,
+      price decimal(10,2) NOT NULL DEFAULT 0.00,
+      currency text NOT NULL DEFAULT 'INR',
+      is_free boolean NOT NULL DEFAULT false,
+      display_order integer,
+      created_at timestamp DEFAULT now(),
+      updated_at timestamp DEFAULT now()
+    );
+
+    -- User purchases table
+    CREATE TABLE IF NOT EXISTS user_purchases (
+      id text PRIMARY KEY DEFAULT gen_random_uuid()::text,
+      user_id text NOT NULL REFERENCES users(id),
+      course_id text NOT NULL,
+      payment_id text,
+      amount decimal(10,2) NOT NULL,
+      currency text NOT NULL DEFAULT 'INR',
+      status text NOT NULL DEFAULT 'pending',
+      payment_method text DEFAULT 'ccavenue',
+      purchased_at timestamp DEFAULT now(),
+      expires_at timestamp
+    );
+
+    -- Payment transactions table
+    CREATE TABLE IF NOT EXISTS payment_transactions (
+      id text PRIMARY KEY DEFAULT gen_random_uuid()::text,
+      user_id text NOT NULL REFERENCES users(id),
+      course_id text NOT NULL,
+      order_id text NOT NULL UNIQUE,
+      ccavenue_order_id text,
+      amount decimal(10,2) NOT NULL,
+      currency text NOT NULL DEFAULT 'INR',
+      status text NOT NULL DEFAULT 'initiated',
+      payment_response text,
+      created_at timestamp DEFAULT now(),
+      updated_at timestamp DEFAULT now()
+    );
+
+    -- Create indexes for better performance
+    CREATE INDEX IF NOT EXISTS idx_user_purchases_user_id ON user_purchases(user_id);
+    CREATE INDEX IF NOT EXISTS idx_user_purchases_course_id ON user_purchases(course_id);
+    CREATE INDEX IF NOT EXISTS idx_payment_transactions_user_id ON payment_transactions(user_id);
+    CREATE INDEX IF NOT EXISTS idx_payment_transactions_order_id ON payment_transactions(order_id);
+    CREATE INDEX IF NOT EXISTS idx_course_pricing_course_id ON course_pricing(course_id);
+    CREATE INDEX IF NOT EXISTS idx_course_pricing_display_order ON course_pricing(display_order);
   `;
   await pool.query(ddl);
 }

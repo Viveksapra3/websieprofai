@@ -15,6 +15,10 @@ type Course = {
   level: string;
   tag?: string;
   description?: string;
+  price?: number;
+  currency?: string;
+  isFree?: boolean;
+  hasAccess?: boolean;
 };
 
 // Global constants for Pexels API
@@ -169,18 +173,33 @@ export default function CoursesPage() {
         };
 
         try {
-          if (apiBase) {
-            console.log(`[Courses] Fetching from external API: ${apiBase}/api/courses`);
-            normalized = await fetchAndNormalize(`${apiBase}/api/courses`);
-          } else {
-            throw new Error("VITE_API_BASE not configured");
-          }
+          // Use the new pricing API that combines external courses with pricing info
+          const res = await fetchWithTimeout(`/api/courses-with-pricing`, { credentials: "include" });
+          const data = await res.json();
+          if (!res.ok) throw new Error(data?.error || `Failed (${res.status})`);
+          
+          normalized = data.courses.map((item: any) => ({
+            id: String(item.id),
+            title: String(item.title),
+            level: String(item.level),
+            description: item.description,
+            tag: item.tag,
+            price: item.price,
+            currency: item.currency,
+            isFree: item.isFree,
+            hasAccess: item.hasAccess,
+          }));
         } catch (err) {
-          console.warn("External API failed, trying local fallback:", err);
+          console.warn("Pricing API failed, trying fallback:", err);
           try {
-            normalized = await fetchAndNormalize(`/api/courses`, { method: "POST", credentials: "include" });
+            if (apiBase) {
+              console.log(`[Courses] Fetching from external API: ${apiBase}/api/courses`);
+              normalized = await fetchAndNormalize(`${apiBase}/api/courses`);
+            } else {
+              normalized = await fetchAndNormalize(`/api/courses`, { method: "POST", credentials: "include" });
+            }
           } catch (err2) {
-            console.error("Both external and local APIs failed:", err2);
+            console.error("All APIs failed:", err2);
             throw err2;
           }
         }
@@ -238,13 +257,58 @@ export default function CoursesPage() {
     );
   }
 
-  const handleRedirect = (courseId: string) => {
-    window.location.href = `/course/${encodeURIComponent(courseId)}`;
+  const handleRedirect = (courseId: string, hasAccess: boolean) => {
+    if (hasAccess) {
+      window.location.href = `/course/${encodeURIComponent(courseId)}`;
+    } else {
+      // Redirect to payment page or show payment modal
+      handlePayment(courseId);
+    }
+  };
+
+  const handlePayment = async (courseId: string) => {
+    try {
+      const response = await fetch("/api/payment/initialize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ courseId }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        alert(data.error || "Failed to initialize payment");
+        return;
+      }
+
+      // Create a form and submit to CCAvenue
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = data.ccavenueUrl;
+      form.style.display = "none";
+
+      const encReqInput = document.createElement("input");
+      encReqInput.type = "hidden";
+      encReqInput.name = "encRequest";
+      encReqInput.value = data.encryptedData;
+
+      const accessCodeInput = document.createElement("input");
+      accessCodeInput.type = "hidden";
+      accessCodeInput.name = "access_code";
+      accessCodeInput.value = data.accessCode;
+
+      form.appendChild(encReqInput);
+      form.appendChild(accessCodeInput);
+      document.body.appendChild(form);
+      form.submit();
+    } catch (error) {
+      console.error("Payment initialization error:", error);
+      alert("Failed to initialize payment. Please try again.");
+    }
   };
   
   // Placeholder for image while loading
   const loadingPlaceholder = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect fill="#f0f0f0" width="800" height="600"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="30" fill="#a0a0a0">Searching Pexels...</text></svg>`;
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900">
@@ -337,12 +401,37 @@ export default function CoursesPage() {
                       )}
                     </div>
 
+                    {/* Pricing Information */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        {c.isFree ? (
+                          <span className="text-lg font-bold text-green-600">FREE</span>
+                        ) : (
+                          <span className="text-lg font-bold text-gray-900">
+                            {c.currency === 'INR' ? '₹' : '$'}{c.price || 0}
+                          </span>
+                        )}
+                        {c.hasAccess && (
+                          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                            ✓ Purchased
+                          </span>
+                        )}
+                      </div>
+                      {!c.hasAccess && !c.isFree && (
+                        <Unlock className="h-4 w-4 text-gray-400" />
+                      )}
+                    </div>
+
                     <Button
                       size="sm"
-                      onClick={() => handleRedirect(c.id)}
-                      className="w-full mt-3"
+                      onClick={() => handleRedirect(c.id, c.hasAccess || c.isFree || false)}
+                      className={`w-full mt-3 ${
+                        c.hasAccess || c.isFree 
+                          ? "bg-green-600 hover:bg-green-700" 
+                          : "bg-blue-600 hover:bg-blue-700"
+                      }`}
                     >
-                      View Course
+                      {c.hasAccess || c.isFree ? "View Course" : `Buy for ${c.currency === 'INR' ? '₹' : '$'}${c.price || 0}`}
                     </Button>
                   </div>
                 </article>

@@ -366,7 +366,7 @@ export default function CoursesPage() {
               return (
                 <article
                   key={c.id}
-                  className="group relative border border-gray-200 rounded-2xl shadow-sm bg-white overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all"
+                  className="group relative border border-gray-200 rounded-2xl shadow-sm bg-white overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all flex flex-col h-full"
                 >
                   {/* Image Section */}
                   <div className="h-40 bg-gray-100 flex items-center justify-center overflow-hidden">
@@ -378,54 +378,57 @@ export default function CoursesPage() {
                     />
                   </div>
 
-                  {/* Content */}
-                  <div className="p-5 space-y-3">
-                    <h3 className="text-lg font-semibold text-gray-900">{c.title}</h3>
-                    <p className="text-sm text-gray-600 line-clamp-2">{c.description ?? "No description available."}</p>
+                  {/* Content - flex-grow pushes button to bottom */}
+                  <div className="p-5 flex-grow flex flex-col">
+                    <div className="space-y-3 flex-grow">
+                      <h3 className="text-lg font-semibold text-gray-900">{c.title}</h3>
+                      <p className="text-sm text-gray-600 line-clamp-2">{c.description ?? "No description available."}</p>
 
-                    <div className="flex items-center justify-between">
-                      <span
-                        className={`text-xs px-2 py-1 rounded-full font-medium ${
-                          c.level.toLowerCase() === "beginner"
-                            ? "bg-blue-100 text-blue-700"
-                            : c.level.toLowerCase() === "intermediate"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-rose-100 text-rose-700"
-                        }`}
-                      >
-                        {c.level}
-                      </span>
+                      <div className="flex items-center justify-between">
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full font-medium ${
+                            c.level.toLowerCase() === "beginner"
+                              ? "bg-blue-100 text-blue-700"
+                              : c.level.toLowerCase() === "intermediate"
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-rose-100 text-rose-700"
+                          }`}
+                        >
+                          {c.level}
+                        </span>
 
-                      {c.tag && (
-                        <span className="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-700">{c.tag}</span>
-                      )}
-                    </div>
-
-                    {/* Pricing Information */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {c.isFree ? (
-                          <span className="text-lg font-bold text-green-600">FREE</span>
-                        ) : (
-                          <span className="text-lg font-bold text-gray-900">
-                            {c.currency === 'INR' ? '₹' : '$'}{c.price || 0}
-                          </span>
-                        )}
-                        {c.hasAccess && (
-                          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                            ✓ Purchased
-                          </span>
+                        {c.tag && (
+                          <span className="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-700">{c.tag}</span>
                         )}
                       </div>
-                      {!c.hasAccess && !c.isFree && (
-                        <Unlock className="h-4 w-4 text-gray-400" />
-                      )}
+
+                      {/* Pricing Information */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          {c.isFree ? (
+                            <span className="text-lg font-bold text-green-600">FREE</span>
+                          ) : (
+                            <span className="text-lg font-bold text-gray-900">
+                              {c.currency === 'INR' ? '₹' : '$'}{c.price || 0}
+                            </span>
+                          )}
+                          {c.hasAccess && (
+                            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                              ✓ Purchased
+                            </span>
+                          )}
+                        </div>
+                        {!c.hasAccess && !c.isFree && (
+                          <Unlock className="h-4 w-4 text-gray-400" />
+                        )}
+                      </div>
                     </div>
 
+                    {/* Button at bottom - separated from space-y-3 */}
                     <Button
                       size="sm"
                       onClick={() => handleRedirect(c.id, c.hasAccess || c.isFree || false)}
-                      className={`w-full mt-3 ${
+                      className={`w-full mt-4 ${
                         c.hasAccess || c.isFree 
                           ? "bg-green-600 hover:bg-green-700" 
                           : "bg-blue-600 hover:bg-blue-700"

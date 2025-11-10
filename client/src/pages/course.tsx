@@ -12,6 +12,22 @@ type CourseDetail = {
   [key: string]: any;
 };
 
+// Helper function to build absolute URL from VITE_API_BASE
+const buildApiUrl = (path: string): string => {
+  const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
+  if (!apiBase) throw new Error("Missing VITE_API_BASE in environment");
+  
+  // If apiBase is already absolute, use it directly
+  if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
+    return `${apiBase}${path}`;
+  }
+  
+  // If relative, construct absolute URL using current window location
+  const protocol = window.location.protocol;
+  const host = window.location.host;
+  return `${protocol}//${host}${apiBase}${path}`;
+};
+
 export default function CoursePage() {
   const [match, params] = useRoute("/course/:id");
   const courseId = params?.id;
@@ -73,10 +89,8 @@ export default function CoursePage() {
 
         console.log("Access granted, loading course content");
 
-        const apiBase = import.meta.env.VITE_API_BASE;
-        if (!apiBase) throw new Error("Missing VITE_API_BASE in environment");
-
-        const res = await fetch(`${apiBase}/api/course/${encodeURIComponent(courseId)}`);
+        const apiUrl = buildApiUrl(`/api/course/${encodeURIComponent(courseId)}`);
+        const res = await fetch(apiUrl);
         const data = await res.json();
         if (!res.ok) throw new Error(data?.error || "Failed to load course");
 
@@ -127,9 +141,7 @@ export default function CoursePage() {
     const weekKey = String(week);
     try {
       setModuleQuizLoading((s) => ({ ...s, [weekKey]: true }));
-      const base = (import.meta.env.VITE_API_BASE as string | undefined) || "";
-      if (!base) throw new Error("Missing VITE_API_BASE in environment");
-      const url = `${base.replace(/\/$/, "")}/api/quiz/generate-module`;
+      const url = buildApiUrl('/api/quiz/generate-module');
       const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -270,9 +282,8 @@ export default function CoursePage() {
     if (!courseId) return;
     try {
       setQuizLoading(true);
-      const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
-      if (!apiBase) throw new Error("Missing VITE_API_BASE in environment");
-      const res = await fetch(`${apiBase}/api/quiz/generate-course`, {
+      const apiUrl = buildApiUrl('/api/quiz/generate-course');
+      const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ quiz_type: "course", course_id: String(courseId), module_week: 0 }),

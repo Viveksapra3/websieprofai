@@ -3,6 +3,22 @@ import { Link, useRoute } from "wouter";
 import { AuthNavbar } from "@/components/auth-navbar";
 import { Button } from "@/components/ui/button";
 
+// Helper function to build absolute URL from VITE_API_BASE
+const buildApiUrl = (path: string): string => {
+  const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
+  if (!apiBase) throw new Error("Missing VITE_API_BASE in environment");
+  
+  // If apiBase is already absolute, use it directly
+  if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
+    return `${apiBase}${path}`;
+  }
+  
+  // If relative, construct absolute URL using current window location
+  const protocol = window.location.protocol;
+  const host = window.location.host;
+  return `${protocol}//${host}${apiBase}${path}`;
+};
+
 // Types reflecting the quiz response shape
 interface QuizQuestion {
   question_id: string;
@@ -87,12 +103,10 @@ export default function CourseQuizPage() {
     if (!courseId || !quizKind) return;
     try {
       setRegenLoading(true);
-      const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
-      if (!apiBase) throw new Error("Missing VITE_API_BASE in environment");
       let url = "";
       let payload: any = {};
       if (quizKind === "course") {
-        url = `${apiBase.replace(/\/$/, "")}/api/quiz/generate-course`;
+        url = buildApiUrl('/api/quiz/generate-course');
         payload = {
           quiz_type: "course",
           course_id: String(courseId),
@@ -100,7 +114,7 @@ export default function CourseQuizPage() {
         };
       } else {
         if (moduleWeek == null) throw new Error("Module week not found for this quiz");
-        url = `${apiBase.replace(/\/$/, "")}/api/quiz/generate-module`;
+        url = buildApiUrl('/api/quiz/generate-module');
         payload = {
           quiz_type: "module",
           course_id: String(courseId),

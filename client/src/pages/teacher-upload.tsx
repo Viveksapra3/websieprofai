@@ -1,16 +1,11 @@
-// import { useRef, useState } from "react";
+// import { useRef, useState, useEffect } from "react";
 // import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 // import { Button } from "@/components/ui/button";
 // import { Input } from "@/components/ui/input";
 // import { Label } from "@/components/ui/label";
 // import { Link, useLocation } from "wouter";
 // import Navigation from "@/components/navigation";
-// import { ArrowLeft, Upload, FileText, Sparkles, Crown, CheckCircle, Zap } from 'lucide-react';
-
-// export default function TeacherUploadPage() {
-//   const [, setLocation] = useLocation();
-//   const [courseName, setCourseName] = useState("");
-//   const [files, setFiles] = useState<File[]>([]);
+// import { ArrowLeft, Upload, FileText, Sparkles, Crown, CheckCircle, Zap, X } from 'lucide-react';
 //   const [error, setError] = useState<string | null>(null);
 
 //   // drag state for upload area
@@ -264,6 +259,22 @@ import { Link } from "wouter";
 import { AuthNavbar } from "@/components/auth-navbar";
 import { Eye, EyeOff, ArrowLeft, Mail, Lock, BookOpen, AlertTriangle } from 'lucide-react';
 
+// Helper function to build absolute URL from VITE_API_BASE
+const buildApiUrl = (path: string): string => {
+  const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
+  if (!apiBase) throw new Error("Missing VITE_API_BASE in environment");
+  
+  // If apiBase is already absolute, use it directly
+  if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
+    return `${apiBase}${path}`;
+  }
+  
+  // If relative, construct absolute URL using current window location
+  const protocol = window.location.protocol;
+  const host = window.location.host;
+  return `${protocol}//${host}${apiBase}${path}`;
+};
+
 export default function TeacherUploadPage() {
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -350,13 +361,9 @@ export default function TeacherUploadPage() {
     }
     setProgressPct(100);
     setProgressText(successFinish ? "Processing complete!" : "Processing finished with errors");
-    setTimeout(() => {
-      setProgressVisible(false);
-      setTimeout(() => {
-        setDetailedProgressVisible(false);
-        setProgressPct(0);
-      }, 600);
-    }, 450);
+    setProgressVisible(false);
+    setDetailedProgressVisible(false);
+    setProgressPct(0);
   };
 
   // File handling (drag & drop and file input)
@@ -389,26 +396,19 @@ export default function TeacherUploadPage() {
       // Check if user is authenticated
       if (!isAuthenticated) {
         setError("You must be signed in to upload files.");
-        setTimeout(() => {
-          window.location.href = "/signin/student";
-        }, 2000);
+        window.location.href = "/signin/student";
         return;
       }
 
       // Check if user is a teacher
       if (!isTeacher) {
         setError("You are not authorized to upload files. Only teachers can create courses.");
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 3000);
+        window.location.href = "/";
         return;
       }
 
       if (files.length === 0) throw new Error("Please select at least one PDF file");
       if (!courseName.trim()) throw new Error("Please enter a course name");
-
-      const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
-      if (!apiBase) throw new Error("Missing VITE_API_BASE in environment");
 
       // Create FormData and append files + course_title
       const fd = new FormData();
@@ -426,7 +426,8 @@ export default function TeacherUploadPage() {
 
       // IMPORTANT: do NOT set Content-Type header when posting FormData;
       // browser will set the multipart boundary automatically.
-      const res = await fetch(`${apiBase}/api/upload-pdfs`, {
+      const apiUrl = buildApiUrl('/api/upload-pdfs');
+      const res = await fetch(apiUrl, {
         method: "POST",
         body: fd,
         signal: controllerRef.current.signal,
@@ -447,14 +448,12 @@ export default function TeacherUploadPage() {
       setFiles([]);
 
       // navigate to created course if backend returned course_id, else to /courses
-      setTimeout(() => {
-        const id = data?.course_id;
-        if (id) {
-          window.location.href = `/course/${encodeURIComponent(String(id))}`;
-        } else {
-          window.location.href = "/courses";
-        }
-      }, 1000);
+      const id = data?.course_id;
+      if (id) {
+        window.location.href = `/course/${encodeURIComponent(String(id))}`;
+      } else {
+        window.location.href = "/courses";
+      }
     } catch (e: any) {
       if (e?.name === "AbortError") {
         setError("Upload cancelled.");

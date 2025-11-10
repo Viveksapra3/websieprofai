@@ -24,8 +24,19 @@ async function fetchCoursesFromAPI() {
   }
 
   try {
-    console.log(`📡 Fetching courses from: ${apiBase}/api/courses`);
-    const response = await fetch(`${apiBase}/api/courses`);
+    // Handle both absolute URLs and relative paths
+    let apiUrl: string;
+    if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
+      // Absolute URL - use as is
+      apiUrl = `${apiBase}/api/courses`;
+    } else {
+      // Relative path - skip for now as we can't determine the host in a script
+      console.warn('⚠️  VITE_API_BASE is a relative path. Please use an absolute URL (e.g., http://localhost:5000)');
+      return [];
+    }
+    
+    console.log(`📡 Fetching courses from: ${apiUrl}`);
+    const response = await fetch(apiUrl);
     const data = await response.json();
     
     if (!response.ok) {

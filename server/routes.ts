@@ -484,7 +484,20 @@ export async function registerRoutes(app: Express): Promise<void> {
 
       if (apiBase) {
         try {
-          const response = await fetch(`${apiBase}/api/courses`);
+          // Handle both absolute URLs and relative paths
+          let apiUrl: string;
+          if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
+            // Absolute URL - use as is
+            apiUrl = `${apiBase}/api/courses`;
+          } else {
+            // Relative path - convert to absolute URL using request host
+            const protocol = req.protocol || 'http';
+            const host = req.get('host') || 'localhost:5000';
+            apiUrl = `${protocol}://${host}${apiBase}/api/courses`;
+          }
+          
+          console.log(`Fetching courses from: ${apiUrl}`);
+          const response = await fetch(apiUrl);
           const data = await response.json();
           courses = Array.isArray(data.courses) ? data.courses : Array.isArray(data) ? data : [];
         } catch (error) {

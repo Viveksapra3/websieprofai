@@ -413,7 +413,7 @@ export default function HowItWorks() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 hover:border-blue-300 transition-all duration-300 group">
+            <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 hover:border-blue-300 transition-all duration-300 group flex flex-col">
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-4">
                   <div className="p-4 rounded-full bg-blue-100 group-hover:bg-blue-200 transition-all duration-300">
@@ -422,8 +422,8 @@ export default function HowItWorks() {
                 </div>
                 <CardTitle className="text-2xl text-gray-900">Undergrad Courses</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 mb-6">
+              <CardContent className="flex-1 flex flex-col">
+                <p className="text-gray-700 mb-6 flex-1">
                   Advanced university-level courses covering specialized topics in various fields of study.
                 </p>
                 <Link href="/courses?type=undergrad">
@@ -435,7 +435,7 @@ export default function HowItWorks() {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 hover:border-green-300 transition-all duration-300 group">
+            <Card className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 hover:border-green-300 transition-all duration-300 group flex flex-col">
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-4">
                   <div className="p-4 rounded-full bg-green-100 group-hover:bg-green-200 transition-all duration-300">
@@ -444,8 +444,8 @@ export default function HowItWorks() {
                 </div>
                 <CardTitle className="text-2xl text-gray-900">High School Courses</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 mb-6">
+              <CardContent className="flex-1 flex flex-col">
+                <p className="text-gray-700 mb-6 flex-1">
                   Comprehensive high school curriculum designed to prepare students for higher education.
                 </p>
                 <Link href="/courses?type=high-school">
@@ -457,7 +457,7 @@ export default function HowItWorks() {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 hover:border-purple-300 transition-all duration-300 group">
+            <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 hover:border-purple-300 transition-all duration-300 group flex flex-col">
               <CardHeader className="text-center">
                 <div className="flex justify-center mb-4">
                   <div className="p-4 rounded-full bg-purple-100 group-hover:bg-purple-200 transition-all duration-300">
@@ -466,8 +466,8 @@ export default function HowItWorks() {
                 </div>
                 <CardTitle className="text-2xl text-gray-900">Skill Development</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 mb-6">
+              <CardContent className="flex-1 flex flex-col">
+                <p className="text-gray-700 mb-6 flex-1">
                   Practical skills and professional development courses for career advancement.
                 </p>
                 <Link href="/courses?type=skill-development">

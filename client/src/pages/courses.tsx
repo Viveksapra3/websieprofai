@@ -277,6 +277,12 @@ export default function CoursesPage() {
 
       const data = await response.json();
       if (!response.ok) {
+        // Check if user is not authenticated
+        if (response.status === 401) {
+          // Redirect to sign-in page
+          window.location.href = "/signin/student";
+          return;
+        }
         alert(data.error || "Failed to initialize payment");
         return;
       }

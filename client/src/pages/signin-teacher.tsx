@@ -178,19 +178,20 @@ export default function SignInTeacher() {
                 </div>
               )}
 
-              {/* Divider */}
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t border-white/20" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="bg-transparent px-2 text-white/70">Or continue with</span>
-                </div>
-              </div>
             </form>
 
+            {/* Divider */}
+            {/* <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-white/20" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-transparent px-2 text-white/70">Or continue with</span>
+              </div>
+            </div> */}
+
             {/* Social Sign In Options */}
-            <div className="grid grid-cols-2 gap-4">
+            {/* <div className="grid grid-cols-2 gap-4">
               <Button 
                 variant="outline" 
                 className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/30 transition-all"
@@ -214,7 +215,7 @@ export default function SignInTeacher() {
                 </svg>
                 Microsoft
               </Button>
-            </div>
+            </div> */}
 
             {/* Sign Up Link */}
             <div className="text-center">

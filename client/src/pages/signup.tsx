@@ -389,7 +389,7 @@ export default function SignUp() {
               </Button>
             </form>
 
-            {/* Divider */}
+            {/* Divider 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t border-white/20" />
@@ -397,9 +397,9 @@ export default function SignUp() {
               <div className="relative flex justify-center text-sm">
                 <span className="bg-transparent px-2 text-white/70">Or continue with</span>
               </div>
-            </div>
+            </div> */}
 
-            {/* Social Signup Options */}
+            {/* Social Signup Options 
             <div className="grid grid-cols-2 gap-4">
               <Button 
                 variant="outline" 
@@ -424,7 +424,7 @@ export default function SignUp() {
                 </svg>
                 GitHub
               </Button>
-            </div>
+            </div> */}
 
             {/* Sign In Link */}
             <div className="text-center">

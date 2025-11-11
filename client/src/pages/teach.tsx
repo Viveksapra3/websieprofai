@@ -187,7 +187,7 @@ export default function TeachPage() {
       {/* Footer */}
       <footer className="py-8 px-4 border-t border-white/10">
         <div className="max-w-6xl mx-auto text-center text-gray-400">
-          <p>&copy; 2024 ProfAI Coach. All rights reserved.</p>
+          <p>&copy; 2025 ProfAI. All rights reserved.</p>
         </div>
       </footer>
     </div>

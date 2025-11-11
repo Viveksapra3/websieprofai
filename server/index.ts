@@ -23,8 +23,9 @@ function log(message: string, source = "express") {
 
 const app = express();
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// Increase limits for large file uploads and long processing times
+app.use(express.json({ limit: '500mb' }));
+app.use(express.urlencoded({ extended: false, limit: '500mb' }));
 
 // --- Minimal CORS for cross-port session sharing with credentials ---
 const defaultAllowed = ["http://localhost:3000", "http://127.0.0.1:3000"]; 
@@ -165,6 +166,11 @@ app.use((req, res, next) => {
 
   // Create a single HTTP server so Vite can hook into HMR in development
   const httpServer = createServer(app);
+  
+  // Set server timeouts for long-running uploads (2+ hours)
+  httpServer.timeout = 10 * 60 * 60 * 1000; // 10 hours
+  httpServer.keepAliveTimeout = 10 * 60 * 60 * 1000; // 10 hours
+  httpServer.headersTimeout = 10 * 60 * 60 * 1000 + 1000; // slightly more than keepAliveTimeout
 
   const nodeEnv = String(process.env.NODE_ENV || "").toLowerCase();
   if (nodeEnv === "development") {

@@ -132,11 +132,17 @@ export async function registerRoutes(app: Express): Promise<void> {
       }
       cb(new Error("Only PDF files are allowed"));
     },
-    limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
+    limits: { 
+      fileSize: 500 * 1024 * 1024, // 500MB - increased for large PDFs
+      files: 1
+    },
   });
 
   // Teacher upload endpoint
   app.post("/api/teacher/courses", upload.single("pdf"), (req: Request, res: Response) => {
+    // Extend timeout for this specific route to handle long uploads
+    req.setTimeout(10 * 60 * 60 * 1000); // 10 hours
+    res.setTimeout(10 * 60 * 60 * 1000); // 10 hours
     const sessUser = (req.session as any)?.user;
     if (!sessUser) return res.status(401).json({ error: "Not authenticated" });
     if (String(sessUser.role).toLowerCase() !== "teacher") return res.status(403).json({ error: "Only teachers can upload courses" });

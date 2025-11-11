@@ -280,7 +280,7 @@ export default function CoursesPage() {
         // Check if user is not authenticated
         if (response.status === 401) {
           // Redirect to sign-in page
-          window.location.href = "/signin/student";
+          window.location.href = "/signin/student401";
           return;
         }
         alert(data.error || "Failed to initialize payment");

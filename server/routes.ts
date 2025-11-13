@@ -654,7 +654,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   }
   });
 //payement cancelled
-  app.get("/payment/cancelled", (req: Request, res: Response) => {
+  app.post("/payment/cancelled", (req: Request, res: Response) => {
     console.log("Payment cancelled by user, redirecting to courses page");
     return res.redirect("/courses");
   });

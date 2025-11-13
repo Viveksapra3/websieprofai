@@ -2,6 +2,7 @@ import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { testDbConnection, ensureSchema, pool } from "./db";
+import { paymentService } from "./payment-service";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
@@ -136,6 +137,20 @@ app.use((req, res, next) => {
     log("Database connection OK");
   } catch (e) {
     log(`Database connection FAILED: ${(e as Error).message}`);
+  }
+
+  // Auto-sync course pricing on startup
+  try {
+    const apiBase = process.env.VITE_API_BASE as string | undefined;
+    if (apiBase) {
+      log("Auto-syncing course pricing from external API...");
+      const result = await paymentService.syncCoursePricing(apiBase);
+      log(`Course sync completed: ${result.synced} new, ${result.updated} updated, ${result.total} total`);
+    } else {
+      log("Skipping course sync - VITE_API_BASE not configured");
+    }
+  } catch (e) {
+    log(`Course sync failed: ${(e as Error).message}`);
   }
 
   // --- error handler (simple JSON error responses) ---

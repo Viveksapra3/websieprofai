@@ -460,7 +460,7 @@ export async function registerRoutes(app: Express): Promise<void> {
       for (let i = 0; i < courses.length; i++) {
         const course = courses[i];
         const isFree = i < 3;
-        const price = isFree ? 0 : (course.price || 999); // Default price 999 INR
+        const price = isFree ? 0 : (course.price || 99); // Default price 99 INR
         
         await paymentService.setCoursePricing(
           course.id,
@@ -476,13 +476,11 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  // Get course pricing and access info
+  // Get course pricing and access info (public - no auth required to see prices)
   app.get("/api/courses-with-pricing", async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = (req.session as any)?.user;
-      if (!user) {
-        return res.status(401).json({ error: "Not authenticated" });
-      }
+      // Allow unauthenticated users to see pricing, but not access courses
 
       // Get courses from external API or fallback to local
       const apiBase = process.env.VITE_API_BASE as string | undefined;
@@ -529,13 +527,16 @@ export async function registerRoutes(app: Express): Promise<void> {
         .from(coursePricing)
         .orderBy(asc(coursePricing.displayOrder));
 
-      // Get user's purchases
-      const userPurchases = await paymentService.getUserPurchases(user.id);
-      const purchasedCourseIds = new Set(
-        userPurchases
-          .filter(p => p.status === "completed")
-          .map(p => p.courseId)
-      );
+      // Get user's purchases (only if logged in)
+      let purchasedCourseIds = new Set<string>();
+      if (user) {
+        const userPurchases = await paymentService.getUserPurchases(user.id);
+        purchasedCourseIds = new Set(
+          userPurchases
+            .filter(p => p.status === "completed")
+            .map(p => p.courseId)
+        );
+      }
 
       // Combine course data with pricing and access info
       const coursesWithPricing = courses.map((course, index) => {
@@ -544,8 +545,9 @@ export async function registerRoutes(app: Express): Promise<void> {
         
         // Default: first 3 courses are free, or if explicitly marked as free
         const isFree = index < 3 || (pricing?.isFree ?? (index < 3));
-        const price = pricing?.price || (isFree ? "0.00" : "999.00");
-        const hasAccess = isFree || purchasedCourseIds.has(courseId);
+        const price = pricing?.price || (isFree ? "0.00" : "99.00");
+        // Only grant access if user is logged in AND (course is free OR user purchased it)
+        const hasAccess = user ? (isFree || purchasedCourseIds.has(courseId)) : false;
 
         return {
           id: courseId,
@@ -588,7 +590,7 @@ export async function registerRoutes(app: Express): Promise<void> {
 
       return res.json({
         hasAccess,
-        pricing: pricing || { price: "999.00", currency: "INR", isFree: false },
+        pricing: pricing || { price: "99.00", currency: "INR", isFree: false },
       });
     } catch (err) {
       console.error(`[ERROR] Course access check failed for ${req.params.courseId}:`, err);
@@ -663,15 +665,15 @@ export async function registerRoutes(app: Express): Promise<void> {
       const result = await paymentService.handlePaymentCallback(encResp);
       
       if (result.success) {
-        // Redirect to success page
-        return res.redirect(`/payment/success?orderId=${result.orderId}&courseId=${result.courseId}`);
+        // Redirect to the purchased course
+        return res.redirect(`/course/${result.courseId}`);
       } else {
-        // Redirect to failure page
-        return res.redirect(`/payment/failure?orderId=${result.orderId}`);
+        // Redirect to courses page (course not purchased)
+        return res.redirect("/courses");
       }
     } catch (err) {
       console.error("Payment callback error:", err);
-      return res.redirect("/payment/failure");
+      return res.redirect("/courses");
     }
   });
 
@@ -687,6 +689,27 @@ export async function registerRoutes(app: Express): Promise<void> {
       return res.json({ purchases });
     } catch (err) {
       next(err);
+    }
+  });
+
+  // Sync course pricing from external API (admin only)
+  app.post("/api/admin/sync-courses", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user = (req.session as any)?.user;
+      if (!user || user.role !== "teacher") {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const apiBase = process.env.VITE_API_BASE as string | undefined;
+      const result = await paymentService.syncCoursePricing(apiBase);
+      
+      return res.json(result);
+    } catch (err) {
+      console.error("Sync error:", err);
+      return res.status(500).json({ 
+        error: "Failed to sync courses", 
+        details: err instanceof Error ? err.message : String(err) 
+      });
     }
   });
 

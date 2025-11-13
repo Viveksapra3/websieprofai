@@ -11,6 +11,7 @@ interface CCAvenueConfig {
   workingKey: string;
   redirectUrl: string;
   cancelUrl: string;
+  ccavenueUrl: string;
 }
 
 class PaymentService {
@@ -23,45 +24,47 @@ class PaymentService {
       workingKey: process.env.CCAVENUE_WORKING_KEY || "YOUR_WORKING_KEY_HERE",
       redirectUrl: process.env.CCAVENUE_REDIRECT_URL || `${process.env.BASE_URL}/api/payment/callback`,
       cancelUrl: process.env.CCAVENUE_CANCEL_URL || `${process.env.BASE_URL}/payment/cancelled`,
+      ccavenueUrl: process.env.CCAVENUE_URL || "https://secure.ccavenue.consaction/transaction.do?command=initiateTransaction",
     };
   }
 
   // Encrypt data for CCAvenue (compatible with their encryption method)
-  private encrypt(plainText: string): string {
-    try {
-      const key = this.config.workingKey;
-      const algorithm = 'aes-128-cbc';
-      
-      // Create a hash of the key to ensure it's the right length
-      const keyHash = crypto.createHash('md5').update(key, 'utf8').digest();
-      const iv = Buffer.alloc(16, 0); // CCAvenue uses zero IV
-      
-      const cipher = crypto.createCipheriv(algorithm, keyHash, iv);
-      cipher.setAutoPadding(true);
-      
-      let encrypted = cipher.update(plainText, 'utf8', 'hex');
-      encrypted += cipher.final('hex');
-      
-      return encrypted;
-    } catch (error) {
-      console.error('Encryption error:', error);
-      throw new Error('Failed to encrypt data for CCAvenue');
-    }
+ private encrypt(plainText: string): string {
+  try {
+    const workingKey = this.config.workingKey;
+    const algorithm = 'aes-128-cbc';
+
+    // Generate key from MD5 hash of workingKey
+    const key = crypto.createHash('md5').update(workingKey).digest();
+    
+    // CCAvenue uses a fixed 16-byte IV: [0x00, 0x01, 0x02, ..., 0x0f]
+    const iv = Buffer.from([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f]);
+
+    const cipher = crypto.createCipheriv(algorithm, key, iv);
+    let encrypted = cipher.update(plainText, 'utf8', 'hex');
+    encrypted += cipher.final('hex');
+
+    return encrypted;
+  } catch (error) {
+    console.error('Encryption error:', error);
+    throw new Error('Failed to encrypt data for CCAvenue');
   }
+}
+
 
   // Decrypt data from CCAvenue
   private decrypt(encText: string): string {
     try {
-      const key = this.config.workingKey;
+      const workingKey = this.config.workingKey;
       const algorithm = 'aes-128-cbc';
       
-      // Create a hash of the key to ensure it's the right length
-      const keyHash = crypto.createHash('md5').update(key, 'utf8').digest();
-      const iv = Buffer.alloc(16, 0); // CCAvenue uses zero IV
+      // Generate key from MD5 hash of workingKey
+      const key = crypto.createHash('md5').update(workingKey).digest();
       
-      const decipher = crypto.createDecipheriv(algorithm, keyHash, iv);
-      decipher.setAutoPadding(true);
+      // CCAvenue uses a fixed 16-byte IV: [0x00, 0x01, 0x02, ..., 0x0f]
+      const iv = Buffer.from([0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f]);
       
+      const decipher = crypto.createDecipheriv(algorithm, key, iv);
       let decrypted = decipher.update(encText, 'hex', 'utf8');
       decrypted += decipher.final('utf8');
       
@@ -164,7 +167,7 @@ class PaymentService {
       const defaultPricing = {
         id: `default_${courseId}`,
         courseId,
-        price: isFree ? "0.00" : "999.00",
+        price: isFree ? "0.00" : "99.00",
         currency: "INR",
         isFree,
         displayOrder: null,
@@ -183,7 +186,7 @@ class PaymentService {
       return {
         id: `error_${courseId}`,
         courseId,
-        price: isFree ? "0.00" : "999.00",
+        price: isFree ? "0.00" : "99.00",
         currency: "INR",
         isFree,
         displayOrder: null,
@@ -264,10 +267,11 @@ class PaymentService {
         currency: pricing.currency,
         redirect_url: this.config.redirectUrl,
         cancel_url: this.config.cancelUrl,
+        upiPaymentFlag:"QR",
         language: "EN",
         billing_name: userInfo.username || "Customer",
-        billing_email: userInfo.email || "",
-        billing_tel: userInfo.phone || "",
+        billing_email: userInfo.email || "customer@example.com",
+        billing_tel: userInfo.phone || "9999999999",
         billing_address: userInfo.address || "Not Provided",
         billing_city: userInfo.city || "Not Provided",
         billing_state: userInfo.state || "Not Provided",
@@ -279,7 +283,7 @@ class PaymentService {
         delivery_state: userInfo.state || "Not Provided",
         delivery_zip: userInfo.zip || "000000",
         delivery_country: "India",
-        delivery_tel: userInfo.phone || "",
+        delivery_tel: userInfo.phone || "9999999999",
         merchant_param1: courseId,
         merchant_param2: userId,
       };
@@ -298,18 +302,22 @@ class PaymentService {
         .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
         .join("&");
       console.log(`✅ Query string length: ${queryString.length} characters`);
+      console.log("🧪 Pre-encryption check:", {
+        accessCode: this.config.accessCode,
+        ccavenueUrl: this.config.ccavenueUrl,
+        queryStringLength: queryString.length
+      });
 
       console.log("🔐 Step 6: Encrypting payment data...");
       const encryptedData = this.encrypt(queryString);
       console.log(`✅ Data encrypted successfully. Encrypted data length: ${encryptedData.length} characters`);
 
-      const ccavenueUrl =  "https://test.ccavenue.com/transaction/transaction.do?command=initiateTransaction";
 
       const result = {
         orderId,
         encryptedData,
         accessCode: this.config.accessCode,
-        ccavenueUrl,
+        ccavenueUrl: this.config.ccavenueUrl,
       };
 
       console.log("🎉 PAYMENT INITIALIZATION COMPLETED SUCCESSFULLY");
@@ -462,6 +470,78 @@ class PaymentService {
     } catch (error) {
       console.error("❌ Error getting user purchases:", error);
       return [];
+    }
+  }
+
+  // Sync course pricing from external API
+  async syncCoursePricing(apiBase?: string) {
+    try {
+      console.log("🔄 Starting course pricing sync...");
+      
+      if (!apiBase) {
+        console.log("⚠️ No API base URL provided, skipping sync");
+        return { synced: 0, message: "No API base URL configured" };
+      }
+
+      // Fetch courses from external API
+      const apiUrl = `${apiBase}/api/courses`;
+      console.log(`📡 Fetching courses from: ${apiUrl}`);
+      
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      const courses = Array.isArray(data.courses) ? data.courses : Array.isArray(data) ? data : [];
+      
+      console.log(`📚 Found ${courses.length} courses from API`);
+
+      // Get existing pricing from database
+      const existingPricing = await db.select().from(coursePricing);
+      const existingCourseIds = new Set(existingPricing.map(p => p.courseId));
+
+      let syncedCount = 0;
+      let updatedCount = 0;
+
+      // Sync each course
+      for (let i = 0; i < courses.length; i++) {
+        const course = courses[i];
+        const courseId = String(course.course_id || course.id);
+        
+        // Determine if course should be free (first 3 courses)
+        const isFree = i < 3;
+        const price = isFree ? 0 : 99; // Default price for paid courses
+
+        if (!existingCourseIds.has(courseId)) {
+          // New course - add to database
+          await this.setCoursePricing(courseId, price, isFree, i + 1);
+          syncedCount++;
+          console.log(`✅ Added new course: ${courseId} (${course.course_title || course.title})`);
+        } else {
+          // Existing course - update display order if needed
+          const existing = existingPricing.find(p => p.courseId === courseId);
+          if (existing && existing.displayOrder !== i + 1) {
+            await db
+              .update(coursePricing)
+              .set({ displayOrder: i + 1, updatedAt: new Date() })
+              .where(eq(coursePricing.courseId, courseId));
+            updatedCount++;
+            console.log(`🔄 Updated display order for course: ${courseId}`);
+          }
+        }
+      }
+
+      console.log(`✅ Sync completed: ${syncedCount} new courses added, ${updatedCount} courses updated`);
+      return {
+        synced: syncedCount,
+        updated: updatedCount,
+        total: courses.length,
+        message: `Successfully synced ${syncedCount} new courses and updated ${updatedCount} existing courses`
+      };
+    } catch (error) {
+      console.error("❌ Error syncing course pricing:", error);
+      throw error;
     }
   }
 }

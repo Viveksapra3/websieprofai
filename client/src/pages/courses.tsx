@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Link } from "wouter";
 import Navigation from "@/components/navigation";
+import PaymentLoadingOverlay from "@/components/PaymentLoadingOverlay";
 
 // Define the core structure of a Course
 type Course = {
@@ -31,6 +32,9 @@ export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isTeacher, setIsTeacher] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [selectedCourseName, setSelectedCourseName] = useState("");
 
   // NEW state: Map course IDs to their fetched Pexels image URL
   const [courseImages, setCourseImages] = useState<Record<string, string>>({});
@@ -101,6 +105,33 @@ export default function CoursesPage() {
     }
   };
 
+  // Handle page visibility to hide loading overlay when user navigates back
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && paymentLoading) {
+        // User came back to the page, hide the loading overlay
+        console.log('Page became visible, hiding payment loading overlay');
+        setPaymentLoading(false);
+      }
+    };
+
+    const handlePageShow = (event: PageTransitionEvent) => {
+      // Handle browser back/forward navigation
+      if (event.persisted && paymentLoading) {
+        console.log('Page restored from cache, hiding payment loading overlay');
+        setPaymentLoading(false);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('pageshow', handlePageShow);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, [paymentLoading]);
+
   // NEW useEffect to fetch images after courses are loaded
   useEffect(() => {
     if (courses.length > 0) {
@@ -134,7 +165,10 @@ export default function CoursesPage() {
         const authRes = await fetch("/api/session", { credentials: "include" });
         const authData: any = await authRes.json();
         if (authRes.ok && authData.authenticated) {
+          setIsAuthenticated(true);
           setIsTeacher(String(authData?.user?.role || "").toLowerCase() === "teacher");
+        } else {
+          setIsAuthenticated(false);
         }
 
         const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
@@ -208,16 +242,11 @@ export default function CoursesPage() {
       } catch (e: any) {
         if (!cancelled) {
           let msg = String(e?.message || "Failed to load courses");
-          if (/Failed \(401\)/.test(msg)) {
-            msg = "You are not authenticated. Please sign in again.";
-          } else if (/Failed \(403\)/.test(msg)) {
-            msg = "You do not have permission to view courses.";
-          } else if (/Failed \(404\)/.test(msg)) {
+          if (/Failed \(404\)/.test(msg)) {
             msg = "Courses endpoint not found.";
           } else if (/NetworkError|TypeError/i.test(String(e))) {
             msg = "Network error. Please check your connection or CORS settings.";
           }
-          console.error("Courses load error:", e);
           setError(msg);
         }
       } finally {
@@ -225,7 +254,7 @@ export default function CoursesPage() {
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [location]);
 
   // --- Filtering Logic (Unchanged) ---
   const filtered = useMemo(() => {
@@ -257,17 +286,37 @@ export default function CoursesPage() {
     );
   }
 
-  const handleRedirect = (courseId: string, hasAccess: boolean) => {
+  const handleRedirect = (courseId: string, hasAccess: boolean, courseName: string, isFree: boolean) => {
+    // Check if user is authenticated before allowing any course access
+    if (!isAuthenticated) {
+      // Redirect to login page
+      window.location.href = "/signin/student";
+      return;
+    }
+
     if (hasAccess) {
       window.location.href = `/course/${encodeURIComponent(courseId)}`;
     } else {
       // Redirect to payment page or show payment modal
-      handlePayment(courseId);
+      handlePayment(courseId, courseName);
     }
   };
 
-  const handlePayment = async (courseId: string) => {
+  const handlePayment = async (courseId: string, courseName: string) => {
     try {
+      // Show loading overlay
+      setSelectedCourseName(courseName);
+      setPaymentLoading(true);
+
+      // Safety timeout: hide overlay after 30 seconds if still loading
+      const timeoutId = setTimeout(() => {
+        console.warn('Payment loading timeout reached, hiding overlay');
+        setPaymentLoading(false);
+      }, 30000); // 30 seconds
+
+      // Store timeout ID to clear it if needed
+      (window as any).__paymentTimeout = timeoutId;
+
       const response = await fetch("/api/payment/initialize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -277,10 +326,11 @@ export default function CoursesPage() {
 
       const data = await response.json();
       if (!response.ok) {
+        setPaymentLoading(false);
         // Check if user is not authenticated
         if (response.status === 401) {
           // Redirect to sign-in page
-          window.location.href = "/signin/student401";
+          window.location.href = "/signin/student";
           return;
         }
         alert(data.error || "Failed to initialize payment");
@@ -303,11 +353,19 @@ export default function CoursesPage() {
       accessCodeInput.name = "access_code";
       accessCodeInput.value = data.accessCode;
 
-      form.appendChild(encReqInput);
+      // Append in desired order: access_code first, then encRequest
       form.appendChild(accessCodeInput);
+      form.appendChild(encReqInput);
       document.body.appendChild(form);
+      console.log(data.accessCode, data.encryptedData?.length, data.ccavenueUrl);
       form.submit();
+      // Keep loading overlay visible during redirect
     } catch (error) {
+      // Clear timeout on error
+      if ((window as any).__paymentTimeout) {
+        clearTimeout((window as any).__paymentTimeout);
+      }
+      setPaymentLoading(false);
       console.error("Payment initialization error:", error);
       alert("Failed to initialize payment. Please try again.");
     }
@@ -318,6 +376,9 @@ export default function CoursesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900">
+      {/* Payment Loading Overlay */}
+      {paymentLoading && <PaymentLoadingOverlay courseName={selectedCourseName} />}
+      
       <Navigation />
 
       <div className="max-w-6xl mx-auto py-10 mt-16 px-4 space-y-8">
@@ -433,14 +494,16 @@ export default function CoursesPage() {
                     {/* Button at bottom - separated from space-y-3 */}
                     <Button
                       size="sm"
-                      onClick={() => handleRedirect(c.id, c.hasAccess || c.isFree || false)}
+                      onClick={() => handleRedirect(c.id, c.hasAccess || c.isFree || false, c.title, c.isFree || false)}
                       className={`w-full mt-4 ${
                         c.hasAccess || c.isFree 
                           ? "bg-green-600 hover:bg-green-700" 
                           : "bg-blue-600 hover:bg-blue-700"
                       }`}
                     >
-                      {c.hasAccess || c.isFree ? "View Course" : `Buy for ${c.currency === 'INR' ? '₹' : '$'}${c.price || 0}`}
+                      {!isAuthenticated 
+                        ? (c.isFree ? "Login to Access" : `Login to Buy - ${c.currency === 'INR' ? '₹' : '$'}${c.price || 0}`)
+                        : (c.hasAccess || c.isFree ? "View Course" : `Buy for ${c.currency === 'INR' ? '₹' : '$'}${c.price || 0}`)}
                     </Button>
                   </div>
                 </article>

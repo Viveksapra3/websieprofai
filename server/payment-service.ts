@@ -203,13 +203,13 @@ class PaymentService {
     console.log(`   User ID: ${userId}`);
     console.log(`   Course ID: ${courseId}`);
     console.log(`   User Info:`, {
-      username: userInfo.username || "Not provided",
-      email: userInfo.email || "Not provided",
-      phone: userInfo.phone || "Not provided",
-      address: userInfo.address || "Not provided",
-      city: userInfo.city || "Not provided",
-      state: userInfo.state || "Not provided",
-      zip: userInfo.zip || "Not provided"
+      username: userInfo.username || "",
+      email: userInfo.email || "",
+      phone: userInfo.phone || "",
+      address: userInfo.address || "",
+      city: userInfo.city || "",
+      state: userInfo.state || "",
+      zip: userInfo.zip || ""
     });
     console.log(`   Timestamp: ${new Date().toISOString()}`);
     
@@ -269,21 +269,21 @@ class PaymentService {
         cancel_url: this.config.cancelUrl,
         upiPaymentFlag:"QR",
         language: "EN",
-        billing_name: userInfo.username || "Customer",
-        billing_email: userInfo.email || "customer@example.com",
-        billing_tel: userInfo.phone || "9999999999",
-        billing_address: userInfo.address || "Not Provided",
-        billing_city: userInfo.city || "Not Provided",
-        billing_state: userInfo.state || "Not Provided",
-        billing_zip: userInfo.zip || "000000",
+        billing_name: userInfo.username || "",
+        billing_email: userInfo.email || "",
+        billing_tel: userInfo.phone || "",
+        billing_address: userInfo.address || "",
+        billing_city: userInfo.city || "",
+        billing_state: userInfo.state || "",
+        billing_zip: userInfo.zip || "",
         billing_country: "India",
-        delivery_name: userInfo.username || "Customer",
-        delivery_address: userInfo.address || "Not Provided",
-        delivery_city: userInfo.city || "Not Provided",
-        delivery_state: userInfo.state || "Not Provided",
-        delivery_zip: userInfo.zip || "000000",
+        delivery_name: userInfo.username || "",
+        delivery_address: userInfo.address || "",
+        delivery_city: userInfo.city || "",
+        delivery_state: userInfo.state || "",
+        delivery_zip: userInfo.zip || "",
         delivery_country: "India",
-        delivery_tel: userInfo.phone || "9999999999",
+        delivery_tel: userInfo.phone || "",
         merchant_param1: courseId,
         merchant_param2: userId,
       };

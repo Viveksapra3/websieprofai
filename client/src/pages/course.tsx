@@ -74,7 +74,13 @@ export default function CoursePage() {
 
         console.log("Access granted, loading course content");
 
-        const res = await fetch(`/api/course/${encodeURIComponent(courseId)}`);
+        // Fetch course content from external API via Nginx proxy
+        const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
+        const courseUrl = apiBase 
+          ? `${apiBase}/api/course/${encodeURIComponent(courseId)}`
+          : `/api/course/${encodeURIComponent(courseId)}`;
+        
+        const res = await fetch(courseUrl);
         const data = await res.json();
         if (!res.ok) throw new Error(data?.error || "Failed to load course");
 
@@ -125,7 +131,9 @@ export default function CoursePage() {
     const weekKey = String(week);
     try {
       setModuleQuizLoading((s) => ({ ...s, [weekKey]: true }));
-      const res = await fetch('/api/quiz/generate-module', {
+      const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
+      const quizUrl = apiBase ? `${apiBase}/api/quiz/generate-module` : '/api/quiz/generate-module';
+      const res = await fetch(quizUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -265,7 +273,9 @@ export default function CoursePage() {
     if (!courseId) return;
     try {
       setQuizLoading(true);
-      const res = await fetch('/api/quiz/generate-course', {
+      const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
+      const quizUrl = apiBase ? `${apiBase}/api/quiz/generate-course` : '/api/quiz/generate-course';
+      const res = await fetch(quizUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ quiz_type: "course", course_id: String(courseId), module_week: 0 }),

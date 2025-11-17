@@ -62,6 +62,66 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  app.post("/api/quiz/generate-course", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const apiBase = process.env.VITE_API_BASE as string | undefined;
+      if (!apiBase) {
+        return res.status(500).json({ error: "External API base not configured (VITE_API_BASE)" });
+      }
+      let apiUrl: string;
+      if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
+        apiUrl = `${apiBase}/api/quiz/generate-course`;
+      } else {
+        const protocol = req.protocol || 'http';
+        const host = req.get('host') || 'localhost:5000';
+        const base = apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase;
+        apiUrl = `${protocol}://${host}${base}/api/quiz/generate-course`;
+      }
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req.body ?? {}),
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok) {
+        return res.status(response.status).json(data || { error: `Failed (${response.status})` });
+      }
+      return res.json(data);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  app.post("/api/quiz/generate-module", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const apiBase = process.env.VITE_API_BASE as string | undefined;
+      if (!apiBase) {
+        return res.status(500).json({ error: "External API base not configured (VITE_API_BASE)" });
+      }
+      let apiUrl: string;
+      if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
+        apiUrl = `${apiBase}/api/quiz/generate-module`;
+      } else {
+        const protocol = req.protocol || 'http';
+        const host = req.get('host') || 'localhost:5000';
+        const base = apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase;
+        apiUrl = `${protocol}://${host}${base}/api/quiz/generate-module`;
+      }
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req.body ?? {}),
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok) {
+        return res.status(response.status).json(data || { error: `Failed (${response.status})` });
+      }
+      return res.json(data);
+    } catch (err) {
+      next(err);
+    }
+  });
+
   // --- File uploads (teacher courses) ---
   const __routesDir = path.dirname(fileURLToPath(import.meta.url));
   const uploadsDir = path.resolve(__routesDir, "..", "uploads");
@@ -564,6 +624,36 @@ export async function registerRoutes(app: Express): Promise<void> {
       });
 
       return res.json({ courses: coursesWithPricing });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  app.get("/api/course/:courseId", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { courseId } = req.params;
+      const apiBase = process.env.VITE_API_BASE as string | undefined;
+
+      if (!apiBase) {
+        return res.status(500).json({ error: "External API base not configured (VITE_API_BASE)" });
+      }
+
+      let apiUrl: string;
+      if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
+        apiUrl = `${apiBase}/api/course/${encodeURIComponent(courseId)}`;
+      } else {
+        const protocol = req.protocol || 'http';
+        const host = req.get('host') || 'localhost:5000';
+        const base = apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase;
+        apiUrl = `${protocol}://${host}${base}/api/course/${encodeURIComponent(courseId)}`;
+      }
+
+      const response = await fetch(apiUrl);
+      const data = await response.json().catch(() => null);
+      if (!response.ok) {
+        return res.status(response.status).json(data || { error: `Failed (${response.status})` });
+      }
+      return res.json(data);
     } catch (err) {
       next(err);
     }

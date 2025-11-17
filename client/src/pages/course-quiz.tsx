@@ -9,9 +9,9 @@ const buildApiUrl = (path: string): string => {
   if (!apiBase) throw new Error("Missing VITE_API_BASE in environment");
   
   // If apiBase is already absolute, use it directly
-  if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
-    return `${apiBase}${path}`;
-  }
+  // if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
+  //   return `${apiBase}${path}`;
+  // }
   
   // If relative, construct absolute URL using current window location
   const protocol = window.location.protocol;

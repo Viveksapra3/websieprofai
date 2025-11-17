@@ -12,20 +12,31 @@ type CourseDetail = {
   [key: string]: any;
 };
 
-// Helper function to build absolute URL from VITE_API_BASE
+// Helper function to build API URL.
+// To avoid mixed-content issues when the site is served over HTTPS
+// and the backend is HTTP behind an Nginx reverse proxy/mask,
+// we prepend VITE_API_BASE (e.g., /backend-api) to all API paths.
 const buildApiUrl = (path: string): string => {
-  const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
-  if (!apiBase) throw new Error("Missing VITE_API_BASE in environment");
+  // If caller passes a fully-qualified URL, use it as-is.
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
+
+  const apiBase = (import.meta.env.VITE_API_BASE as string | undefined) || "";
   
-  // If apiBase is already absolute, use it directly
-  if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
-    return `${apiBase}${path}`;
+  // Remove leading slash from path if present to avoid double slashes
+  const cleanPath = path.startsWith("/") ? path.slice(1) : path;
+  
+  // Combine apiBase with the path
+  // If apiBase is empty, just return the path with leading slash
+  if (!apiBase) {
+    return `/${cleanPath}`;
   }
   
-  // If relative, construct absolute URL using current window location
-  const protocol = window.location.protocol;
-  const host = window.location.host;
-  return `${protocol}//${host}${apiBase}${path}`;
+  // Remove trailing slash from apiBase if present
+  const cleanBase = apiBase.endsWith("/") ? apiBase.slice(0, -1) : apiBase;
+  
+  return `${cleanBase}/${cleanPath}`;
 };
 
 export default function CoursePage() {

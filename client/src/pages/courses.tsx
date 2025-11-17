@@ -416,9 +416,9 @@ export default function CoursesPage() {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             {/* Left: Title */}
             <div className="space-y-4 flex-1 animate-slide-in-left">
-              <div className="inline-block">
-                <h1 className="text-6xl md:text-7xl font-black tracking-tight">
-                  <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-white via-violet-200 to-fuchsia-200 animate-shimmer" style={{
+              <div className="inline-block pb-4">
+                <h1 className="text-6xl md:text-7xl font-black tracking-tight leading-tight">
+                  <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-white via-violet-200 to-fuchsia-200 animate-shimmer pb-2" style={{
                     backgroundSize: '200% 100%'
                   }}>
                     {getPageTitle()}

@@ -79,9 +79,19 @@ export const paymentTransactions = pgTable("payment_transactions", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Course images table
+export const courseImages = pgTable("course_images", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  courseId: text("course_id").notNull().unique(), // External API course ID
+  imageUrl: text("image_url").notNull(), // Custom image URL for the course
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertCoursePricingSchema = createInsertSchema(coursePricing);
 export const insertUserPurchaseSchema = createInsertSchema(userPurchases);
 export const insertPaymentTransactionSchema = createInsertSchema(paymentTransactions);
+export const insertCourseImageSchema = createInsertSchema(courseImages);
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -89,3 +99,4 @@ export type SignInData = z.infer<typeof signInSchema>;
 export type CoursePricing = typeof coursePricing.$inferSelect;
 export type UserPurchase = typeof userPurchases.$inferSelect;
 export type PaymentTransaction = typeof paymentTransactions.$inferSelect;
+export type CourseImage = typeof courseImages.$inferSelect;

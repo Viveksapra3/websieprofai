@@ -1,6 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db, pool } from "./db";
-import { users, coursePricing, userPurchases } from "@shared/schema";
+import { users, coursePricing, userPurchases, courseImages } from "@shared/schema";
 import { eq, or, sql, and, asc } from "drizzle-orm";
 import crypto from "crypto";
 import multer from "multer";
@@ -587,6 +587,11 @@ export async function registerRoutes(app: Express): Promise<void> {
         .from(coursePricing)
         .orderBy(asc(coursePricing.displayOrder));
 
+      // Get custom course images
+      const courseImagesData = await db
+        .select()
+        .from(courseImages);
+
       // Get user's purchases (only if logged in)
       let purchasedCourseIds = new Set<string>();
       if (user) {
@@ -598,10 +603,11 @@ export async function registerRoutes(app: Express): Promise<void> {
         );
       }
 
-      // Combine course data with pricing and access info
+      // Combine course data with pricing, access info, and custom images
       const coursesWithPricing = courses.map((course, index) => {
         const courseId = String(course.course_id || course.id);
         const pricing = pricingData.find(p => p.courseId === courseId);
+        const customImage = courseImagesData.find(img => img.courseId === courseId);
         
         // Default: first 3 courses are free, or if explicitly marked as free
         const isFree = index < 3 || (pricing?.isFree ?? (index < 3));
@@ -620,6 +626,7 @@ export async function registerRoutes(app: Express): Promise<void> {
           isFree,
           hasAccess,
           displayOrder: pricing?.displayOrder || (index + 1),
+          imageUrl: customImage?.imageUrl || null, // Add custom image URL
         };
       });
 

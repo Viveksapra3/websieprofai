@@ -130,23 +130,13 @@ export default function Navigation() {
               </div>
             </div>
 
-            {/* ProfAI Business Link */}
-            <Link href="/profai-business">
+            {/* How it works Button */}
+            <Link href="/how-it-works">
               <button 
                 className={`${textColor} ${hoverColor} transition-colors hover:scale-110`}
-                data-testid="nav-business"
+                data-testid="nav-how-it-works"
               >
-                ProfAI Business
-              </button>
-            </Link>
-
-            {/* Career GPT Link */}
-            <Link href="/career-gpt">
-              <button 
-                className={`${textColor} ${hoverColor} transition-colors hover:scale-110`}
-                data-testid="nav-career-gpt"
-              >
-                Career GPT
+                How it works
               </button>
             </Link>
             
@@ -188,14 +178,24 @@ export default function Navigation() {
                 </Link>
               </div>
             </div>
-            
-            {/* How it works Button */}
-            <Link href="/how-it-works">
+
+            {/* ProfAI Business Link */}
+            <Link href="/profai-business">
               <button 
                 className={`${textColor} ${hoverColor} transition-colors hover:scale-110`}
-                data-testid="nav-how-it-works"
+                data-testid="nav-business"
               >
-                How it works
+                ProfAI Business
+              </button>
+            </Link>
+
+            {/* Career GPT Link */}
+            <Link href="/career-gpt">
+              <button 
+                className={`${textColor} ${hoverColor} transition-colors hover:scale-110`}
+                data-testid="nav-career-gpt"
+              >
+                Career GPT
               </button>
             </Link>
             
@@ -351,17 +351,10 @@ export default function Navigation() {
               </Link>
             </div>
 
-            {/* Mobile ProfAI Business Link */}
-            <Link href="/profai-business">
+            {/* Mobile How it works Link */}
+            <Link href="/how-it-works">
               <button className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left border-b border-white/20 pb-2 mb-2`}>
-                ProfAI Business
-              </button>
-            </Link>
-
-            {/* Mobile Career GPT Link */}
-            <Link href="/career-gpt">
-              <button className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left border-b border-white/20 pb-2 mb-2`}>
-                Career GPT
+                How it works
               </button>
             </Link>
             
@@ -389,10 +382,18 @@ export default function Navigation() {
                 </button>
               </Link>
             </div>
-            
-            <Link href="/how-it-works">
+
+            {/* Mobile ProfAI Business Link */}
+            <Link href="/profai-business">
+              <button className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left border-b border-white/20 pb-2 mb-2`}>
+                ProfAI Business
+              </button>
+            </Link>
+
+            {/* Mobile Career GPT Link */}
+            <Link href="/career-gpt">
               <button className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left`}>
-                How it works
+                Career GPT
               </button>
             </Link>
             

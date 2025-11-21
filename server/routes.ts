@@ -408,12 +408,196 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // SIGNUP (STUDENT) - For Google Sign-Up with Firebase
+  app.post("/api/signup/student", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { usernameOrEmail, firebaseUid, displayName, profileData } = req.body ?? {};
+      
+      if (!usernameOrEmail || !firebaseUid) {
+        return res.status(400).json({ error: "Email and Firebase UID are required" });
+      }
+
+      // Check if user already exists
+      const existing = await db
+        .select()
+        .from(users)
+        .where(or(eq(users.email, usernameOrEmail), eq(users.username, displayName)))
+        .limit(1);
+      
+      if (existing.length > 0) {
+        return res.status(409).json({ error: "User with this email or username already exists" });
+      }
+
+      const username = displayName || usernameOrEmail.split('@')[0];
+      const hashedPassword = hashPassword(firebaseUid); // Use firebaseUid as password placeholder
+      
+      console.log(`[Firebase Signup] Creating new student account for: ${usernameOrEmail}`);
+      console.log(`[Firebase Signup] Profile data:`, profileData);
+      
+      // Prepare user data with profile information
+      const userData: any = {
+        username,
+        email: usernameOrEmail,
+        password: hashedPassword,
+        role: "student",
+        termsAccepted: profileData?.termsAccepted || false,
+      };
+
+      // Add student-specific fields if provided
+      if (profileData) {
+        if (profileData.studentType) userData.studentType = profileData.studentType;
+        if (profileData.collegeName) userData.collegeName = profileData.collegeName;
+        if (profileData.degree) userData.degree = profileData.degree;
+        if (profileData.schoolClass) userData.schoolClass = profileData.schoolClass;
+        if (profileData.schoolAffiliation) userData.schoolAffiliation = profileData.schoolAffiliation;
+      }
+      
+      console.log(`[Firebase Signup] Saving student data:`, userData);
+      
+      const [newUser] = await db
+        .insert(users)
+        .values(userData)
+        .returning();
+      
+      console.log(`[Firebase Signup] Student account created successfully: ${newUser.id}`);
+      
+      // Create session
+      try {
+        (req.session as any).user = { 
+          id: newUser.id, 
+          username: newUser.username, 
+          email: newUser.email, 
+          role: newUser.role 
+        };
+      } catch {}
+
+      const redirectUrl = process.env.STUDENT_REDIRECT_URL || process.env.REDIRECT_URL || "/courses";
+      return res.status(201).json({ 
+        message: "Student account created", 
+        user: { 
+          id: newUser.id, 
+          username: newUser.username, 
+          email: newUser.email, 
+          role: newUser.role 
+        }, 
+        redirectUrl 
+      });
+    } catch (err) {
+      const anyErr = err as any;
+      console.error('[Firebase Signup] Error creating student account:', anyErr);
+      
+      if (anyErr && typeof anyErr === "object" && anyErr.code === "23505") {
+        return res.status(409).json({ error: "User with this email or username already exists" });
+      }
+      
+      return res.status(500).json({ 
+        error: "Failed to create account", 
+        detail: anyErr?.message || String(anyErr) 
+      });
+    }
+  });
+
+  // SIGNUP (TEACHER) - For Google Sign-Up with Firebase
+  app.post("/api/signup/teacher", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { usernameOrEmail, firebaseUid, displayName, profileData } = req.body ?? {};
+      
+      if (!usernameOrEmail || !firebaseUid) {
+        return res.status(400).json({ error: "Email and Firebase UID are required" });
+      }
+
+      // Check if user already exists
+      const existing = await db
+        .select()
+        .from(users)
+        .where(or(eq(users.email, usernameOrEmail), eq(users.username, displayName)))
+        .limit(1);
+      
+      if (existing.length > 0) {
+        return res.status(409).json({ error: "User with this email or username already exists" });
+      }
+
+      const username = displayName || usernameOrEmail.split('@')[0];
+      const hashedPassword = hashPassword(firebaseUid); // Use firebaseUid as password placeholder
+      
+      console.log(`[Firebase Signup] Creating new teacher account for: ${usernameOrEmail}`);
+      console.log(`[Firebase Signup] Profile data:`, profileData);
+      
+      // Prepare user data with profile information
+      const userData: any = {
+        username,
+        email: usernameOrEmail,
+        password: hashedPassword,
+        role: "teacher",
+        termsAccepted: profileData?.termsAccepted || false,
+      };
+
+      // Add teacher-specific fields if provided
+      if (profileData) {
+        if (profileData.institution) userData.institution = profileData.institution;
+        if (profileData.subject) userData.subject = profileData.subject;
+        if (profileData.experience) userData.experience = profileData.experience;
+      }
+      
+      console.log(`[Firebase Signup] Saving teacher data:`, userData);
+      
+      const [newUser] = await db
+        .insert(users)
+        .values(userData)
+        .returning();
+      
+      console.log(`[Firebase Signup] Teacher account created successfully: ${newUser.id}`);
+      
+      // Create session
+      try {
+        (req.session as any).user = { 
+          id: newUser.id, 
+          username: newUser.username, 
+          email: newUser.email, 
+          role: newUser.role 
+        };
+      } catch {}
+
+      const redirectUrl = process.env.TEACHER_REDIRECT_URL || process.env.REDIRECT_URL || "/teacher/upload";
+      return res.status(201).json({ 
+        message: "Teacher account created", 
+        user: { 
+          id: newUser.id, 
+          username: newUser.username, 
+          email: newUser.email, 
+          role: newUser.role 
+        }, 
+        redirectUrl 
+      });
+    } catch (err) {
+      const anyErr = err as any;
+      console.error('[Firebase Signup] Error creating teacher account:', anyErr);
+      
+      if (anyErr && typeof anyErr === "object" && anyErr.code === "23505") {
+        return res.status(409).json({ error: "User with this email or username already exists" });
+      }
+      
+      return res.status(500).json({ 
+        error: "Failed to create account", 
+        detail: anyErr?.message || String(anyErr) 
+      });
+    }
+  });
+
   // SIGN IN (TEACHER)
   app.post("/api/signin/teacher", async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { usernameOrEmail, password } = req.body ?? {};
-      if (!usernameOrEmail || !password) {
-        return res.status(400).json({ error: "username/email and password required" });
+      const { usernameOrEmail, password, firebaseUid, displayName } = req.body ?? {};
+      
+      // Check if this is Firebase Google Sign-In (has firebaseUid but no password)
+      const isFirebaseAuth = firebaseUid && !password;
+      
+      if (!usernameOrEmail) {
+        return res.status(400).json({ error: "email is required" });
+      }
+      
+      if (!isFirebaseAuth && !password) {
+        return res.status(400).json({ error: "password is required for email/password login" });
       }
 
       const found = await db
@@ -422,10 +606,49 @@ export async function registerRoutes(app: Express): Promise<void> {
         .where(or(eq(users.email, usernameOrEmail), eq(users.username, usernameOrEmail)))
         .limit(1);
 
-      const user = found[0];
+      let user = found[0];
+      
+      // If Firebase auth and user doesn't exist, create new user
+      if (!user && isFirebaseAuth) {
+        try {
+          const username = displayName || usernameOrEmail.split('@')[0];
+          const hashedPassword = hashPassword(firebaseUid); // Use firebaseUid as password placeholder
+          
+          console.log(`[Firebase Auth] Creating new teacher account for: ${usernameOrEmail}`);
+          
+          const [newUser] = await db
+            .insert(users)
+            .values({
+              username,
+              email: usernameOrEmail,
+              password: hashedPassword,
+              role: "teacher",
+            })
+            .returning();
+          
+          user = newUser;
+          console.log(`[Firebase Auth] Teacher account created successfully: ${user.id}`);
+        } catch (insertError: any) {
+          console.error('[Firebase Auth] Error creating teacher account:', insertError);
+          // User might already exist with different role or username conflict
+          return res.status(500).json({ 
+            error: "Failed to create account. Email may already be registered.",
+            detail: insertError.message 
+          });
+        }
+      }
+      
       if (!user) return res.status(401).json({ error: "Invalid credentials" });
-      if (user.role !== "teacher") return res.status(403).json({ error: "User is not a teacher" });
-      if (!verifyPassword(password, user.password)) return res.status(401).json({ error: "Invalid credentials" });
+      if (user.role !== "teacher") {
+        return res.status(403).json({ 
+          error: "This account is registered as a student. Please sign in as a student instead." 
+        });
+      }
+      
+      // For traditional password login, verify password
+      if (!isFirebaseAuth && !verifyPassword(password, user.password)) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
 
       // create session
       try {
@@ -442,9 +665,17 @@ export async function registerRoutes(app: Express): Promise<void> {
   // SIGN IN (STUDENT)
   app.post("/api/signin/student", async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { usernameOrEmail, password } = req.body ?? {};
-      if (!usernameOrEmail || !password) {
-        return res.status(400).json({ error: "username/email and password required" });
+      const { usernameOrEmail, password, firebaseUid, displayName } = req.body ?? {};
+      
+      // Check if this is Firebase Google Sign-In (has firebaseUid but no password)
+      const isFirebaseAuth = firebaseUid && !password;
+      
+      if (!usernameOrEmail) {
+        return res.status(400).json({ error: "email is required" });
+      }
+      
+      if (!isFirebaseAuth && !password) {
+        return res.status(400).json({ error: "password is required for email/password login" });
       }
 
       const found = await db
@@ -453,10 +684,49 @@ export async function registerRoutes(app: Express): Promise<void> {
         .where(or(eq(users.email, usernameOrEmail), eq(users.username, usernameOrEmail)))
         .limit(1);
 
-      const user = found[0];
+      let user = found[0];
+      
+      // If Firebase auth and user doesn't exist, create new user
+      if (!user && isFirebaseAuth) {
+        try {
+          const username = displayName || usernameOrEmail.split('@')[0];
+          const hashedPassword = hashPassword(firebaseUid); // Use firebaseUid as password placeholder
+          
+          console.log(`[Firebase Auth] Creating new student account for: ${usernameOrEmail}`);
+          
+          const [newUser] = await db
+            .insert(users)
+            .values({
+              username,
+              email: usernameOrEmail,
+              password: hashedPassword,
+              role: "student",
+            })
+            .returning();
+          
+          user = newUser;
+          console.log(`[Firebase Auth] Student account created successfully: ${user.id}`);
+        } catch (insertError: any) {
+          console.error('[Firebase Auth] Error creating student account:', insertError);
+          // User might already exist with different role or username conflict
+          return res.status(500).json({ 
+            error: "Failed to create account. Email may already be registered.",
+            detail: insertError.message 
+          });
+        }
+      }
+      
       if (!user) return res.status(401).json({ error: "Invalid credentials" });
-      if (user.role !== "student") return res.status(403).json({ error: "User is not a student" });
-      if (!verifyPassword(password, user.password)) return res.status(401).json({ error: "Invalid credentials" });
+      if (user.role !== "student") {
+        return res.status(403).json({ 
+          error: "This account is registered as a teacher. Please sign in as a teacher instead." 
+        });
+      }
+      
+      // For traditional password login, verify password
+      if (!isFirebaseAuth && !verifyPassword(password, user.password)) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
 
       // create session
       try {
@@ -465,6 +735,77 @@ export async function registerRoutes(app: Express): Promise<void> {
 
       const redirectUrl = process.env.STUDENT_REDIRECT_URL || process.env.REDIRECT_URL || "/courses";
       return res.json({ message: "Student signed in", user: { id: user.id, username: user.username, email: user.email, role: user.role }, redirectUrl });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Check if user exists (for Google Sign-In flow)
+  app.post("/api/check-user", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email } = req.body ?? {};
+      
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+      }
+
+      const found = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1);
+
+      const user = found[0];
+
+      if (user) {
+        // User exists - return their role
+        return res.json({ 
+          exists: true, 
+          role: user.role,
+          message: `Account already exists as ${user.role}` 
+        });
+      } else {
+        // User doesn't exist - needs to select role
+        return res.json({ 
+          exists: false,
+          message: "No account found. Please select your role." 
+        });
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Check if username is available
+  app.post("/api/check-username", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { username } = req.body ?? {};
+      
+      if (!username) {
+        return res.status(400).json({ error: "Username is required" });
+      }
+
+      // Validate username format
+      const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+      if (!usernameRegex.test(username)) {
+        return res.json({ 
+          available: false,
+          message: "Username must be 3-20 characters and contain only letters, numbers, and underscores" 
+        });
+      }
+
+      const found = await db
+        .select()
+        .from(users)
+        .where(eq(users.username, username))
+        .limit(1);
+
+      const available = !found[0];
+
+      return res.json({ 
+        available,
+        message: available ? "Username is available" : "Username is already taken" 
+      });
     } catch (err) {
       next(err);
     }

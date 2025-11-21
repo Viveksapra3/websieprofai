@@ -1,13 +1,16 @@
 import { useState } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, ArrowLeft, Mail, Lock, BookOpen } from 'lucide-react';
 import logoPath from "@assets/prof-ai-logo_1755775207766-DKA28TFR.avif";
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function SignInStudent() {
+  const [, setLocation] = useLocation();
+  const { signInWithEmail, signInWithGoogle } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -30,7 +33,10 @@ export default function SignInStudent() {
     setAuthError(null);
     
     try {
-      // POST request to sign in as student
+      // Firebase email/password authentication
+      await signInWithEmail(formData.email, formData.password);
+      
+      // After successful Firebase auth, sync with backend
       const response = await fetch('/api/signin/student', {
         method: 'POST',
         headers: {
@@ -46,16 +52,96 @@ export default function SignInStudent() {
       if (response.ok) {
         const data = await response.json();
         console.log('Student sign-in successful:', data);
-        const redirectUrl = data?.redirectUrl || (import.meta.env.VITE_AUTH_REDIRECT_URL as string) || '/';
+        const redirectUrl = data?.redirectUrl || (import.meta.env.VITE_AUTH_REDIRECT_URL as string) || '/courses';
         window.location.href = redirectUrl;
       } else {
         const error = await response.json();
         console.error('Student sign-in failed:', error);
         setAuthError('Authentication Failed, Please Verify Your Credentials');
       }
-    } catch (error) {
-      console.error('Network error:', error);
-      setAuthError('Authentication Failed, Please Verify Your Credentials');
+    } catch (error: any) {
+      console.error('Authentication error:', error);
+      const errorMessage = error?.message || 'Authentication Failed, Please Verify Your Credentials';
+      setAuthError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    setAuthError(null);
+    
+    try {
+      const result = await signInWithGoogle();
+      const user = result.user;
+      
+      // Check if user already exists
+      const checkResponse = await fetch('/api/check-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ email: user.email }),
+      });
+
+      const checkData = await checkResponse.json();
+
+      if (checkData.exists) {
+        // User exists - check if role matches
+        if (checkData.role === 'student') {
+          // Sign in as student
+          await signInWithRole(user, 'student');
+        } else {
+          // User exists but as different role
+          setAuthError(`This email is already registered as a ${checkData.role}. Please sign in as ${checkData.role} instead.`);
+          setIsLoading(false);
+        }
+      } else {
+        // User doesn't exist - redirect to signup
+        setAuthError('No account found with this email. Please sign up first.');
+        setIsLoading(false);
+      }
+    } catch (error: any) {
+      console.error('Google sign-in error:', error);
+      setAuthError(error?.message || 'Google sign-in failed. Please try again.');
+      setIsLoading(false);
+    }
+  };
+
+  const signInWithRole = async (user: any, role: 'student' | 'teacher') => {
+    setIsLoading(true);
+    setAuthError(null);
+    
+    try {
+      const endpoint = role === 'teacher' ? '/api/signin/teacher' : '/api/signin/student';
+      
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          usernameOrEmail: user.email,
+          firebaseUid: user.uid,
+          displayName: user.displayName,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Google sign-in successful:', data);
+        const redirectUrl = data?.redirectUrl || (import.meta.env.VITE_AUTH_REDIRECT_URL as string) || '/courses';
+        window.location.href = redirectUrl;
+      } else {
+        const errorData = await response.json();
+        setAuthError(errorData.error || 'Failed to complete sign-in. Please try again.');
+      }
+    } catch (error: any) {
+      console.error('Sign-in error:', error);
+      setAuthError(error?.message || 'Sign-in failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -153,13 +239,13 @@ export default function SignInStudent() {
               </div>
 
               {/* Forgot Password Link */}
-              {/* <div className="text-right">
+              <div className="text-right">
                 <Link href="/forgot-password">
                   <span className="text-green-400 hover:text-green-300 text-sm cursor-pointer transition-colors">
                     Forgot your password?
                   </span>
                 </Link>
-              </div> */}
+              </div>
 
               {/* Submit Button */}
               <Button 
@@ -177,7 +263,7 @@ export default function SignInStudent() {
               )}
             </form>
 
-            {/* Divider 
+            {/* Divider */}
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t border-white/20" />
@@ -185,13 +271,16 @@ export default function SignInStudent() {
               <div className="relative flex justify-center text-sm">
                 <span className="bg-transparent px-2 text-white/70">Or continue with</span>
               </div>
-            </div> */}
+            </div>
 
-            {/* Social Sign In Options 
-            <div className="grid grid-cols-2 gap-4">
+            {/* Social Sign In Options */}
+            <div className="w-full">
               <Button 
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={isLoading}
                 variant="outline" 
-                className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/30 transition-all"
+                className="w-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 data-testid="button-google-signin"
               >
                 <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
@@ -200,19 +289,9 @@ export default function SignInStudent() {
                   <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                   <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
-                Google
+                {isLoading ? 'Signing in...' : 'Continue with Google'}
               </Button>
-              <Button 
-                variant="outline" 
-                className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/30 transition-all"
-                data-testid="button-github-signin"
-              >
-                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-                GitHub
-              </Button>
-            </div> */}
+            </div>
 
             {/* Sign Up Link */}
             <div className="text-center">
@@ -240,6 +319,7 @@ export default function SignInStudent() {
           </CardContent>
         </Card>
       </div>
+
     </div>
   );
 }

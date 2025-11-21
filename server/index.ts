@@ -47,6 +47,11 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Headers",
     "Content-Type, Authorization, X-Requested-With, X-CSRF-Token"
   );
+  
+  // Fix for Firebase Google Sign-In popup (COOP error)
+  res.header("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  res.header("Cross-Origin-Embedder-Policy", "unsafe-none");
+  
   if (req.method === "OPTIONS") {
     return res.sendStatus(204);
   }

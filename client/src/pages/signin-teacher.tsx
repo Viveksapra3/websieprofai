@@ -1,13 +1,16 @@
 import { useState } from 'react';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, ArrowLeft, Mail, Lock, GraduationCap } from 'lucide-react';
 import logoPath from "@assets/prof-ai-logo_1755775207766-DKA28TFR.avif";
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function SignInTeacher() {
+  const [, setLocation] = useLocation();
+  const { signInWithEmail, signInWithGoogle } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -30,7 +33,10 @@ export default function SignInTeacher() {
     setAuthError(null);
     
     try {
-      // POST request to sign in as teacher
+      // Firebase email/password authentication
+      await signInWithEmail(formData.email, formData.password);
+      
+      // After successful Firebase auth, sync with backend
       const response = await fetch('/api/signin/teacher', {
         method: 'POST',
         headers: {
@@ -53,9 +59,89 @@ export default function SignInTeacher() {
         console.error('Teacher sign-in failed:', error);
         setAuthError('Authentication Failed, Please Verify Your Credentials');
       }
-    } catch (error) {
-      console.error('Network error:', error);
-      setAuthError('Authentication Failed,Please Verify Your Credentials');
+    } catch (error: any) {
+      console.error('Authentication error:', error);
+      const errorMessage = error?.message || 'Authentication Failed, Please Verify Your Credentials';
+      setAuthError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    setAuthError(null);
+    
+    try {
+      const result = await signInWithGoogle();
+      const user = result.user;
+      
+      // Check if user already exists
+      const checkResponse = await fetch('/api/check-user', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ email: user.email }),
+      });
+
+      const checkData = await checkResponse.json();
+
+      if (checkData.exists) {
+        // User exists - check if role matches
+        if (checkData.role === 'teacher') {
+          // Sign in as teacher
+          await signInWithRole(user, 'teacher');
+        } else {
+          // User exists but as different role
+          setAuthError(`This email is already registered as a ${checkData.role}. Please sign in as ${checkData.role} instead.`);
+          setIsLoading(false);
+        }
+      } else {
+        // User doesn't exist - redirect to signup
+        setAuthError('No account found with this email. Please sign up first.');
+        setIsLoading(false);
+      }
+    } catch (error: any) {
+      console.error('Google sign-in error:', error);
+      setAuthError(error?.message || 'Google sign-in failed. Please try again.');
+      setIsLoading(false);
+    }
+  };
+
+  const signInWithRole = async (user: any, role: 'student' | 'teacher') => {
+    setIsLoading(true);
+    setAuthError(null);
+    
+    try {
+      const endpoint = role === 'teacher' ? '/api/signin/teacher' : '/api/signin/student';
+      
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          usernameOrEmail: user.email,
+          firebaseUid: user.uid,
+          displayName: user.displayName,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Google sign-in successful:', data);
+        const redirectUrl = data?.redirectUrl || (import.meta.env.VITE_AUTH_REDIRECT_URL as string) || '/courses';
+        window.location.href = redirectUrl;
+      } else {
+        const errorData = await response.json();
+        setAuthError(errorData.error || 'Failed to complete sign-in. Please try again.');
+      }
+    } catch (error: any) {
+      console.error('Sign-in error:', error);
+      setAuthError(error?.message || 'Sign-in failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -152,16 +238,14 @@ export default function SignInTeacher() {
                 </div>
               </div>
 
-              {/* Forgot Password Link (disabled until route exists) */}
-              {false && (
-                <div className="text-right">
-                  <Link href="/forgot-password">
-                    <span className="text-blue-400 hover:text-blue-300 text-sm cursor-pointer transition-colors">
-                      Forgot your password?
-                    </span>
-                  </Link>
-                </div>
-              )}
+              {/* Forgot Password Link */}
+              <div className="text-right">
+                <Link href="/forgot-password">
+                  <span className="text-blue-400 hover:text-blue-300 text-sm cursor-pointer transition-colors">
+                    Forgot your password?
+                  </span>
+                </Link>
+              </div>
 
               {/* Submit Button */}
               <Button 
@@ -181,20 +265,23 @@ export default function SignInTeacher() {
             </form>
 
             {/* Divider */}
-            {/* <div className="relative">
+            <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <span className="w-full border-t border-white/20" />
               </div>
               <div className="relative flex justify-center text-sm">
                 <span className="bg-transparent px-2 text-white/70">Or continue with</span>
               </div>
-            </div> */}
+            </div>
 
             {/* Social Sign In Options */}
-            {/* <div className="grid grid-cols-2 gap-4">
+            <div className="w-full">
               <Button 
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={isLoading}
                 variant="outline" 
-                className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/30 transition-all"
+                className="w-full border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 data-testid="button-google-signin"
               >
                 <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">
@@ -203,19 +290,9 @@ export default function SignInTeacher() {
                   <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                   <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                 </svg>
-                Google
+                {isLoading ? 'Signing in...' : 'Continue with Google'}
               </Button>
-              <Button 
-                variant="outline" 
-                className="border-white/20 bg-white/5 text-white hover:bg-white/10 hover:border-white/30 transition-all"
-                data-testid="button-microsoft-signin"
-              >
-                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M0 0h11.377v11.372H0V0zm12.623 0H24v11.372H12.623V0zM0 12.623h11.377V24H0V12.623zm12.623 0H24V24H12.623V12.623z"/>
-                </svg>
-                Microsoft
-              </Button>
-            </div> */}
+            </div>
 
             {/* Sign Up Link */}
             <div className="text-center">
@@ -243,6 +320,7 @@ export default function SignInTeacher() {
           </CardContent>
         </Card>
       </div>
+
     </div>
   );
 }

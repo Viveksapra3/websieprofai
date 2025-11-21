@@ -646,8 +646,19 @@ export async function registerRoutes(app: Express): Promise<void> {
       }
       
       // For traditional password login, verify password
-      if (!isFirebaseAuth && !verifyPassword(password, user.password)) {
-        return res.status(401).json({ error: "Invalid credentials" });
+      if (!isFirebaseAuth) {
+        if (!verifyPassword(password, user.password)) {
+          return res.status(401).json({ error: "Invalid credentials" });
+        }
+      } else {
+        // For Firebase auth on existing user, update database password with Firebase UID
+        // This handles cases where user reset password via Firebase
+        const hashedPassword = hashPassword(firebaseUid);
+        await db
+          .update(users)
+          .set({ password: hashedPassword })
+          .where(eq(users.email, usernameOrEmail));
+        console.log(`[Firebase Auth] Synced database password for existing teacher: ${usernameOrEmail}`);
       }
 
       // create session
@@ -724,8 +735,19 @@ export async function registerRoutes(app: Express): Promise<void> {
       }
       
       // For traditional password login, verify password
-      if (!isFirebaseAuth && !verifyPassword(password, user.password)) {
-        return res.status(401).json({ error: "Invalid credentials" });
+      if (!isFirebaseAuth) {
+        if (!verifyPassword(password, user.password)) {
+          return res.status(401).json({ error: "Invalid credentials" });
+        }
+      } else {
+        // For Firebase auth on existing user, update database password with Firebase UID
+        // This handles cases where user reset password via Firebase
+        const hashedPassword = hashPassword(firebaseUid);
+        await db
+          .update(users)
+          .set({ password: hashedPassword })
+          .where(eq(users.email, usernameOrEmail));
+        console.log(`[Firebase Auth] Synced database password for existing student: ${usernameOrEmail}`);
       }
 
       // create session
@@ -807,6 +829,49 @@ export async function registerRoutes(app: Express): Promise<void> {
         message: available ? "Username is available" : "Username is already taken" 
       });
     } catch (err) {
+      next(err);
+    }
+  });
+
+  // Update password in database after Firebase password reset
+  app.post("/api/update-password", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { email, newPassword } = req.body ?? {};
+
+      if (!email || !newPassword) {
+        return res.status(400).json({ error: "Email and new password are required" });
+      }
+
+      // Find user by email
+      const found = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1);
+
+      const user = found[0];
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Hash the new password
+      const hashedPassword = hashPassword(newPassword);
+
+      // Update password in database
+      await db
+        .update(users)
+        .set({ password: hashedPassword })
+        .where(eq(users.email, email));
+
+      console.log(`[Password Reset] Password updated in database for: ${email}`);
+
+      return res.json({ 
+        success: true,
+        message: "Password updated successfully" 
+      });
+    } catch (err) {
+      console.error('[Password Reset] Error updating password:', err);
       next(err);
     }
   });

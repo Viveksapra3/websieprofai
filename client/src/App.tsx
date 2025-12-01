@@ -4,6 +4,8 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { SetPasswordModal } from "@/components/set-password-modal";
+import { IndiaAIPopup } from "@/components/india-ai-popup";
 import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
 import Signup from "@/pages/signup";
@@ -24,6 +26,10 @@ import PaymentPage from "@/pages/payment";
 import TeachPage from "@/pages/teach";
 import ProfAIBusinessPage from "@/pages/profai-business";
 import CareerGPTPage from "@/pages/career-gpt";
+import CourseProgressPage from "@/pages/india-ai-course";
+import CourseManager from "@/pages/admin/course-manager";
+import IndiaAIMissionPage from "@/pages/india-ai-mission";
+import SuggestionsPage from "@/pages/suggestions";
 
 function Router() {
   return (
@@ -44,6 +50,10 @@ function Router() {
       <Route path="/teach" component={TeachPage} />
       <Route path="/profai-business" component={ProfAIBusinessPage} />
       <Route path="/career-gpt" component={CareerGPTPage} />
+      <Route path="/india-ai-course" component={CourseProgressPage} />
+      <Route path="/india-ai-mission" component={IndiaAIMissionPage} />
+      <Route path="/suggestions" component={SuggestionsPage} />
+      <Route path="/admin/course-manager" component={CourseManager} />
       <Route path="/course/:id" component={CoursePage} />
       <Route path="/unlock-course" component={UnlockCoursePage} />
       <Route path="/course/:id/quiz/:quizId" component={CourseQuizPage} />
@@ -59,6 +69,8 @@ function App() {
       <AuthProvider>
         <TooltipProvider>
           <Toaster />
+          <SetPasswordModal />
+          <IndiaAIPopup />
           <Router />
         </TooltipProvider>
       </AuthProvider>

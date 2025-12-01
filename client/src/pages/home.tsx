@@ -6,6 +6,7 @@ import FeaturesSection from '@/components/sections/features';
 import LLMComparisonSection from '@/components/sections/llm-comparison';
 import HowItWorksSection from '@/components/sections/how-it-works';
 import PartnersSection from '@/components/sections/partners';
+import IndiaAIMissionSection from '@/components/sections/india-ai-mission';
 import AboutSection from '@/components/sections/about';
 import TestimonialsSection from '@/components/sections/testimonials';
 import PricingSection from '@/components/sections/pricing';
@@ -22,6 +23,7 @@ export default function Home() {
       <LLMComparisonSection />
       <FeaturesSection />
       <HowItWorksSection />
+      <IndiaAIMissionSection />
       <PartnersSection />
       {/* <AboutSection />
       <TestimonialsSection />

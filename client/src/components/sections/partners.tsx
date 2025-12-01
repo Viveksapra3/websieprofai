@@ -44,22 +44,22 @@ const partners = [
 
 const stats = [
   {
+    icon: Users,
+    number: '150,00+',
+    label: 'Students Taught',
+    description: 'Learners empowered with AI education'
+  },
+  {
     icon: Building2,
     number: '50+',
-    label: 'Partner Institutions',
-    description: 'Universities and colleges worldwide'
+    label: 'Schools Supported',
+    description: 'Educational institutions partnered'
   },
   {
     icon: Award,
-    number: '100+',
-    label: 'Certifications',
-    description: 'Industry-recognized credentials'
-  },
-  {
-    icon: Users,
-    number: '1M+',
-    label: 'Students Served',
-    description: 'Across all partner networks'
+    number: '24,000+',
+    label: 'Hours of Teaching',
+    description: 'Quality learning delivered'
   },
   {
     icon: Globe,

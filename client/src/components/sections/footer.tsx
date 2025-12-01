@@ -1,4 +1,5 @@
-import { Brain, Twitter, Facebook, Linkedin, Youtube } from 'lucide-react';
+import { Brain, Twitter, Facebook, Linkedin, Youtube, Globe } from 'lucide-react';
+import { Link } from 'wouter';
 
 const footerSections = [
   {
@@ -73,7 +74,19 @@ export default function Footer() {
           ))}
         </div>
         
-        <div className="border-t border-gray-700 text-center" data-testid="footer-bottom">
+        {/* Suggestion Link */}
+        <div className="border-t border-gray-700 py-6 mb-4">
+          <Link href="/suggestions">
+            <div className="flex items-center justify-center gap-2 text-gray-300 hover:text-white transition-colors cursor-pointer group">
+              <Globe className="h-5 w-5 text-purple-400 group-hover:text-purple-300" />
+              <span className="text-sm">
+                Can't find your country or syllabus or want to suggest improvements? <span className="text-purple-400 group-hover:text-purple-300 font-medium underline underline-offset-2">Drop us a line.</span>
+              </span>
+            </div>
+          </Link>
+        </div>
+
+        <div className="border-t border-gray-700 text-center pt-6" data-testid="footer-bottom">
           <p className="text-gray-400" >
             © 2025 Professor AI. All rights reserved @iPredictt Data Labs Pvt. Ltd.| {' '}
             <a href="#" className="hover:text-white transition-colors" data-testid="link-privacy">

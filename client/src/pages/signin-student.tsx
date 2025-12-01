@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
+import { getAndClearRedirectUrl } from '@/lib/auth-redirect';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -52,7 +53,8 @@ export default function SignInStudent() {
       if (response.ok) {
         const data = await response.json();
         console.log('Student sign-in successful:', data);
-        const redirectUrl = data?.redirectUrl || (import.meta.env.VITE_AUTH_REDIRECT_URL as string) || '/courses';
+        // Check for stored redirect URL first, then fall back to defaults
+        const redirectUrl = getAndClearRedirectUrl(data?.redirectUrl || (import.meta.env.VITE_AUTH_REDIRECT_URL as string) || '/courses');
         window.location.href = redirectUrl;
       } else {
         const error = await response.json();
@@ -133,7 +135,8 @@ export default function SignInStudent() {
       if (response.ok) {
         const data = await response.json();
         console.log('Google sign-in successful:', data);
-        const redirectUrl = data?.redirectUrl || (import.meta.env.VITE_AUTH_REDIRECT_URL as string) || '/courses';
+        // Check for stored redirect URL first, then fall back to defaults
+        const redirectUrl = getAndClearRedirectUrl(data?.redirectUrl || (import.meta.env.VITE_AUTH_REDIRECT_URL as string) || '/courses');
         window.location.href = redirectUrl;
       } else {
         const errorData = await response.json();

@@ -6,7 +6,7 @@ import { useTypingAnimation } from '@/hooks/useTypingAnimation';
 
 export default function HeroSection() {
   const { displayText} = useTypingAnimation({
-    text: 'STUDY SMART',
+    text: "WORLD'S FIRST",
     speed: 90,
     delay: 1500,
     repeat: true
@@ -37,7 +37,7 @@ export default function HeroSection() {
       <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10"></div>
       
       <div className="relative min-h-screen flex items-center justify-center lg:justify-start z-20">
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 lg:ml-20 py-8 sm:py-12 lg:py-20">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 lg:ml-20 py-8 sm:py-12 lg:py-20 mt-16 sm:mt-20 lg:mt-24">
           <div className="text-center lg:text-left max-w-4xl mx-auto lg:mx-0">
             <h1 className="mb-6" data-testid="hero-title">
               {/* Gradient "STUDY SMART" */}
@@ -55,19 +55,15 @@ export default function HeroSection() {
 
               {/* Subheading */}
               <div className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold mt-2 sm:mt-4 text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]">
-                with AI Co-Pilot
+                Syllabus-Aligned
               </div>
 
               <div className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium mt-1 sm:mt-2 text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]">
-                As Your
-              </div>
-
-              <div className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-white drop-shadow-[0_4px_6px_rgba(0,0,0,0.8)]">
-                Learning Companion
+                AI Learning Companion
               </div>
             </h1>
             <p className="text-base sm:text-lg lg:text-xl text-white/90 mb-6 sm:mb-8 max-w-2xl mx-auto lg:mx-0 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-              Transform your educational experience with Professor AI - an intelligent learning companion that personalizes your training, and becomes your guide, mentor, and coach anytime, anywhere.
+              Built for pure learning. No distractions, no off-track content. Just precise, curriculum-tight teaching across multiple country pedagogy and curriculum. A unique doubt-buster buddy Avatar that works tirelessly 24×7 to deliver personalised learning, improve exam results, accelerate progress, build confidence for all age groups.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center lg:items-start justify-center lg:justify-start">
               <Link href="/courses">

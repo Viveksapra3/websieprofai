@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
+import { getAndClearRedirectUrl } from '@/lib/auth-redirect';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -120,7 +121,8 @@ export default function SignUp() {
 
       if (response.ok) {
         console.log('Signup successful:', data);
-        const redirectUrl = data?.redirectUrl || (import.meta.env.VITE_AUTH_REDIRECT_URL as string) || '/';
+        // Check for stored redirect URL first, then fall back to defaults
+        const redirectUrl = getAndClearRedirectUrl(data?.redirectUrl || (import.meta.env.VITE_AUTH_REDIRECT_URL as string) || '/');
         // Full page redirect (cross-domain supported)
         window.location.href = redirectUrl;
       } else {
@@ -201,7 +203,8 @@ export default function SignUp() {
       if (response.ok) {
         const data = await response.json();
         console.log('Google sign-up successful:', data);
-        const redirectUrl = data?.redirectUrl || (import.meta.env.VITE_AUTH_REDIRECT_URL as string) || '/courses';
+        // Check for stored redirect URL first, then fall back to defaults
+        const redirectUrl = getAndClearRedirectUrl(data?.redirectUrl || (import.meta.env.VITE_AUTH_REDIRECT_URL as string) || '/courses');
         window.location.href = redirectUrl;
       } else {
         const errorData = await response.json();

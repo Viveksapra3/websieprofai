@@ -468,21 +468,21 @@ export default function CourseProgressPage() {
     <div className="min-h-screen bg-gray-900">
       <AuthNavbar />
       
-      <div className="flex h-[calc(100vh-64px)] overflow-hidden">
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-64px)] overflow-hidden">
         {/* Sidebar - Course Content */}
-        <div className="w-96 bg-gray-800 border-r border-gray-700 flex flex-col overflow-hidden">
+        <div className="w-full lg:w-96 bg-gray-800 border-b lg:border-b-0 lg:border-r border-gray-700 flex flex-col overflow-hidden max-h-[40vh] lg:max-h-none">
           {/* Course Header */}
-          <div className="p-6 border-b border-gray-700">
-            <h1 className="text-xl font-bold text-white mb-2">{DEMO_COURSE.title}</h1>
-            <p className="text-sm text-gray-400 mb-4">by {DEMO_COURSE.instructor}</p>
+          <div className="p-4 sm:p-6 border-b border-gray-700">
+            <h1 className="text-lg sm:text-xl font-bold text-white mb-2">{DEMO_COURSE.title}</h1>
+            <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">by {DEMO_COURSE.instructor}</p>
             
             {/* Progress */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
+            <div className="space-y-1.5 sm:space-y-2">
+              <div className="flex justify-between text-xs sm:text-sm">
                 <span className="text-gray-400">Course Progress</span>
                 <span className="text-white font-semibold">{progressPercentage}%</span>
               </div>
-              <Progress value={progressPercentage} className="h-2" />
+              <Progress value={progressPercentage} className="h-1.5 sm:h-2" />
               <p className="text-xs text-gray-500">
                 {completedLessons} of {totalLessons} lessons completed
               </p>
@@ -491,24 +491,24 @@ export default function CourseProgressPage() {
 
           {/* Lessons List */}
           <ScrollArea className="flex-1">
-            <div className="p-4 space-y-4">
+            <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
               {modules.map((module, moduleIndex) => {
                 const stats = getModuleStats(module);
                 
                 return (
                   <div key={module.id} className="space-y-2">
                     {/* Module Header */}
-                    <div className="flex items-center justify-between px-3 py-2 bg-gray-700/50 rounded-lg">
-                      <div className="flex-1">
-                        <h3 className="text-sm font-semibold text-white">
+                    <div className="flex items-center justify-between px-2 sm:px-3 py-1.5 sm:py-2 bg-gray-700/50 rounded-lg">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-xs sm:text-sm font-semibold text-white truncate">
                           Module {moduleIndex + 1}: {module.title}
                         </h3>
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="text-xs text-gray-400 mt-0.5 sm:mt-1">
                           {stats.completed}/{stats.total} lessons
                         </p>
                       </div>
                       {stats.isComplete && (
-                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                        <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 flex-shrink-0" />
                       )}
                     </div>
 
@@ -523,7 +523,7 @@ export default function CourseProgressPage() {
                             key={lesson.id}
                             onClick={() => !isLocked && selectLesson(module.id, lesson.id)}
                             disabled={isLocked}
-                            className={`w-full text-left px-3 py-3 rounded-lg transition-all ${
+                            className={`w-full text-left px-2 sm:px-3 py-2 sm:py-3 rounded-lg transition-all ${
                               isActive
                                 ? "bg-primary text-white"
                                 : lesson.completed
@@ -533,24 +533,24 @@ export default function CourseProgressPage() {
                                 : "bg-gray-800 text-gray-300 hover:bg-gray-700"
                             }`}
                           >
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 sm:gap-3">
                               <div className={`flex-shrink-0 ${isActive ? "text-white" : lesson.completed ? "text-green-500" : isLocked ? "text-gray-600" : "text-gray-400"}`}>
-                                {isLocked ? <Lock className="h-4 w-4" /> : getLessonIcon(lesson.type)}
+                                {isLocked ? <Lock className="h-3 w-3 sm:h-4 sm:w-4" /> : getLessonIcon(lesson.type)}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className={`text-sm font-medium truncate ${isActive ? "text-white" : ""}`}>
+                                <p className={`text-xs sm:text-sm font-medium truncate ${isActive ? "text-white" : ""}`}>
                                   {lesson.title}
                                 </p>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Clock className="h-3 w-3" />
+                                <div className="flex items-center gap-1.5 sm:gap-2 mt-0.5 sm:mt-1">
+                                  <Clock className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
                                   <span className="text-xs">{lesson.duration}</span>
                                 </div>
                               </div>
                               {lesson.completed && !isActive && (
-                                <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0" />
+                                <CheckCircle2 className="h-3 w-3 sm:h-4 sm:w-4 text-green-500 flex-shrink-0" />
                               )}
                               {isActive && (
-                                <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                                <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                               )}
                             </div>
                           </button>
@@ -564,10 +564,10 @@ export default function CourseProgressPage() {
           </ScrollArea>
 
           {/* Certificate Section */}
-          <div className="px-4 py-3 border-t border-gray-600 bg-gray-800 mt-auto">
+          <div className="px-3 sm:px-4 py-2 sm:py-3 border-t border-gray-600 bg-gray-800 mt-auto">
             <div className="flex items-center gap-2 mb-2">
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">
+                <p className="text-xs sm:text-sm font-medium text-white truncate">
                   {allCompleted ? '🎉 Course Completed!' : 'Course Certificate'}
                 </p>
                 <p className="text-xs text-gray-400">
@@ -582,11 +582,11 @@ export default function CourseProgressPage() {
               onClick={handleDownloadCertificate}
               disabled={!allCompleted}
               size="sm"
-              className={`w-full ${allCompleted 
+              className={`w-full text-xs sm:text-sm ${allCompleted 
                 ? 'bg-green-600 hover:bg-green-700 text-white' 
                 : 'bg-gray-600 text-gray-400 cursor-not-allowed hover:bg-gray-600'}`}
             >
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="h-3 w-3 sm:h-4 sm:w-4 mr-2" />
               {allCompleted ? 'Download Certificate' : 'Complete to Unlock'}
             </Button>
           </div>
@@ -597,9 +597,9 @@ export default function CourseProgressPage() {
           {currentLessonData ? (
             <>
               {/* Video Player */}
-              <div className="flex-1 flex items-start justify-center bg-gray-900 pt-4">
+              <div className="flex-1 flex items-start justify-center bg-gray-900 pt-2 sm:pt-4">
                 {currentLessonData.type === "video" && currentLessonData.vimeoId ? (
-                  <div className="w-full max-w-5xl mx-auto px-4">
+                  <div className="w-full max-w-5xl mx-auto px-2 sm:px-4">
                     <VimeoPlayer
                       videoId={currentLessonData.vimeoId}
                       onEnded={handleVideoEnded}
@@ -638,14 +638,14 @@ export default function CourseProgressPage() {
               </div>
 
               {/* Lesson Info Bar */}
-              <div className="flex-shrink-0 bg-gray-900 border-t border-gray-800 p-4">
+              <div className="flex-shrink-0 bg-gray-900 border-t border-gray-800 p-3 sm:p-4">
                 <div className="max-w-5xl mx-auto">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <h2 className="text-xl font-bold text-white mb-1 truncate">{currentLessonData.title}</h2>
-                      <div className="flex items-center gap-4 text-sm text-gray-400">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div className="flex-1 min-w-0 w-full sm:w-auto">
+                      <h2 className="text-base sm:text-lg md:text-xl font-bold text-white mb-1 truncate">{currentLessonData.title}</h2>
+                      <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-400">
                         <span className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
+                          <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
                           {currentLessonData.duration}
                         </span>
                         <span className="flex items-center gap-1">
@@ -654,13 +654,13 @@ export default function CourseProgressPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 flex-shrink-0">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
                       <Checkbox
                         checked={currentLessonData.completed}
                         onCheckedChange={() => toggleLessonCompletion(currentLesson!.moduleId, currentLesson!.lessonId)}
-                        className="h-5 w-5 border-white data-[state=checked]:bg-white data-[state=checked]:text-gray-900"
+                        className="h-4 w-4 sm:h-5 sm:w-5 border-white data-[state=checked]:bg-white data-[state=checked]:text-gray-900"
                       />
-                      <span className="text-sm text-white">Mark as complete</span>
+                      <span className="text-xs sm:text-sm text-white">Mark as complete</span>
                     </div>
                   </div>
                 </div>

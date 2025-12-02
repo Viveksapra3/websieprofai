@@ -169,48 +169,48 @@ export default function IndiaAIMissionPage() {
         {/* Background pattern */}
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
 
-        <div className="container mx-auto px-4 py-16 relative">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 relative">
           <div className="max-w-4xl mx-auto text-center">
             {/* Badges */}
-            <div className="flex flex-wrap justify-center gap-3 mb-6">
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-orange-500/20 via-white/10 to-green-500/20 border border-orange-500/30 rounded-full px-4 py-2">
-                <Sparkles className="h-4 w-4 text-orange-400" />
-                <span className="text-sm font-medium text-white">Government of India Initiative</span>
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-orange-500/20 via-white/10 to-green-500/20 border border-orange-500/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2">
+                <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-orange-400" />
+                <span className="text-xs sm:text-sm font-medium text-white">Government of India Initiative</span>
               </div>
-              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/40 rounded-full px-4 py-2">
-                <Brain className="h-4 w-4 text-purple-400" />
-                <span className="text-sm font-medium text-white">Yuva AI for All</span>
+              <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/40 rounded-full px-3 sm:px-4 py-1.5 sm:py-2">
+                <Brain className="h-3 w-3 sm:h-4 sm:w-4 text-purple-400" />
+                <span className="text-xs sm:text-sm font-medium text-white">Yuva AI for All</span>
               </div>
             </div>
 
             {/* Title */}
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">
               <span className="text-orange-500">India</span>
               <span className="text-white">AI</span>
               <span className="text-green-500"> Mission</span>
             </h1>
 
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+            <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
               Empowering India's workforce with cutting-edge AI skills. Join the national movement to build an AI-ready India.
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4">
               <Link href="/india-ai-course">
-                <Button size="lg" className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold px-8">
-                  <PlayCircle className="mr-2 h-5 w-5" />
+                <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold px-6 sm:px-8 py-3">
+                  <PlayCircle className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
                   Start Learning
                 </Button>
               </Link>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
               {COURSE_STATS.map((stat, index) => (
-                <div key={index} className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 border border-gray-700 text-center flex flex-col items-center justify-center">
-                  <stat.icon className="h-6 w-6 text-orange-400 mb-2" />
-                  <div className="text-2xl font-bold text-white">{stat.value}</div>
-                  <div className="text-sm text-gray-400">{stat.label}</div>
+                <div key={index} className="bg-gray-800/50 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-700 text-center flex flex-col items-center justify-center">
+                  <stat.icon className="h-5 w-5 sm:h-6 sm:w-6 text-orange-400 mb-1 sm:mb-2" />
+                  <div className="text-lg sm:text-xl md:text-2xl font-bold text-white">{stat.value}</div>
+                  <div className="text-xs sm:text-sm text-gray-400">{stat.label}</div>
                 </div>
               ))}
             </div>
@@ -218,58 +218,58 @@ export default function IndiaAIMissionPage() {
         </div>
       </section>
 
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-white mb-2">Our Partners</h2>
-            <p className="text-gray-400">Key Program Partners</p>
+      <section className="py-12 sm:py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8 sm:mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Our Partners</h2>
+            <p className="text-sm sm:text-base text-gray-400">Key Program Partners</p>
           </div>
-          <div className="flex flex-wrap justify-center items-center gap-8 max-w-5xl mx-auto">
+          <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 md:gap-8 max-w-5xl mx-auto">
             {PARTNER_LOGOS.map((p, i) => (
-              <img key={i} src={p.src} alt={p.name} className="h-14 object-contain grayscale hover:grayscale-0 transition-all duration-300 opacity-80 hover:opacity-100" />
+              <img key={i} src={p.src} alt={p.name} className="h-10 sm:h-12 md:h-14 object-contain grayscale hover:grayscale-0 transition-all duration-300 opacity-80 hover:opacity-100" />
             ))}
           </div>
         </div>
       </section>
 
       {/* Course Features */}
-      <section className="py-12 border-y border-gray-800">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-wrap justify-center gap-6">
+      <section className="py-8 sm:py-12 border-y border-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-4 sm:gap-6">
             {COURSE_FEATURES.map((feature, index) => (
-              <div key={index} className="flex items-center gap-2 text-gray-300">
-                <CheckCircle2 className="h-5 w-5 text-green-500" />
-                <span>{feature}</span>
+              <div key={index} className="flex items-start sm:items-center gap-2 text-sm sm:text-base text-gray-300">
+                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-green-500 flex-shrink-0 mt-0.5 sm:mt-0" />
+                <span className="flex-1">{feature}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-20 relative overflow-hidden">
+      <section className="py-12 sm:py-16 lg:py-20 relative overflow-hidden">
         {/* Futuristic background effects */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-900/5 to-transparent" />
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-green-500/10 rounded-full blur-3xl" />
         
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 mb-4">
-              <Sparkles className="h-4 w-4 text-purple-400" />
-              <span className="text-sm text-purple-300">Comprehensive Learning</span>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-12 sm:mb-16">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 mb-4">
+              <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-purple-400" />
+              <span className="text-xs sm:text-sm text-purple-300">Comprehensive Learning</span>
             </div>
-            <h2 className="text-4xl font-bold text-white mb-4">Course Details</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 px-4">Course Details</h2>
+            <p className="text-sm sm:text-base text-gray-400 max-w-2xl mx-auto px-4">
               Yuva AI for All is a foundation course designed to democratise AI literacy across India by enabling every learner to understand, use, and benefit from AI responsibly.
             </p>
           </div>
 
           {/* Main cards with glassmorphism */}
-          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 max-w-6xl mx-auto mb-12 sm:mb-16">
             {/* Learning Objectives */}
             <div className="group relative">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl blur-xl opacity-20 group-hover:opacity-30 transition-opacity" />
-              <div className="relative bg-gray-900/80 backdrop-blur-xl border border-gray-700/50 rounded-2xl p-6 h-full hover:border-blue-500/50 transition-all duration-300">
+              <div className="relative bg-gray-900/80 backdrop-blur-xl border border-gray-700/50 rounded-xl sm:rounded-2xl p-4 sm:p-6 h-full hover:border-blue-500/50 transition-all duration-300">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mb-4">
                   <Brain className="h-6 w-6 text-white" />
                 </div>
@@ -320,7 +320,7 @@ export default function IndiaAIMissionPage() {
 
           {/* Course Details Grid - Futuristic hexagon-inspired design */}
           <div className="max-w-5xl mx-auto">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 sm:gap-3">
               {COURSE_DETAILS.map((item, idx) => (
                 <div 
                   key={idx} 
@@ -339,11 +339,11 @@ export default function IndiaAIMissionPage() {
       </section>
 
       {/* Course Modules */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">Course Curriculum</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto">
+      <section className="py-12 sm:py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">Course Curriculum</h2>
+            <p className="text-sm sm:text-base text-gray-400 max-w-2xl mx-auto px-4">
               A comprehensive curriculum designed by industry experts and aligned with India's AI strategy
             </p>
           </div>
@@ -362,13 +362,13 @@ export default function IndiaAIMissionPage() {
                   value={module.id}
                   className="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl overflow-hidden"
                 >
-                  <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-gray-700/30 transition-colors">
-                    <div className="flex items-center gap-4 text-left">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${module.color} flex items-center justify-center flex-shrink-0`}>
-                        <module.icon className="h-6 w-6 text-white" />
+                  <AccordionTrigger className="px-4 sm:px-6 py-3 sm:py-4 hover:no-underline hover:bg-gray-700/30 transition-colors">
+                    <div className="flex items-center gap-3 sm:gap-4 text-left">
+                      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br ${module.color} flex items-center justify-center flex-shrink-0`}>
+                        <module.icon className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1">
                           <Badge variant="outline" className="text-xs border-gray-600 text-gray-400">
                             Module {index + 1}
                           </Badge>
@@ -377,27 +377,27 @@ export default function IndiaAIMissionPage() {
                             {module.duration}
                           </Badge>
                         </div>
-                        <h3 className="text-lg font-semibold text-white">{module.title}</h3>
-                        <p className="text-sm text-gray-400">{module.description}</p>
+                        <h3 className="text-base sm:text-lg font-semibold text-white">{module.title}</h3>
+                        <p className="text-xs sm:text-sm text-gray-400 line-clamp-2">{module.description}</p>
                       </div>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="px-6 pb-4">
-                    <div className="ml-16 space-y-2">
+                  <AccordionContent className="px-4 sm:px-6 pb-3 sm:pb-4">
+                    <div className="ml-0 sm:ml-16 space-y-2">
                       {module.lessons.map((lesson, lessonIndex) => (
                         <div 
                           key={lessonIndex}
-                          className="flex items-center justify-between p-3 bg-gray-900/50 rounded-lg border border-gray-700/50"
+                          className="flex items-center justify-between p-2 sm:p-3 bg-gray-900/50 rounded-lg border border-gray-700/50"
                         >
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                             {lesson.type === "video" ? (
-                              <PlayCircle className="h-4 w-4 text-orange-400" />
+                              <PlayCircle className="h-3 w-3 sm:h-4 sm:w-4 text-orange-400 flex-shrink-0" />
                             ) : (
-                              <FileText className="h-4 w-4 text-green-400" />
+                              <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-green-400 flex-shrink-0" />
                             )}
-                            <span className="text-gray-300">{lesson.title}</span>
+                            <span className="text-xs sm:text-sm text-gray-300 truncate">{lesson.title}</span>
                           </div>
-                          <span className="text-sm text-gray-500">{lesson.duration}</span>
+                          <span className="text-xs sm:text-sm text-gray-500 flex-shrink-0 ml-2">{lesson.duration}</span>
                         </div>
                       ))}
                     </div>
@@ -410,49 +410,49 @@ export default function IndiaAIMissionPage() {
       </section>
 
       {/* About IndiaAI Mission */}
-      <section className="py-16 bg-gray-800/30">
-        <div className="container mx-auto px-4">
+      <section className="py-12 sm:py-16 bg-gray-800/30">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-center">
               <div>
-                <h2 className="text-3xl font-bold text-white mb-4">About IndiaAI Mission</h2>
-                <p className="text-gray-300 mb-4">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">About IndiaAI Mission</h2>
+                <p className="text-sm sm:text-base text-gray-300 mb-3 sm:mb-4">
                   The IndiaAI Mission is a flagship initiative by the Government of India aimed at democratizing AI education and building a skilled workforce capable of driving India's AI revolution.
                 </p>
-                <p className="text-gray-300 mb-6">
+                <p className="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6">
                   This comprehensive program covers everything from AI fundamentals to advanced applications, with a special focus on solving India-specific challenges across healthcare, agriculture, governance, and more.
                 </p>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-orange-500/20 flex items-center justify-center">
-                      <Star className="h-4 w-4 text-orange-400" />
+                <div className="space-y-2 sm:space-y-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-orange-500/20 flex items-center justify-center flex-shrink-0">
+                      <Star className="h-3 w-3 sm:h-4 sm:w-4 text-orange-400" />
                     </div>
-                    <span className="text-gray-300">Aligned with National AI Strategy</span>
+                    <span className="text-sm sm:text-base text-gray-300">Aligned with National AI Strategy</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                      <Award className="h-4 w-4 text-white" />
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0">
+                      <Award className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                     </div>
-                    <span className="text-gray-300">Industry-Recognized Certification</span>
+                    <span className="text-sm sm:text-base text-gray-300">Industry-Recognized Certification</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                      <Users className="h-4 w-4 text-green-400" />
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                      <Users className="h-3 w-3 sm:h-4 sm:w-4 text-green-400" />
                     </div>
-                    <span className="text-gray-300">Join 10,000+ Learners</span>
+                    <span className="text-sm sm:text-base text-gray-300">Join 10,000+ Learners</span>
                   </div>
                 </div>
               </div>
               <div className="relative">
-                <div className="aspect-video rounded-2xl bg-gradient-to-br from-orange-500/20 via-gray-800 to-green-500/20 border border-gray-700 flex items-center justify-center">
-                  <div className="text-center">
+                <div className="aspect-video rounded-xl sm:rounded-2xl bg-gradient-to-br from-orange-500/20 via-gray-800 to-green-500/20 border border-gray-700 flex items-center justify-center">
+                  <div className="text-center p-4">
                     <img 
                       src={INDIA_AI_LOGO} 
                       alt="IndiaAI Mission" 
-                      className="w-32 h-32 object-contain mx-auto mb-4"
+                      className="w-24 h-24 sm:w-32 sm:h-32 object-contain mx-auto mb-3 sm:mb-4"
                     />
-                    <p className="text-white font-semibold">IndiaAI Mission</p>
-                    <p className="text-gray-400 text-sm">Building AI-Ready India</p>
+                    <p className="text-base sm:text-lg text-white font-semibold">IndiaAI Mission</p>
+                    <p className="text-xs sm:text-sm text-gray-400">Building AI-Ready India</p>
                   </div>
                 </div>
               </div>
@@ -462,28 +462,28 @@ export default function IndiaAIMissionPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
+      <section className="py-12 sm:py-16">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Your AI Journey?</h2>
-            <p className="text-gray-400 mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">Ready to Start Your AI Journey?</h2>
+            <p className="text-sm sm:text-base text-gray-400 mb-6 sm:mb-8 px-4">
               Join thousands of learners who are already building their AI skills with IndiaAI Mission
             </p>
             <Button 
               size="lg" 
-              className="bg-gradient-to-r from-orange-500 to-green-500 hover:from-orange-600 hover:to-green-600 text-white font-semibold px-12"
+              className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-green-500 hover:from-orange-600 hover:to-green-600 text-white font-semibold px-8 sm:px-12 py-3"
               onClick={handleEnroll}
               disabled={isEnrolling}
             >
               {isEnrolling ? (
                 <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Taking you to the classroom...
+                  <Loader2 className="mr-2 h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+                  <span className="text-sm sm:text-base">Taking you to the classroom...</span>
                 </>
               ) : (
                 <>
-                  Enroll Now - It's Free
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <span className="text-sm sm:text-base">Enroll Now - It's Free</span>
+                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                 </>
               )}
             </Button>
@@ -492,9 +492,9 @@ export default function IndiaAIMissionPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-8 border-t border-gray-800">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-gray-500 text-sm">
+      <footer className="py-6 sm:py-8 border-t border-gray-800">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-gray-500 text-xs sm:text-sm">
             © 2024 IndiaAI Mission. An initiative by Government of India. Powered by ProfAI Academy.
           </p>
         </div>

@@ -56,27 +56,27 @@ export default function ProfAIBusinessPage() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
+      <section className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-center">
             <div>
-              <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
                 ProfAI for Business
               </h1>
-              <p className="text-xl text-gray-300 mb-8">
+              <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8">
                 Upskill your team with AI-powered learning. Build skills your team needs with our comprehensive learning platform.
               </p>
-              <div className="flex flex-wrap gap-4 mb-8">
-                <div className="flex items-center gap-2 text-gray-300">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+              <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mb-6 sm:mb-8">
+                <div className="flex items-center gap-2 text-sm sm:text-base text-gray-300">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 flex-shrink-0" />
                   <span>Unlimited access to 10,000+ courses</span>
                 </div>
-                <div className="flex items-center gap-2 text-gray-300">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                <div className="flex items-center gap-2 text-sm sm:text-base text-gray-300">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 flex-shrink-0" />
                   <span>AI-powered personalization</span>
                 </div>
-                <div className="flex items-center gap-2 text-gray-300">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                <div className="flex items-center gap-2 text-sm sm:text-base text-gray-300">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 flex-shrink-0" />
                   <span>Advanced analytics & insights</span>
                 </div>
               </div>
@@ -84,10 +84,10 @@ export default function ProfAIBusinessPage() {
 
             {/* Request Demo Form */}
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
-              <CardContent className="p-8">
-                <h2 className="text-2xl font-bold text-white mb-6">Request a Demo</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+              <CardContent className="p-4 sm:p-6 md:p-8">
+                <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Request a Demo</h2>
+                <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                       <Input
                         name="firstName"
@@ -175,7 +175,7 @@ export default function ProfAIBusinessPage() {
 
                   <Button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-6"
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-4 sm:py-5 md:py-6 text-sm sm:text-base"
                   >
                     Request Demo
                   </Button>
@@ -187,48 +187,48 @@ export default function ProfAIBusinessPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4 bg-black/30">
+      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-black/30">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-white text-center mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-center mb-10 sm:mb-12 md:mb-16">
             Why choose ProfAI Business?
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
-              <CardContent className="p-6 text-center">
-                <Building2 className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-3">Enterprise-Grade</h3>
-                <p className="text-gray-300">
+              <CardContent className="p-4 sm:p-6 text-center">
+                <Building2 className="w-10 h-10 sm:w-12 sm:h-12 text-purple-400 mx-auto mb-3 sm:mb-4" />
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">Enterprise-Grade</h3>
+                <p className="text-sm sm:text-base text-gray-300">
                   Secure, scalable platform built for organizations of all sizes.
                 </p>
               </CardContent>
             </Card>
 
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
-              <CardContent className="p-6 text-center">
-                <Zap className="w-12 h-12 text-blue-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-3">AI-Powered</h3>
-                <p className="text-gray-300">
+              <CardContent className="p-4 sm:p-6 text-center">
+                <Zap className="w-10 h-10 sm:w-12 sm:h-12 text-blue-400 mx-auto mb-3 sm:mb-4" />
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">AI-Powered</h3>
+                <p className="text-sm sm:text-base text-gray-300">
                   Personalized learning paths powered by advanced AI technology.
                 </p>
               </CardContent>
             </Card>
 
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
-              <CardContent className="p-6 text-center">
-                <TrendingUp className="w-12 h-12 text-green-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-3">Analytics</h3>
-                <p className="text-gray-300">
+              <CardContent className="p-4 sm:p-6 text-center">
+                <TrendingUp className="w-10 h-10 sm:w-12 sm:h-12 text-green-400 mx-auto mb-3 sm:mb-4" />
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">Analytics</h3>
+                <p className="text-sm sm:text-base text-gray-300">
                   Track progress and measure ROI with detailed insights.
                 </p>
               </CardContent>
             </Card>
 
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
-              <CardContent className="p-6 text-center">
-                <Shield className="w-12 h-12 text-red-400 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-white mb-3">Compliance</h3>
-                <p className="text-gray-300">
+              <CardContent className="p-4 sm:p-6 text-center">
+                <Shield className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto mb-3 sm:mb-4" />
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">Compliance</h3>
+                <p className="text-sm sm:text-base text-gray-300">
                   Meet industry standards with certified training programs.
                 </p>
               </CardContent>
@@ -238,48 +238,48 @@ export default function ProfAIBusinessPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 px-4">
+      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-white text-center mb-16">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-center mb-10 sm:mb-12 md:mb-16">
             Trusted by leading organizations
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 md:gap-12 text-center">
             <div>
-              <div className="text-5xl font-bold text-purple-400 mb-3">14,000+</div>
-              <div className="text-xl text-gray-300">Organizations</div>
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-purple-400 mb-2 sm:mb-3">14,000+</div>
+              <div className="text-base sm:text-lg md:text-xl text-gray-300">Organizations</div>
             </div>
             <div>
-              <div className="text-5xl font-bold text-blue-400 mb-3">90%</div>
-              <div className="text-xl text-gray-300">Skill improvement</div>
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-blue-400 mb-2 sm:mb-3">90%</div>
+              <div className="text-base sm:text-lg md:text-xl text-gray-300">Skill improvement</div>
             </div>
             <div>
-              <div className="text-5xl font-bold text-green-400 mb-3">4.5/5</div>
-              <div className="text-xl text-gray-300">Average rating</div>
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-400 mb-2 sm:mb-3">4.5/5</div>
+              <div className="text-base sm:text-lg md:text-xl text-gray-300">Average rating</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-black/30">
+      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-black/30">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6">
             Ready to transform your team?
           </h2>
-          <p className="text-xl text-gray-300 mb-8">
+          <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8">
             Join thousands of organizations already using ProfAI Business to upskill their workforce.
           </p>
-          <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-6 text-lg rounded-full">
+          <Button className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 sm:px-8 py-4 sm:py-5 md:py-6 text-base sm:text-lg rounded-full">
             Get Started Today
           </Button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-4 border-t border-white/10">
+      <footer className="py-6 sm:py-8 px-4 sm:px-6 lg:px-8 border-t border-white/10">
         <div className="max-w-6xl mx-auto text-center text-gray-400">
-          <p>&copy; 2024 ProfAI Coach. All rights reserved.</p>
+          <p className="text-sm sm:text-base">&copy; 2024 ProfAI Coach. All rights reserved.</p>
         </div>
       </footer>
     </div>

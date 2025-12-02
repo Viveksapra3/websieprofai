@@ -6,7 +6,7 @@ import { useTypingAnimation } from '@/hooks/useTypingAnimation';
 
 export default function HeroSection() {
   const { displayText} = useTypingAnimation({
-    text: "WORLD'S FIRST",
+    text: "STUDY SMART",
     speed: 90,
     delay: 1500,
     repeat: true
@@ -34,7 +34,7 @@ export default function HeroSection() {
       </video>
       
       {/* Video Overlay */}
-      <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-10"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-black/70 z-10"></div>
       
       <div className="relative min-h-screen flex items-center justify-center lg:justify-start z-20">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 lg:ml-20 py-8 sm:py-12 lg:py-20 mt-16 sm:mt-20 lg:mt-24">

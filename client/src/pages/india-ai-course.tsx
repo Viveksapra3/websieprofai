@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { storeRedirectUrl } from "@/lib/auth-redirect";
 import { AuthNavbar } from "@/components/auth-navbar";
@@ -12,7 +12,10 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { VimeoPlayer } from "@/components/VimeoPlayer";
-import { CheckCircle2, ChevronRight, Clock, Download, PlayCircle, Lock, Award, BookOpen } from "lucide-react";
+import { CheckCircle2, ChevronRight, Clock, Download, PlayCircle, Lock, Award, BookOpen, GripVertical } from "lucide-react";
+import { IndiaAIModuleQuiz } from "@/components/IndiaAIModuleQuiz";
+import { IndiaAIQuizResult } from "@/components/IndiaAIQuizResult";
+import { INDIA_AI_MCQS } from "@/data/india-ai-mcqs";
 
 // Types
 interface Lesson {
@@ -76,7 +79,7 @@ const DEMO_MODULES: Module[] = [
       { id: "m1-v2", title: "Module 1B: Evolution of AI", duration: "10:00", completed: false, vimeoId: "1141840888", type: "video" },
       { id: "m1-v3", title: "Module 1C: AI in Daily Life", duration: "10:00", completed: false, vimeoId: "1141840894", type: "video" },
       { id: "m1-v4", title: "Module 1D: AI Capabilities & Limitations", duration: "10:00", completed: false, vimeoId: "1141840905?fl=tl&fe=ec", type: "video" },
-      // { id: "m1-q1", title: "Assessments", duration: "5:00", completed: false, type: "quiz" },
+      { id: "m1-q1", title: "Module 1 Assessment", duration: "5:00", completed: false, type: "quiz" },
     ]
   },
   
@@ -90,7 +93,7 @@ const DEMO_MODULES: Module[] = [
       { id: "m2-v2", title: "Module 2B: How Machines Learn", duration: "12:00", completed: false, vimeoId: "1141840920?fl=tl&fe=ec", type: "video" },
       { id: "m2-v3", title: "Module 2C: Introduction to Generative AI", duration: "12:00", completed: false, vimeoId: "1141840931?fl=tl&fe=ec", type: "video" },
       { id: "m2-v4", title: "Module 2D: Prompt Engineering & the CRAFT Formula", duration: "12:00", completed: false, vimeoId: "1141840937?fl=tl&fe=ec", type: "video" },
-      // { id: "m2-q1", title: "Assessments", duration: "5:00", completed: false, type: "quiz" },
+      { id: "m2-q1", title: "Module 2 Assessment", duration: "5:00", completed: false, type: "quiz" },
     ]
   },
   
@@ -104,7 +107,7 @@ const DEMO_MODULES: Module[] = [
       { id: "m3-v2", title: "Module 3B: Demo - Use the CRAFT Formula to Learn Better", duration: "12:00", completed: false, vimeoId: "1141840950?fl=tl&fe=ec", type: "video" },
       { id: "m3-v3", title: "Module 3C: Demo - Use the CRAFT Formula to Create Content", duration: "12:00", completed: false, vimeoId: "1141840963?fl=tl&fe=ec", type: "video" },
       { id: "m3-v4", title: "Module 3D: Demo - Use the CRAFT Formula to Analyse Data", duration: "12:00", completed: false, vimeoId: "1141840973?fl=tl&fe=ec", type: "video" },
-      // { id: "m3-q1", title: "Assessments", duration: "5:00", completed: false, type: "quiz" },
+      { id: "m3-q1", title: "Module 3 Assessment", duration: "5:00", completed: false, type: "quiz" },
     ]
   },
   
@@ -116,7 +119,7 @@ const DEMO_MODULES: Module[] = [
     lessons: [
       { id: "m4-v1", title: "Module 4A: Demo - Using AI as a Thinking Partner", duration: "12:00", completed: false, vimeoId: "1141840979?fl=tl&fe=ec", type: "video" },
       { id: "m4-v2", title: "Module 4B: Demo - Using AI as a Planning Assistant", duration: "12:00", completed: false, vimeoId: "1141840988?fl=tl&fe=ec", type: "video" },
-      // { id: "m4-q1", title: "Assessments", duration: "5:00", completed: false, type: "quiz" },
+      { id: "m4-q1", title: "Module 4 Assessment", duration: "5:00", completed: false, type: "quiz" },
     ]
   },
   
@@ -129,7 +132,7 @@ const DEMO_MODULES: Module[] = [
       { id: "m5-v1", title: "Module 5A: Principles of AI Ethics & Introduction to the FAST Framework", duration: "12:00", completed: false, vimeoId: "1141840995?fl=tl&fe=ec", type: "video" },
       { id: "m5-v2", title: "Module 5B: AI & Ethical Concerns", duration: "12:00", completed: false, vimeoId: "1141841005?fl=tl&fe=ec", type: "video" },
       { id: "m5-v3", title: "Module 5C: Regulation of AI", duration: "12:00", completed: false, vimeoId: "1141841014?fl=tl&fe=ec", type: "video" },
-      // { id: "m5-q1", title: "Assessments", duration: "5:00", completed: false, type: "quiz" },
+      { id: "m5-q1", title: "Module 5 Assessment", duration: "5:00", completed: false, type: "quiz" },
     ]
   },
   
@@ -141,7 +144,7 @@ const DEMO_MODULES: Module[] = [
     lessons: [
       { id: "m6-v1", title: "Module 6A: Key Trends in AI", duration: "10:00", completed: false, vimeoId: "1141841026?fl=tl&fe=ec", type: "video" },
       { id: "m6-v2", title: "Module 6B: AI & Your Future", duration: "10:00", completed: false, vimeoId: "1141841037?fl=tl&fe=ec", type: "video" },
-      // { id: "m6-q1", title: "Assessments", duration: "5:00", completed: false, type: "quiz" },
+      { id: "m6-q1", title: "Module 6 Assessment", duration: "5:00", completed: false, type: "quiz" },
     ]
   }
 ];
@@ -154,7 +157,31 @@ export default function CourseProgressPage() {
   const { toast } = useToast();
   const { currentUser, loading } = useAuth();
   const [, setLocation] = useLocation();
+  
+  // Quiz result state
+  const [quizResult, setQuizResult] = useState<{
+    moduleNumber: number;
+    score: number;
+    totalQuestions: number;
+    answers: number[];
+  } | null>(null);
+  
+  // Resizable pane state
+  const [sidebarWidth, setSidebarWidth] = useState(384); // 96 * 4 = 384px (w-96)
+  const [isResizing, setIsResizing] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isMobileView, setIsMobileView] = useState(false);
 
+  // Check for mobile view
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobileView(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
   // Redirect to login if not authenticated
   useEffect(() => {
     if (loading) return; // Wait for auth to load
@@ -170,6 +197,31 @@ export default function CourseProgressPage() {
       setLocation("/signin/student");
     }
   }, [currentUser, loading, setLocation, toast]);
+  
+  // Handle resizing
+  useEffect(() => {
+    if (!isResizing) return;
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!containerRef.current) return;
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const newWidth = e.clientX - containerRect.left;
+      // Constrain between 280px and 600px
+      setSidebarWidth(Math.max(280, Math.min(600, newWidth)));
+    };
+    
+    const handleMouseUp = () => {
+      setIsResizing(false);
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing]);
 
   // Generate user-specific storage key
   const getStorageKey = () => {
@@ -325,23 +377,17 @@ export default function CourseProgressPage() {
   };
 
   // Handle video ended
-  const handleVideoEnded = () => {
+  const goToNextLesson = () => {
     if (!currentLesson) return;
-    
-    // Mark current lesson as completed
-    toggleLessonCompletion(currentLesson.moduleId, currentLesson.lessonId);
-    
-    // Find next lesson
+
     const currentModule = modules.find(m => m.id === currentLesson.moduleId);
     if (!currentModule) return;
-    
+
     const currentIndex = currentModule.lessons.findIndex(l => l.id === currentLesson.lessonId);
     if (currentIndex < currentModule.lessons.length - 1) {
-      // Next lesson in same module
       const nextLesson = currentModule.lessons[currentIndex + 1];
       setCurrentLesson({ moduleId: currentModule.id, lessonId: nextLesson.id });
     } else {
-      // Try next module
       const moduleIndex = modules.findIndex(m => m.id === currentModule.id);
       if (moduleIndex < modules.length - 1) {
         const nextModule = modules[moduleIndex + 1];
@@ -350,6 +396,13 @@ export default function CourseProgressPage() {
         }
       }
     }
+  };
+
+  const handleVideoEnded = () => {
+    if (!currentLesson) return;
+
+    toggleLessonCompletion(currentLesson.moduleId, currentLesson.lessonId);
+    goToNextLesson();
   };
 
   const currentLessonData = getCurrentLesson();
@@ -365,112 +418,91 @@ export default function CourseProgressPage() {
       return;
     }
 
-    // Create a simple certificate page
-    const certificateWindow = window.open("", "_blank");
-    if (certificateWindow) {
-      const completionDate = new Date().toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-      });
+    // Get user's display name or email
+    const userName = currentUser?.displayName || currentUser?.email || "Student";
 
-      certificateWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Certificate of Completion</title>
-            <style>
-              body {
-                font-family: 'Georgia', serif;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                margin: 0;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              }
-              .certificate {
-                background: white;
-                padding: 60px;
-                max-width: 800px;
-                border: 20px solid #f0f0f0;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-                text-align: center;
-              }
-              .certificate h1 {
-                font-size: 48px;
-                color: #333;
-                margin-bottom: 20px;
-                font-weight: normal;
-              }
-              .certificate h2 {
-                font-size: 32px;
-                color: #667eea;
-                margin: 30px 0;
-                font-weight: bold;
-              }
-              .certificate p {
-                font-size: 18px;
-                color: #666;
-                line-height: 1.8;
-                margin: 20px 0;
-              }
-              .certificate .name {
-                font-size: 36px;
-                color: #333;
-                font-weight: bold;
-                margin: 30px 0;
-                border-bottom: 2px solid #667eea;
-                display: inline-block;
-                padding-bottom: 10px;
-              }
-              .certificate .footer {
-                margin-top: 50px;
-                font-size: 14px;
-                color: #999;
-              }
-              @media print {
-                body { background: white; }
-                .certificate { box-shadow: none; }
-              }
-            </style>
-          </head>
-          <body>
-            <div class="certificate">
-              <h1>🎓 Certificate of Completion</h1>
-              <p>This is to certify that</p>
-              <div class="name">Your Name</div>
-              <p>has successfully completed the</p>
-              <h2>${DEMO_COURSE.title}</h2>
-              <p>Instructed by ${DEMO_COURSE.instructor}</p>
-              <p>Completion Date: ${completionDate}</p>
-              <div class="footer">
-                <p>Professor AI Coach - Excellence in Online Education</p>
-              </div>
-            </div>
-            <script>
-              // Auto-print dialog
-              setTimeout(() => window.print(), 500);
-            </script>
-          </body>
-        </html>
-      `);
-      certificateWindow.document.close();
+    // Create a canvas to draw the certificate with the user's name
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    if (!ctx) {
+      toast({
+        title: "Error",
+        description: "Unable to generate certificate. Please try again.",
+        variant: "destructive"
+      });
+      return;
     }
 
-    toast({
-      title: "Certificate Ready!",
-      description: "Your certificate has been generated. You can print or save it as PDF.",
-    });
+    // Load the certificate image
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = '/india-ai-certificate.jpg';
+    
+    img.onload = () => {
+      // Set canvas size to match image
+      canvas.width = img.width;
+      canvas.height = img.height;
+      
+      // Draw the certificate image
+      ctx.drawImage(img, 0, 0);
+      
+      // Configure text styling for the user's name
+      // Position the name in the space provided (adjust these values based on certificate layout)
+      ctx.font = 'bold 180px "Times New Roman", serif';
+      ctx.fillStyle = '#2c3e50'; // Dark color for the name
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      
+      // Draw the user's name at the center of the certificate
+      // Y position is approximately where the name space is (adjust as needed)
+      const nameY = canvas.height * 0.45; // 40% from top (adjust based on your certificate)
+      ctx.fillText(userName, canvas.width / 2, nameY);
+      
+      // Convert canvas to blob and download
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `IndiaAI_Certificate_${userName.replace(/\s+/g, '_')}.jpg`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          
+          toast({
+            title: "Certificate Downloaded!",
+            description: "Your certificate has been saved to your downloads folder.",
+          });
+        }
+      }, 'image/jpeg', 0.95);
+    };
+    
+    img.onerror = () => {
+      toast({
+        title: "Error",
+        description: "Unable to load certificate template. Please try again.",
+        variant: "destructive"
+      });
+    };
   };
 
   return (
     <div className="min-h-screen bg-gray-900">
       <AuthNavbar />
       
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-64px)] overflow-hidden">
+      <div ref={containerRef} className="flex flex-col lg:flex-row h-[calc(100vh-64px)] overflow-hidden">
         {/* Sidebar - Course Content */}
-        <div className="w-full lg:w-96 bg-gray-800 border-b lg:border-b-0 lg:border-r border-gray-700 flex flex-col overflow-hidden max-h-[40vh] lg:max-h-none">
+        <div 
+          className="bg-gray-800 border-b lg:border-b-0 lg:border-r border-gray-700 flex flex-col overflow-hidden"
+          style={{
+            width: isMobileView ? '100%' : `${sidebarWidth}px`,
+            maxHeight: isMobileView ? '40vh' : 'none',
+            minWidth: isMobileView ? 'auto' : '280px',
+            maxWidth: isMobileView ? '100%' : '600px',
+          }}
+        >
           {/* Course Header */}
           <div className="p-4 sm:p-6 border-b border-gray-700">
             <h1 className="text-lg sm:text-xl font-bold text-white mb-2">{DEMO_COURSE.title}</h1>
@@ -592,8 +624,20 @@ export default function CourseProgressPage() {
           </div>
         </div>
 
+        {/* Resize Handle - Desktop only */}
+        {!isMobileView && (
+          <div
+            className="hidden lg:flex w-1 bg-gray-700 hover:bg-orange-500 cursor-col-resize items-center justify-center group transition-colors"
+            onMouseDown={() => setIsResizing(true)}
+          >
+            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+              <GripVertical className="h-4 w-4 text-white" />
+            </div>
+          </div>
+        )}
+
         {/* Main Content - Video Player */}
-        <div className="flex-1 bg-gray-900 flex flex-col">
+        <div className="flex-1 bg-gray-900 flex flex-col overflow-hidden">
           {currentLessonData ? (
             <>
               {/* Video Player */}
@@ -620,18 +664,43 @@ export default function CourseProgressPage() {
                       </Button>
                     </div>
                   </div>
+                ) : quizResult ? (
+                  <div className="w-full h-full overflow-y-auto">
+                    <IndiaAIQuizResult
+                      moduleNumber={quizResult.moduleNumber}
+                      score={quizResult.score}
+                      totalQuestions={quizResult.totalQuestions}
+                      answers={quizResult.answers}
+                      questions={INDIA_AI_MCQS[`Module - ${quizResult.moduleNumber}` as keyof typeof INDIA_AI_MCQS] || []}
+                      onRetake={() => {
+                        setQuizResult(null);
+                        // Reset quiz lesson completion to allow retake
+                        if (currentLesson) {
+                          toggleLessonCompletion(currentLesson.moduleId, currentLesson.lessonId);
+                        }
+                      }}
+                      onContinue={() => {
+                        setQuizResult(null);
+                        goToNextLesson();
+                      }}
+                    />
+                  </div>
                 ) : (
-                  <div className="max-w-4xl mx-auto p-8 text-white">
-                    <div className="bg-gray-800 rounded-lg p-8">
-                      <Award className="h-12 w-12 text-primary mb-4" />
-                      <h2 className="text-2xl font-bold mb-4">{currentLessonData.title}</h2>
-                      <p className="text-gray-300 mb-6">
-                        This is a quiz or assessment. In a real implementation, you would display
-                        quiz questions and handle submissions here.
-                      </p>
-                      <Button onClick={() => toggleLessonCompletion(currentLesson!.moduleId, currentLesson!.lessonId)}>
-                        {currentLessonData.completed ? "Retake Quiz" : "Start Quiz"}
-                      </Button>
+                  <div className="max-w-4xl mx-auto p-4 sm:p-8 text-white w-full">
+                    <div className="bg-gray-900 rounded-lg p-4 sm:p-6">
+                      <IndiaAIModuleQuiz
+                        moduleNumber={(modules.findIndex(m => m.id === currentLesson!.moduleId) + 1) as any}
+                        onComplete={(score, answers) => {
+                          const moduleNumber = modules.findIndex(m => m.id === currentLesson!.moduleId) + 1;
+                          setQuizResult({
+                            moduleNumber,
+                            score,
+                            totalQuestions: answers.length,
+                            answers,
+                          });
+                          toggleLessonCompletion(currentLesson!.moduleId, currentLesson!.lessonId);
+                        }}
+                      />
                     </div>
                   </div>
                 )}

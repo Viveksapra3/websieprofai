@@ -18,8 +18,9 @@ const INDIA_AI_LOGO = "https://storageprdv2inwink.blob.core.windows.net/420a82bb
 const INDIA_AI_MODULES = [
   {
     id: "module-1",
-    title: "What is Artificial Intelligence?",
-    description: "Learn what AI really means, how it has evolved over time, and where you can already see it in your daily life",
+    title: "What is Artificial Intelligence",
+    summary: "The module offers a foundational understanding of Artificial Intelligence, tracing its evolution, applications, and growing impact across industries and everyday life. It demystifies how AI systems learn, make decisions, and assist humans, helping learners move from curiosity to practical comprehension.",
+    description: "This module introduces learners to the fundamentals of Artificial Intelligence (AI) and its subset, Machine Learning (ML). It traces the evolution of AI, from early logic-based systems and rule-driven programs to today's data-centric and neural network models. Learners explore key milestones and the rise of intelligent assistants; that mark AI's transition from theory to practice. The module demonstrates real-world applications of AI showing how algorithms enhance efficiency and innovation. It also examines the strengths and limitations of AI, such as its speed and precision versus issues of bias, opacity, and lack of empathy. Concluding with an introduction to AI literacy, the module emphasises the need to understand, evaluate, and use AI ethically and effectively. Learners gain the conceptual and critical foundations necessary to engage meaningfully with intelligent technologies in an evolving digital era.",
     duration: "45 min",
     lessons: [
       { title: "1A: Introduction to AI & Machine Learning", type: "video", duration: "10 min" },
@@ -33,8 +34,9 @@ const INDIA_AI_MODULES = [
   },
   {
     id: "module-2",
-    title: "The Technology Behind Artificial Intelligence",
-    description: "Understand how machines learn, what Generative AI is, and how to communicate effectively with AI tools using the CRAFT formula",
+    title: "The Technology behind Artificial Intelligence",
+    summary: "This module provides an introduction to Generative Artificial Intelligence, exploring how machines learn, process language, and generate content. Learners are guided through the workings of Machine Learning, Large Language Models, and the principles of effective prompting. By integrating practical tools like the CRAFT Formula, the module equips learners to interact with AI systems confidently, producing accurate and meaningful outputs. It emphasises understanding both the capabilities and constraints of AI, promoting responsible and informed use for everyday contexts.",
+    description: "This module introduces learners to Generative Artificial Intelligence, highlighting how AI systems can create content, respond to queries, and assist in problem-solving. It explains how Machine Learning enables systems to identify patterns, adapt, and improve from data over time. Learners explore Large Language Models, which form the backbone of text-based AI tools, and learn how these models process information to generate coherent and contextually relevant responses. The module also covers prompting techniques, providing strategies to interact effectively with AI systems. A key feature is the CRAFT Formula, a structured approach to designing prompts that maximise clarity and output quality. By the end of the module, learners will have both the conceptual understanding and practical skills to engage with generative AI tools responsibly, enhancing learning, productivity, and creativity.",
     duration: "50 min",
     lessons: [
       { title: "2A: Learn the Language of AI", type: "video", duration: "10 min" },
@@ -49,7 +51,8 @@ const INDIA_AI_MODULES = [
   {
     id: "module-3",
     title: "Using Artificial Intelligence to Learn and Create",
-    description: "Explore popular GenAI tools and discover how AI can help you study better, create content, summarise information, and analyse data",
+    summary: "This module demonstrates how Artificial Intelligence can be applied to real-world situations, illustrating its versatility and problem-solving potential. Learners see the CRAFT Formula in action across diverse scenarios, learning how to design effective prompts to address varied challenges and achieve meaningful results.",
+    description: "This module focuses on the practical application of Artificial Intelligence through real-world examples. Learners explore how AI tools can be leveraged to solve challenges across multiple contexts, from academic tasks to professional problem-solving. The CRAFT Formula is applied systematically, showing how structured prompting enhances clarity, relevance, and accuracy in AI outputs. By working through diverse user scenarios, learners gain hands-on experience in translating theoretical knowledge into actionable solutions, reinforcing both practical skills and strategic thinking in the use of AI.",
     duration: "55 min",
     lessons: [
       { title: "3A: Popular AI Tools", type: "video", duration: "10 min" },
@@ -64,7 +67,8 @@ const INDIA_AI_MODULES = [
   {
     id: "module-4",
     title: "Using Artificial Intelligence to Think and Plan",
-    description: "Learn how AI can act as a thinking partner — helping you plan projects, draft ideas, solve problems, and make better decisions",
+    summary: "This module positions Artificial Intelligence as a practical ally, showing how it can be leveraged to navigate evolving personal, academic, and professional landscapes. Learners explore real-world applications of AI across sectors, understanding how intelligent systems can enhance productivity, decision-making, and problem-solving. Through concrete examples, the module demonstrates AI's potential as a supportive tool while highlighting the need for responsible use and critical engagement.",
+    description: "This module guides learners in viewing Artificial Intelligence as an ally, capable of augmenting human abilities and adapting to changing times. It presents practical examples of AI applications in areas such as education, business, and everyday life, illustrating how AI supports analysis, prediction, creativity, and efficiency. Learners examine multiple use cases, from recommendation systems and virtual assistants to automation and data-driven insights, understanding the benefits and limitations of each. The module emphasises the importance of responsible and informed use, encouraging learners to integrate AI thoughtfully into their work and daily routines. By the end, learners gain the awareness and skills to harness AI as a constructive and ethical partner in achieving personal and professional goals.",
     duration: "35 min",
     lessons: [
       { title: "4A: Demo - Using AI as a Thinking Partner", type: "video", duration: "12 min" },
@@ -77,7 +81,8 @@ const INDIA_AI_MODULES = [
   {
     id: "module-5",
     title: "Artificial Intelligence Ethics",
-    description: "Understand why responsible AI use matters — learn the principles of AI ethics, risks, and how the FAST framework ensures safe technology usage",
+    summary: "This module introduces the FAST Framework, providing learners with a structured approach to understanding and navigating ethical concerns in Artificial Intelligence. It examines the societal and personal implications of AI use, outlines government initiatives and policies addressing these challenges, and emphasises responsible, ethical engagement with AI technologies. By the end of the module, learners are equipped to apply ethical principles in practical AI use, ensuring safety, fairness, and accountability.",
+    description: "This module focuses on ethical considerations in Artificial Intelligence, introducing the FAST Framework as a guide to responsible AI use. Learners explore common ethical concerns, including bias, privacy, transparency, and accountability, and examine their implications for individuals, organisations, and society. The module also highlights the government's response to these challenges, covering policy measures, regulations, and initiatives aimed at promoting safe and fair AI deployment. Through examples and practical guidance, learners are encouraged to integrate ethical thinking into AI interactions and decision-making. The module concludes with key takeaways, reinforcing the importance of ethical awareness, informed use, and critical evaluation in leveraging AI responsibly for personal, academic, and professional growth.",
     duration: "45 min",
     lessons: [
       { title: "5A: Principles of AI Ethics & Introduction to the FAST Framework", type: "video", duration: "12 min" },
@@ -91,7 +96,8 @@ const INDIA_AI_MODULES = [
   {
     id: "module-6",
     title: "The Future of Artificial Intelligence",
-    description: "Explore key AI trends and opportunities for your future — how AI will shape careers, industries, and daily life",
+    summary: "This module explores major trends that are reshaping how humans interact with Artificial Intelligence today. It highlights how AI is transforming coding, user interfaces, search, and customer experiences, while introducing AI agents as collaborative team members in workplaces. Learners discover how natural language has become the primary interface for interacting with AI, how AI agents are taking on tasks autonomously, and how conversational AI is replacing traditional apps and search tools. The module emphasises that AI literacy is now an essential skill, and that human creativity and judgment remain irreplaceable when combined with AI's speed, scale, and capabilities. By the end, learners understand how to leverage AI effectively, ethically, and collaboratively.",
+    description: "This module presents current trends in Artificial Intelligence that are actively transforming work, learning, and daily life. It explains how natural language is becoming the new coding medium, enabling anyone to create websites, apps, or reports without learning traditional programming languages. AI is also becoming the new user interface, with conversational systems replacing multiple apps and screens, making interactions more intuitive. The module differentiates AI tools from AI agents, showing how agents can autonomously perform tasks like booking tickets, managing schedules, or summarising meetings. Learners explore the idea of AI as future workplace colleagues and the evolving personal technology landscape, where screens, apps, and operating systems may be replaced by AI-driven systems. Trends like conversational search and AI-influenced customer expectations demonstrate the need for AI literacy as a core skill. The module concludes with a reminder that the AI revolution is already underway and that humans who combine creativity, empathy, and judgment with AI capabilities will shape the future. Practical applications, ethical considerations, and collaboration strategies reinforce learners' ability to engage meaningfully with AI in personal and professional contexts.",
     duration: "40 min",
     lessons: [
       { title: "6A: Key Trends in AI", type: "video", duration: "10 min" },
@@ -378,12 +384,19 @@ export default function IndiaAIMissionPage() {
                           </Badge>
                         </div>
                         <h3 className="text-base sm:text-lg font-semibold text-white">{module.title}</h3>
-                        <p className="text-xs sm:text-sm text-gray-400 line-clamp-2">{module.description}</p>
+                        <p className="text-xs sm:text-sm text-gray-400 line-clamp-2">{module.summary}</p>
                       </div>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="px-4 sm:px-6 pb-3 sm:pb-4">
-                    <div className="ml-0 sm:ml-16 space-y-2">
+                    <div className="ml-0 sm:ml-16 space-y-4">
+                      {/* Module Description */}
+                      <div className="p-4 bg-gray-900/30 rounded-lg border border-gray-700/30">
+                        <p className="text-sm text-gray-300 leading-relaxed">{module.description}</p>
+                      </div>
+                      
+                      {/* Module Lessons */}
+                      <div className="space-y-2">
                       {module.lessons.map((lesson, lessonIndex) => (
                         <div 
                           key={lessonIndex}
@@ -400,6 +413,7 @@ export default function IndiaAIMissionPage() {
                           <span className="text-xs sm:text-sm text-gray-500 flex-shrink-0 ml-2">{lesson.duration}</span>
                         </div>
                       ))}
+                      </div>
                     </div>
                   </AccordionContent>
                 </AccordionItem>

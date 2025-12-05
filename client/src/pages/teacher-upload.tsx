@@ -79,7 +79,7 @@
 //               Transform Your Content with AI
 //             </h1> */}
 //             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-//               Upload your PDF materials and let Professor AI create engaging, structured courses automatically.
+//               Upload your PDF materials and let ProfessorsAI create engaging, structured courses automatically.
 //             </p>
 //           </div>
 

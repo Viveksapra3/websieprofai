@@ -61,7 +61,7 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // Professor AI Brand Colors
+        // ProfessorsAI Brand Colors
         "professor-primary": "hsl(var(--professor-primary))",
         "professor-secondary": "hsl(var(--professor-secondary))",
         "professor-accent": "hsl(var(--professor-accent))",

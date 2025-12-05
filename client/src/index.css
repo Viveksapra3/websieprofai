@@ -41,7 +41,7 @@
   --font-mono: "Menlo", monospace;
   --radius: 0.75rem;
   
-  /* Professor AI Brand Colors */
+  /* ProfessorsAI Brand Colors */
   --professor-primary: hsl(217 88% 62%);
   --professor-secondary: hsl(211 21% 14%);
   --professor-accent: hsl(258 90% 66%);
@@ -78,7 +78,7 @@
   --sidebar-border: hsl(216 34% 17%);
   --sidebar-ring: hsl(217 88% 62%);
   
-  /* Professor AI Brand Colors - Dark Mode */
+  /* ProfessorsAI Brand Colors - Dark Mode */
   --professor-primary: hsl(217 88% 62%);
   --professor-secondary: hsl(213 31% 91%);
   --professor-accent: hsl(258 90% 66%);

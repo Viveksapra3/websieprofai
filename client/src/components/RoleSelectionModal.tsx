@@ -25,7 +25,7 @@ export default function RoleSelectionModal({ isOpen, onSelectRole, userEmail }: 
       <Card className="w-full max-w-md mx-4 bg-white/95 backdrop-blur-lg border-2 border-white/20 shadow-2xl">
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-2xl font-bold text-gray-900">
-            Welcome to ProfAI Coach!
+            Welcome to ProfessorsAI!
           </CardTitle>
           <CardDescription className="text-gray-600">
             Signing in as: <span className="font-semibold text-gray-900">{userEmail}</span>

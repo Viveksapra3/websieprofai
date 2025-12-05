@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Link } from 'wouter';
 import { ArrowLeft, Check, CreditCard, Shield, Zap, Users, Crown, Star } from 'lucide-react';
-import logoPath from "@assets/prof-ai-logo_1755775207766-DKA28TFR.avif";
+import logoPath from "@assets/ProfAI-Updated.svg";
 
 export default function PaymentPage() {
   const [selectedPlan, setSelectedPlan] = useState('pro');
@@ -76,7 +76,7 @@ export default function PaymentPage() {
               <Link href="/">
                 <img 
                   src={logoPath} 
-                  alt="Professor AI Logo" 
+                  alt="ProfessorsAI Logo" 
                   className="h-8 w-auto"
                 />
               </Link>
@@ -98,7 +98,7 @@ export default function PaymentPage() {
         {/* Billing Toggle */}
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Unlock the Full Power of Professor AI
+            Unlock the Full Power of ProfessorsAI
           </h2>
           <p className="text-xl text-gray-600 mb-8">
             Choose the perfect plan to transform your educational content with AI

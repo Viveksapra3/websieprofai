@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Link } from 'wouter';
 import { ArrowLeft, Building, Users, Mail, Phone, Globe, CheckCircle } from 'lucide-react';
-import logoPath from "@assets/prof-ai-logo_1755775207766-DKA28TFR.avif";
+import logoPath from "@assets/ProfAI-Updated.svg";
 
 export default function OrganizationContact() {
   const [formData, setFormData] = useState({
@@ -77,7 +77,7 @@ export default function OrganizationContact() {
               <div className="flex justify-center">
                 <img 
                   src={logoPath} 
-                  alt="Professor AI Logo" 
+                  alt="ProfessorsAI Logo" 
                   className="h-12 w-auto"
                 />
               </div>
@@ -128,7 +128,7 @@ export default function OrganizationContact() {
             <div className="flex justify-center">
               <img 
                 src={logoPath} 
-                alt="Professor AI Logo" 
+                alt="ProfessorsAI Logo" 
                 className="h-12 w-auto"
               />
             </div>

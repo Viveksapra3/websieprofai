@@ -19,8 +19,8 @@ export default function Home() {
       <Navigation />
       <HeroSection />
       <CoursesSection />
-      <AvatarTeachingSection />
       <LLMComparisonSection />
+      <AvatarTeachingSection />
       <FeaturesSection />
       <HowItWorksSection />
       <IndiaAIMissionSection />

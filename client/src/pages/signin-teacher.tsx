@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, ArrowLeft, Mail, Lock, GraduationCap } from 'lucide-react';
-import logoPath from "@assets/prof-ai-logo_1755775207766-DKA28TFR.avif";
+import logoPath from "@assets/ProfAI-Updated.svg";
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function SignInTeacher() {
@@ -173,7 +173,7 @@ export default function SignInTeacher() {
             <div className="flex justify-center">
               <img 
                 src={logoPath} 
-                alt="Professor AI Logo" 
+                alt="ProfessorsAI Logo" 
                 className="h-12 w-auto"
                 data-testid="signin-logo"
               />

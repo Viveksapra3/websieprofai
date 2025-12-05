@@ -45,7 +45,7 @@ const partners = [
 const stats = [
   {
     icon: Users,
-    number: '150,00+',
+    number: '15,000+',
     label: 'Students Taught',
     description: 'Learners empowered with AI education'
   },

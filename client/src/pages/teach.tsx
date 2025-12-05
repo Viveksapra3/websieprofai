@@ -31,7 +31,7 @@ export default function TeachPage() {
       <section className="py-16 px-4 bg-black/30">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="text-center">
-            <div className="text-4xl font-bold text-purple-400 mb-2">73M+</div>
+            <div className="text-4xl font-bold text-purple-400 mb-2">15,000++</div>
             <div className="text-gray-300">Students</div>
           </div>
           <div className="text-center">

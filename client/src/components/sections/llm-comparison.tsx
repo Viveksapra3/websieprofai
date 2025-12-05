@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef } from 'react';
+import { Link } from 'wouter';
 import { 
   Brain, 
   Target, 
@@ -11,8 +12,11 @@ import {
   Zap,
   GraduationCap,
   MessageSquare,
-  Clock
+  Clock,
+  ArrowRight
 } from 'lucide-react';
+import chatgptImage from '@assets/chatgpt.jpg';
+import professorsaiImage from '@assets/professorsai.jpg';
 
 const comparisonPoints = [
   {
@@ -49,13 +53,13 @@ const comparisonPoints = [
     category: "Content Alignment",
     profai: {
       title: "Syllabus-Centered Learning",
-      description: "Our platform is focused on syllabus content of the education standars , or of you favourite tutor",
+      description: "Our platform is focused on syllabus content of the education standards , or of you favourite tutor",
       icon: BookOpen,
       color: "text-green-600"
     },
     generalLLM: {
       title: "Generic Knowledge Base",
-      description: "Provides broad information without alignment to specific educational curricula or learning standards",
+      description: "Provides broad information without alignment to specific educational curriculum or learning standards",
       icon: Users,
       color: "text-red-500"
     }
@@ -130,14 +134,14 @@ export default function LLMComparisonSection() {
             variants={itemVariants}
             className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6"
           >
-            Why Choose ProfAI Coach Over 
+            Why Choose ProfessorsAI Over 
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"> General LLMs?</span>
           </motion.h2>
           <motion.p 
             variants={itemVariants}
             className="text-xl text-gray-600 dark:text-gray-400 max-w-4xl mx-auto"
           >
-            While general-purpose AI tools provide broad knowledge, ProfAI Coach is specifically engineered 
+            While general-purpose AI tools provide broad knowledge, ProfessorsAI is specifically engineered 
             for education with advanced pedagogical intelligence and structured learning methodologies.
           </motion.p>
         </motion.div>
@@ -160,7 +164,7 @@ export default function LLMComparisonSection() {
               </motion.h3>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* ProfAI Coach Side */}
+                {/* ProfessorsAI Side */}
                 <motion.div 
                   variants={cardVariants}
                   initial="hidden"
@@ -187,7 +191,7 @@ export default function LLMComparisonSection() {
                         <point.profai.icon className={`w-6 h-6 ${point.profai.color}`} />
                       </motion.div>
                       <h4 className="text-xl font-semibold text-gray-900 dark:text-white">
-                        ProfAI Coach
+                        ProfessorsAI
                       </h4>
                     </div>
                     <h5 className="text-lg font-medium text-green-800 dark:text-green-300 mb-2">
@@ -242,31 +246,100 @@ export default function LLMComparisonSection() {
           ))}
         </div>
 
-        {/* Call to Action */}
-        {/* <motion.div
+        {/* Visual Comparison Section */}
+        <motion.div
           variants={itemVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 0.9 }}
+          className="mt-20"
+        >
+          <h3 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">
+            See the Difference in Action
+          </h3>
+          <p className="text-lg text-gray-600 dark:text-gray-400 text-center mb-12 max-w-3xl mx-auto">
+            Compare how ChatGPT and ProfessorsAI respond to the same question. Notice how our platform 
+            provides structured, curriculum-focused learning with clear boundaries.
+          </p>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* ChatGPT Comparison */}
+            <motion.div
+              variants={cardVariants}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              transition={{ delay: 1.0 }}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border-2 border-red-200 dark:border-red-700"
+            >
+              <div className="bg-gradient-to-r from-red-500 to-orange-500 p-4">
+                <h4 className="text-xl font-bold text-white flex items-center">
+                  <XCircle className="w-6 h-6 mr-2" />
+                  ChatGPT - General Purpose
+                </h4>
+              </div>
+              <div className="p-4">
+                <img 
+                  src={chatgptImage} 
+                  alt="ChatGPT general response example" 
+                  className="w-full h-auto rounded-lg shadow-md"
+                />
+                <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                  Generic responses without educational structure or curriculum alignment
+                </p>
+              </div>
+            </motion.div>
+
+            {/* ProfessorsAI Comparison */}
+            <motion.div
+              variants={cardVariants}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              transition={{ delay: 1.2 }}
+              className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border-2 border-green-200 dark:border-green-700"
+            >
+              <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-4">
+                <h4 className="text-xl font-bold text-white flex items-center">
+                  <CheckCircle className="w-6 h-6 mr-2" />
+                  ProfessorsAI - Focused Learning
+                </h4>
+              </div>
+              <div className="p-4">
+                <img 
+                  src={professorsaiImage} 
+                  alt="ProfessorsAI structured learning response" 
+                  className="w-full h-auto rounded-lg shadow-md"
+                />
+                <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                  Structured, curriculum-aligned responses with clear learning boundaries
+                </p>
+              </div>
+            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* Call to Action with Detailed Comparison Button */}
+        <motion.div
+          variants={itemVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          transition={{ delay: 1.4 }}
           className="text-center mt-16"
         >
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
             <h3 className="text-2xl md:text-3xl font-bold mb-4">
-              Experience the Difference
+              Want to See More?
             </h3>
             <p className="text-xl mb-6 opacity-90">
-              Join thousands of educators who've transformed their teaching with AI-powered precision
+              Explore our detailed comparison to understand how ProfessorsAI revolutionizes learning
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-white text-blue-600 px-8 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors">
-                Start Free Trial
+            <Link href="/comparison">
+              <button className="bg-white text-blue-600 px-8 py-4 rounded-xl font-semibold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2 mx-auto">
+                View Detailed Comparison
+                <ArrowRight className="w-5 h-5" />
               </button>
-              <button className="border-2 border-white text-white px-8 py-3 rounded-xl font-semibold hover:bg-white/10 transition-colors">
-                See Demo
-              </button>
-            </div>
+            </Link>
           </div>
-        </motion.div> */}
+        </motion.div>
       </div>
     </section>
   );

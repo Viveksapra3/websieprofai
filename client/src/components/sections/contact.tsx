@@ -48,7 +48,7 @@ export default function ContactSection() {
               Get in <span className="text-gradient">Touch</span>
             </h2>
             <p className="text-base sm:text-lg text-muted mb-6 sm:mb-8" data-testid="contact-description">
-              Have questions about Professor AI? Our team is here to help you get started on your learning journey.
+              Have questions about ProfessorsAI? Our team is here to help you get started on your learning journey.
             </p>
             
             <div className="space-y-6">

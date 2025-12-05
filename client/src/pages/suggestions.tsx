@@ -88,7 +88,7 @@ export default function SuggestionsPage() {
     
     toast({
       title: "Suggestion submitted!",
-      description: "Thank you for helping us improve Professor AI.",
+      description: "Thank you for helping us improve ProfessorsAI.",
     });
     
     setTimeout(() => setShowSuccess(false), 3000);
@@ -303,7 +303,7 @@ export default function SuggestionsPage() {
       <footer className="py-8 border-t border-gray-800">
         <div className="container mx-auto px-4 text-center">
           <p className="text-gray-500 text-sm">
-            © 2025 Professor AI. All rights reserved.
+            © 2025 ProfessorsAI. All rights reserved.
           </p>
         </div>
       </footer>

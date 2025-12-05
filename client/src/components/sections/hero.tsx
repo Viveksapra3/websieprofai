@@ -29,7 +29,7 @@ export default function HeroSection() {
         <div className="text-3xl font-medium text-white">Learning Companion</div>
       </h1>
       <p className="text-lg sm:text-xl text-white/90 mb-8 leading-relaxed">
-        Transform your educational experience with Professor AI - an intelligent learning companion that personalizes your training, and becomes your guide, mentor, and coach anytime, anywhere.
+        Transform your educational experience with ProfessorsAI - an intelligent learning companion that personalizes your training, and becomes your guide, mentor, and coach anytime, anywhere.
       </p>
       <div className="flex flex-col sm:flex-row gap-4">
         <Button className="relative px-8 py-3 rounded-full font-bold text-lg transition-all duration-500 transform hover:scale-110 hover:shadow-2xl bg-gradient-to-r from-zinc-900 via-stone-950 to-stone-900 text-white shadow-lg hover:shadow-purple-500/50 group">

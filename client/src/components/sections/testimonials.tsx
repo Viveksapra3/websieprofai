@@ -4,7 +4,7 @@ import { Star, User } from 'lucide-react';
 const testimonials = [
   {
     rating: 5,
-    text: "Professor AI has completely changed how I approach learning. The personalized feedback and 24/7 availability make it feel like having a dedicated tutor.",
+    text: "ProfessorsAI has completely changed how I approach learning. The personalized feedback and 24/7 availability make it feel like having a dedicated tutor.",
     author: "Sarah Johnson",
     role: "Computer Science Student",
     gradient: "from-primary/5 to-white",
@@ -13,7 +13,7 @@ const testimonials = [
   },
   {
     rating: 5,
-    text: "As an educator, I'm amazed by how Professor AI adapts to different learning styles. It's like having an AI assistant for every student.",
+    text: "As an educator, I'm amazed by how ProfessorsAI adapts to different learning styles. It's like having an AI assistant for every student.",
     author: "Dr. Michael Chen",
     role: "Mathematics Professor",
     gradient: "from-accent/5 to-white",
@@ -40,7 +40,7 @@ export default function TestimonialsSection() {
             What Students & Teachers <span className="text-gradient">Are Saying</span>
           </h2>
           <p className="text-lg sm:text-xl text-muted px-4" data-testid="testimonials-description">
-            Join thousands of learners who have transformed their education with Professor AI
+            Join thousands of learners who have transformed their education with ProfessorsAI
           </p>
         </div>
         

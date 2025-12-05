@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Eye, EyeOff, ArrowLeft, Mail, User, Lock, ChevronDown, Check } from 'lucide-react';
 import * as Select from '@radix-ui/react-select';
-import logoPath from "@assets/prof-ai-logo_1755775207766-DKA28TFR.avif";
+import logoPath from "@assets/ProfAI-Updated.svg";
 import { useAuth } from '@/contexts/AuthContext';
 import ProfileCompletionModal from '@/components/ProfileCompletionModal';
 
@@ -245,7 +245,7 @@ export default function SignUp() {
             <div className="flex justify-center">
               <img 
                 src={logoPath} 
-                alt="Professor AI Logo" 
+                alt="ProfessorsAI Logo" 
                 className="h-12 w-auto"
                 data-testid="signup-logo"
               />

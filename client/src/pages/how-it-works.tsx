@@ -94,7 +94,7 @@ export default function HowItWorks() {
         <div className="max-w-7xl mx-auto text-center">
           <div className="mb-8">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-              How Professor AI
+              How ProfessorsAI
               <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent"> Works</span>
             </h1>
             <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
@@ -127,7 +127,7 @@ export default function HowItWorks() {
               Simple Steps to Success
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              From sign-up to mastery, here's how Professor AI transforms your learning journey
+              From sign-up to mastery, here's how ProfessorsAI transforms your learning journey
             </p>
           </div>
         </div>
@@ -375,7 +375,7 @@ export default function HowItWorks() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Why Choose Professor AI?
+              Why Choose ProfessorsAI?
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Experience the future of education with our innovative features
@@ -507,7 +507,7 @@ export default function HowItWorks() {
             Ready to Transform Your Learning?
           </h2>
           <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of students and teachers who are already experiencing the future of education with Professor AI.
+            Join thousands of students and teachers who are already experiencing the future of education with ProfessorsAI.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup">

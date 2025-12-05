@@ -19,7 +19,7 @@ export default function AboutSection() {
               The Future of <span className="text-gradient">AI Education</span>
             </h2>
             <p className="text-base sm:text-lg text-muted mb-6 sm:mb-8 leading-relaxed" data-testid="about-description">
-              Professor AI represents a breakthrough in educational technology, combining advanced natural language processing with deep learning algorithms to create an intelligent teaching companion that understands and adapts to each student's unique needs.
+              ProfessorsAI represents a breakthrough in educational technology, combining advanced natural language processing with deep learning algorithms to create an intelligent teaching companion that understands and adapts to each student's unique needs.
             </p>
             
             <div className="grid grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">

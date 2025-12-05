@@ -30,6 +30,7 @@ import CourseProgressPage from "@/pages/india-ai-course";
 import CourseManager from "@/pages/admin/course-manager";
 import IndiaAIMissionPage from "@/pages/india-ai-mission";
 import SuggestionsPage from "@/pages/suggestions";
+import ComparisonPage from "@/pages/comparison";
 
 function Router() {
   return (
@@ -53,6 +54,7 @@ function Router() {
       <Route path="/india-ai-course" component={CourseProgressPage} />
       <Route path="/india-ai-mission" component={IndiaAIMissionPage} />
       <Route path="/suggestions" component={SuggestionsPage} />
+      <Route path="/comparison" component={ComparisonPage} />
       <Route path="/admin/course-manager" component={CourseManager} />
       <Route path="/course/:id" component={CoursePage} />
       <Route path="/unlock-course" component={UnlockCoursePage} />

@@ -31,7 +31,7 @@ export default function Footer() {
           <div data-testid="footer-brand">
             <div className="flex items-center mb-6">
               <Brain className="text-accent text-2xl w-8 h-8 mr-3" />
-              <span className="text-2xl font-bold">Professor AI</span>
+              <span className="text-2xl font-bold">ProfessorsAI</span>
             </div>
             <p className="text-gray-300 mb-6">
               Transforming education through intelligent, conversational AI that adapts to every learner's unique needs.
@@ -88,7 +88,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-700 text-center pt-6" data-testid="footer-bottom">
           <p className="text-gray-400" >
-            © 2025 Professor AI. All rights reserved @iPredictt Data Labs Pvt. Ltd.| {' '}
+            © 2025 ProfessorsAI. All rights reserved @iPredictt Data Labs Pvt. Ltd.| {' '}
             <a href="#" className="hover:text-white transition-colors" data-testid="link-privacy">
               Privacy Policy
             </a>{' '}

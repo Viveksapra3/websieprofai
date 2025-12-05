@@ -9,7 +9,7 @@ import { AuthNavbar } from "@/components/auth-navbar";
 import { Avatar } from "@/components/ui/avatar";
 import { Check, X, LogOut, Home, Edit3, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
-import logoPath from "@assets/prof-ai-logo_1755775207766-DKA28TFR.avif";
+import logoPath from "@assets/ProfAI-Updated.svg";
 
 // Fallback Textarea + Avatar if not present in UI kit
 // Remove if you already have implementations at '@/components/ui/*'
@@ -183,7 +183,7 @@ export default function PostAuthPage(): JSX.Element {
               <div className="flex justify-center">
                 <img 
                   src={logoPath} 
-                  alt="Professor AI Logo" 
+                  alt="ProfessorsAI Logo" 
                   className="h-12 w-auto"
                 />
               </div>
@@ -221,7 +221,7 @@ export default function PostAuthPage(): JSX.Element {
                   <span className="w-full border-t border-white/20" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="bg-transparent px-2 text-white/70">New to Professor AI?</span>
+                  <span className="bg-transparent px-2 text-white/70">New to ProfessorsAI?</span>
                 </div>
               </div>
 

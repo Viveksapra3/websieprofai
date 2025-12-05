@@ -3,8 +3,10 @@ import { Link, useLocation } from "wouter";
 import { X, Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// IndiaAI Mission Logo
+// IndiaAI Mission Logo - for minimized state
 const INDIA_AI_LOGO = "https://storageprdv2inwink.blob.core.windows.net/420a82bb-9653-422b-8f56-70bfebb4e75e/527ca2de-8828-4650-b19b-225d74fc778a";
+// IndiaAI Mission Logo - for expanded/hover state
+const INDIA_AI_LOGO_EXTENDED = "https://indiaai.gov.in/indiaAi-2021/build/images/logo-white.png";
 
 // Pages where the popup should be visible
 const ALLOWED_PAGES = ["/", "/courses"];
@@ -96,7 +98,7 @@ export function IndiaAIPopup() {
               <div className="flex items-center gap-3 mb-4">
                 <div className="relative">
                   <img 
-                    src={INDIA_AI_LOGO} 
+                    src={INDIA_AI_LOGO_EXTENDED} 
                     alt="IndiaAI Mission" 
                     className="w-16 h-16 object-contain"
                   />

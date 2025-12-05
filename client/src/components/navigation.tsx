@@ -68,13 +68,13 @@ export default function Navigation() {
   return (
     <nav className={`fixed top-2 left-0 right-0 z-50 transition-all duration-300 bg-transparent`} data-testid="main-navigation">
       <div className="max-w-10xl mx-auto  px-4 sm:px-6 lg:px-10">
-        <div className="flex justify-between items-center py-3 px-6 sm:py-3 bg-black/90 rounded-full">
+        <div className="flex justify-between items-center py-1.5 px-4 sm:py-1.5 bg-black/90 rounded-full">
           <div className="flex items-center" data-testid="logo-brand">
             <Link href="/">
               <img 
                 src={logoPath} 
-                alt="Professor AI Logo" 
-                className="h-6 sm:h-10 w-auto cursor-pointer hover:scale-105 transition-transform duration-200"
+                alt="ProfessorsAI Logo" 
+                className="h-12 sm:h-14 w-auto cursor-pointer hover:scale-105 transition-transform duration-200"
               />
             </Link>
           </div>
@@ -196,6 +196,16 @@ export default function Navigation() {
                 data-testid="nav-career-gpt"
               >
                 Career GPT
+              </button>
+            </Link>
+
+            {/* Why ProfAI? Link - Highlighted */}
+            <Link href="/comparison">
+              <button 
+                className="relative px-4 py-2 rounded-full font-medium text-sm transition-all duration-300 transform hover:scale-105 bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md hover:shadow-amber-500/50 border border-amber-400"
+                data-testid="nav-comparison"
+              >
+                Why ProfAI?
               </button>
             </Link>
             
@@ -392,9 +402,16 @@ export default function Navigation() {
 
             {/* Mobile Career GPT Link */}
             <Link href="/career-gpt">
-              <button className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left`}>
+              <button className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left border-b border-white/20 pb-2 mb-2`}>
                 Career GPT
               </button>
+            </Link>
+
+            {/* Mobile Why ProfAI? Link */}
+            <Link href="/comparison">
+              <Button className="w-full mb-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 border border-amber-400">
+                Why ProfAI?
+              </Button>
             </Link>
             
             {/* TRY IT OUT Button - only show when not logged in */}

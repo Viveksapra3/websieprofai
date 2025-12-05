@@ -41,7 +41,7 @@
 //         <div className="flex items-center gap-3">
 //           <Link href="/">
 //             <a className="font-semibold hover:opacity-80 inline-flex items-center">
-//               <img src={Logo} alt="Professor AI" className="h-auto w-52 object-contain" />
+//               <img src={Logo} alt="ProfessorsAI" className="h-auto w-52 object-contain" />
 //             </a>
 //           </Link>
 //         </div>
@@ -143,7 +143,7 @@ export function AuthNavbar() {
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link href="/" className="font-semibold hover:opacity-80 inline-flex items-center">
-            <img src={Logo} alt="Professor AI" className="h-auto w-52 object-contain" />
+            <img src={Logo} alt="ProfessorsAI" className="h-auto w-52 object-contain" />
           </Link>
         </div>
 

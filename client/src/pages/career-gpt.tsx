@@ -182,7 +182,7 @@ export default function CareerGPTPage() {
       {/* Footer */}
       <footer className="py-6 sm:py-8 px-4 sm:px-6 lg:px-8 border-t border-white/10">
         <div className="max-w-6xl mx-auto text-center text-gray-400">
-          <p className="text-sm sm:text-base">&copy; 2024 ProfAI Coach. All rights reserved.</p>
+          <p className="text-sm sm:text-base">&copy; 2025 ProfessorsAI. All rights reserved.</p>
         </div>
       </footer>
     </div>

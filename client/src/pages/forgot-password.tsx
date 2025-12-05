@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Mail, CheckCircle2 } from 'lucide-react';
-import logoPath from "@assets/prof-ai-logo_1755775207766-DKA28TFR.avif";
+import logoPath from "@assets/ProfAI-Updated.svg";
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function ForgotPassword() {
@@ -55,7 +55,7 @@ export default function ForgotPassword() {
             <div className="flex justify-center">
               <img 
                 src={logoPath} 
-                alt="Professor AI Logo" 
+                alt="ProfessorsAI Logo" 
                 className="h-12 w-auto"
               />
             </div>

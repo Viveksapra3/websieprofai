@@ -150,6 +150,9 @@ const DEMO_MODULES: Module[] = [
 ];
 
 const STORAGE_PREFIX = "course-progress";
+// Increment this version number whenever you update course content (videos, quizzes, etc.)
+// This will force all users to reload fresh data from the updated DEMO_MODULES
+const COURSE_VERSION = "v2"; // Change to v3, v4, etc. when you update content
 
 export default function CourseProgressPage() {
   const [modules, setModules] = useState<Module[]>([]);
@@ -223,9 +226,9 @@ export default function CourseProgressPage() {
     };
   }, [isResizing]);
 
-  // Generate user-specific storage key
+  // Generate user-specific storage key with version
   const getStorageKey = () => {
-    return currentUser ? `${STORAGE_PREFIX}-${currentUser.uid}` : null;
+    return currentUser ? `${STORAGE_PREFIX}-${COURSE_VERSION}-${currentUser.uid}` : null;
   };
 
   // Load progress from localStorage on mount (per user)
@@ -234,6 +237,13 @@ export default function CourseProgressPage() {
     
     const storageKey = getStorageKey();
     if (!storageKey) return;
+    
+    // Clean up old cached versions
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith(STORAGE_PREFIX) && key !== storageKey) {
+        localStorage.removeItem(key);
+      }
+    });
     
     const stored = localStorage.getItem(storageKey);
     if (stored) {

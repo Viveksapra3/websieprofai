@@ -68,7 +68,8 @@ export default function HeroSection() {
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center lg:items-start justify-center lg:justify-start">
               <Link href="/courses">
                 <Button 
-                  className="border relative px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-bold text-sm sm:text-base lg:text-lg transition-all duration-500 transform hover:scale-110 hover:shadow-2xl bg-gradient-to-r from-zinc-900 via-stone-950 to-stone-900 text-white shadow-lg hover:shadow-purple-500/50 overflow-hidden group w-full sm:w-auto"
+                  className="border relative px-6 sm:px-7 py-4 sm:py-[1.375rem] rounded-full font-semibold text-sm sm:text-base lg:text-lg transition-all duration-500 transform hover:scale-110 hover:shadow-2xl bg-gradient-to-r from-zinc-900 via-stone-950 to-stone-900 text-white shadow-lg hover:shadow-purple-500/50 overflow-hidden group w-full sm:w-auto"
+
                   data-testid="button-sign-up"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -91,7 +92,7 @@ export default function HeroSection() {
                 <Button 
                   variant="outline"
                   size="lg"
-                  className="border-2 border-yellow-400 bg-gradient-to-r from-amber-500 to-orange-500 text-white   px-6 sm:px-8 py-2.5 sm:py-4 rounded-full font-semibold hover:scale-110 hover:bg-yellow-400/10 transition-all text-sm sm:text-base lg:text-lg w-full sm:w-auto"
+                  className="border-2 border-yellow-400 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 sm:px-8 py-2.5 sm:py-4 rounded-full font-semibold hover:scale-110 hover:text-white hover:bg-yellow-400/10 transition-all text-sm sm:text-base lg:text-lg w-full sm:w-auto"
                   data-testid="button-comparison"
                 >
                   <Zap className="w-5 h-5 mr-2" />

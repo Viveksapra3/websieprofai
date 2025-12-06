@@ -203,12 +203,38 @@ app.use((req, res, next) => {
     const distPath = path.resolve(__dirname, "..", "dist", "public");
 
     if (fs.existsSync(distPath)) {
-      app.use(express.static(distPath));
+      // Serve static assets with proper cache control
+      app.use(express.static(distPath, {
+        maxAge: 0, // Don't cache by default
+        etag: true, // Use ETags for cache validation
+        lastModified: true,
+        setHeaders: (res, filePath) => {
+          // Cache hashed assets (with version hash in filename) for 1 year
+          if (filePath.match(/\.(js|css|woff2?|ttf|eot|svg|png|jpg|jpeg|gif|webp|ico)$/)) {
+            if (filePath.match(/\.[a-f0-9]{8,}\./)) {
+              // Files with content hash can be cached forever
+              res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+            } else {
+              // Other assets cache for 1 hour
+              res.setHeader('Cache-Control', 'public, max-age=3600, must-revalidate');
+            }
+          } else {
+            // HTML and other files - no cache
+            res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            res.setHeader('Pragma', 'no-cache');
+            res.setHeader('Expires', '0');
+          }
+        }
+      }));
       log(`Serving static files from: ${distPath}`);
 
       // SPA fallback - serve index.html for all non-API routes
       app.get("*", (req, res) => {
         if (!req.path.startsWith("/api")) {
+          // Prevent caching of index.html
+          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+          res.setHeader('Pragma', 'no-cache');
+          res.setHeader('Expires', '0');
           res.sendFile(path.resolve(distPath, "index.html"));
         }
       });

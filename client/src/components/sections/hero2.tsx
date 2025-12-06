@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Play, Video, ChevronDown ,Sparkles} from 'lucide-react';
+import { Play, Video, ChevronDown, Sparkles, Zap } from 'lucide-react';
 import { Link } from 'wouter';
 import courseVideo from '@assets/video (2).mp4';
 import { useTypingAnimation } from '@/hooks/useTypingAnimation';
@@ -85,6 +85,17 @@ export default function HeroSection() {
                 >
                   <Video className="w-5 h-5 mr-2" />
                   How It Works
+                </Button>
+              </Link>
+              <Link href="/comparison">
+                <Button 
+                  variant="outline"
+                  size="lg"
+                  className="border-2 border-yellow-400 bg-gradient-to-r from-amber-500 to-orange-500 text-white   px-6 sm:px-8 py-2.5 sm:py-4 rounded-full font-semibold hover:scale-110 hover:bg-yellow-400/10 transition-all text-sm sm:text-base lg:text-lg w-full sm:w-auto"
+                  data-testid="button-comparison"
+                >
+                  <Zap className="w-5 h-5 mr-2" />
+                  GPT vs ProfAI
                 </Button>
               </Link>
             </div>

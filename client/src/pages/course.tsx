@@ -42,7 +42,16 @@ const buildApiUrl = (path: string): string => {
 export default function CoursePage() {
   const [match, params] = useRoute("/course/:id");
   const courseId = params?.id;
+  
+  // Debug environment variable loading
+  console.log('🔧 CoursePage initialization - Environment check:');
+  console.log('  import.meta.env.VITE_AVI_URL:', import.meta.env.VITE_AVI_URL);
+  console.log('  import.meta.env.MODE:', import.meta.env.MODE);
+  console.log('  import.meta.env.PROD:', import.meta.env.PROD);
+  
   const AVI_BASE = (import.meta.env.VITE_AVI_URL as string | undefined) || "";
+  console.log('  AVI_BASE after assignment:', AVI_BASE);
+  
   const [, navigate] = useLocation();
 
   const [loading, setLoading] = useState(true);
@@ -201,23 +210,45 @@ export default function CoursePage() {
   };
 
   const handleStartClass = async () => {
-    console.log('handleStartClass called with courseId:', courseId);
-    console.log('Current URL params:', params);
-    console.log('AVI_BASE:', AVI_BASE);
+    // Comprehensive debugging
+    console.group('🔍 Start Class Debug Info');
+    console.log('courseId:', courseId);
+    console.log('params:', params);
+    console.log('AVI_BASE raw value:', AVI_BASE);
+    console.log('AVI_BASE type:', typeof AVI_BASE);
+    console.log('AVI_BASE length:', AVI_BASE?.length);
+    console.log('import.meta.env.VITE_AVI_URL:', import.meta.env.VITE_AVI_URL);
+    console.log('import.meta.env.MODE:', import.meta.env.MODE);
+    console.log('import.meta.env.PROD:', import.meta.env.PROD);
+    console.log('import.meta.env.DEV:', import.meta.env.DEV);
+    console.log('All import.meta.env:', import.meta.env);
+    console.groupEnd();
     
     if (!courseId) {
-      console.error('No courseId available');
+      console.error('❌ No courseId available');
       alert('Course ID is missing. Please refresh the page and try again.');
       return;
     }
     
-    // Use a default URL if VITE_AVI_URL is not set
-    let targetBase = AVI_BASE;
+    // Use VITE_AVI_URL from environment
+    const targetBase = AVI_BASE ? AVI_BASE.replace(/\/$/, "") : "";
+    
+    console.log('📍 targetBase after processing:', targetBase);
+    console.log('📍 targetBase is empty?', !targetBase);
+    
+    // Check if targetBase is valid before proceeding
     if (!targetBase) {
-      // Default to localhost:3001 for the r3f project
-      // targetBase = "http://localhost:3001";
-      console.warn('VITE_AVI_URL not set, using default:', targetBase);
+      console.error('❌ VITE_AVI_URL is not set or empty');
+      console.error('Expected VITE_AVI_URL but got:', {
+        raw: AVI_BASE,
+        processed: targetBase,
+        envValue: import.meta.env.VITE_AVI_URL
+      });
+      alert('3D classroom URL is not configured. Please contact support.');
+      return;
     }
+    
+    console.log('✅ targetBase validated:', targetBase);
     
     try {
       // Get current session info
@@ -229,7 +260,6 @@ export default function CoursePage() {
         return;
       }
       
-      const base = targetBase.replace(/\/$/, "");
       const returnUrl = window.location.href;
       
       // Prepare session transfer data - include both userInfo and sessionToken
@@ -256,7 +286,16 @@ export default function CoursePage() {
         timestamp: String(Date.now())
       });
       
-      const targetUrl = new URL(base);
+      // Validate URL before constructing
+      let targetUrl;
+      try {
+        targetUrl = new URL(targetBase);
+      } catch (urlError) {
+        console.error('Invalid VITE_AVI_URL:', targetBase, urlError);
+        alert('3D classroom URL is invalid. Please contact support.');
+        return;
+      }
+      
       targetUrl.search = params.toString();
       const target = targetUrl.href;
       

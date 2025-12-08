@@ -51,10 +51,6 @@ export default defineConfig({
       },
     },
   },
-  // Define environment variables that should be available at build time
-  define: {
-    'import.meta.env.VITE_API_BASE': JSON.stringify(process.env.VITE_API_BASE),
-    'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
-    'import.meta.env.VITE_AVI_URL': JSON.stringify(process.env.VITE_AVI_URL),
-  },
+  // Vite automatically loads VITE_* variables from .env files
+  // No need to manually define them - they're available via import.meta.env
 });

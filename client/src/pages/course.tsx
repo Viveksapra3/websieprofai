@@ -215,7 +215,7 @@ export default function CoursePage() {
     let targetBase = AVI_BASE;
     if (!targetBase) {
       // Default to localhost:3001 for the r3f project
-      targetBase = "http://localhost:3001";
+      // targetBase = "http://localhost:3001";
       console.warn('VITE_AVI_URL not set, using default:', targetBase);
     }
     

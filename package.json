@@ -7,10 +7,13 @@
     "dev": "cross-env NODE_ENV=development tsx watch server/index.ts",
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "build-client": "vite build",
+    "build-client:prod": "vite build --mode production",
     "build-server": "esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
     "predeploy": "npm run build-client",
     "deploy": "gh-pages -d dist",
     "build": "npm run build-client && npm run build-server",
+    "build:prod": "npm run build-client:prod && npm run build-server",
+    "preview": "vite preview",
     "check": "tsc",
     "db:generate": "drizzle-kit generate:pg",
     "db:migrate": "drizzle-kit up:pg",
@@ -18,7 +21,8 @@
     "setup-pricing": "tsx scripts/setup-course-pricing.ts",
     "setup-pricing:help": "tsx scripts/setup-course-pricing.ts --help",
     "setup-pricing:direct": "tsx scripts/direct-setup.ts",
-    "set-all-free": "tsx scripts/set-all-courses-free.ts"
+    "set-all-free": "tsx scripts/set-all-courses-free.ts",
+    "setup:prod": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-production.ps1"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

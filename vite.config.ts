@@ -41,5 +41,20 @@ export default defineConfig({
       strict: true,
       deny: ["**/.*"],
     },
+    proxy: {
+      // Proxy API requests to backend in development
+      // In production, VITE_API_BASE will point directly to EC2
+      '/api': {
+        target: process.env.VITE_API_BASE || 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+  // Define environment variables that should be available at build time
+  define: {
+    'import.meta.env.VITE_API_BASE': JSON.stringify(process.env.VITE_API_BASE),
+    'import.meta.env.VITE_API_URL': JSON.stringify(process.env.VITE_API_URL),
+    'import.meta.env.VITE_AVI_URL': JSON.stringify(process.env.VITE_AVI_URL),
   },
 });

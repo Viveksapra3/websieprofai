@@ -410,13 +410,14 @@ export default function TeacherUploadPage() {
       if (files.length === 0) throw new Error("Please select at least one PDF file");
       if (!courseName.trim()) throw new Error("Please enter a course name");
 
-      // Create FormData and append files + course_title
+      // Create FormData and append files + course_title + priority
       const fd = new FormData();
       files.forEach((f) => {
         // key "files" used in your HTML sample
         fd.append("files", f, f.name);
       });
       fd.append("course_title", courseName.trim());
+      fd.append("priority", "1");
 
       // Prepare abort controller
       controllerRef.current = new AbortController();

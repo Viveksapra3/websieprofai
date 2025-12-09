@@ -22,7 +22,10 @@
     "setup-pricing:help": "tsx scripts/setup-course-pricing.ts --help",
     "setup-pricing:direct": "tsx scripts/direct-setup.ts",
     "set-all-free": "tsx scripts/set-all-courses-free.ts",
-    "setup:prod": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-production.ps1"
+    "setup:prod": "powershell -ExecutionPolicy Bypass -File ./scripts/setup-production.ps1",
+    "fetch-course-ids": "tsx scripts/fetch-and-generate-mappings.ts",
+    "migrate-course-ids": "tsx scripts/migrate-course-ids.ts",
+    "view-course-mappings": "tsx scripts/view-course-mappings.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

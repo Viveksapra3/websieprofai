@@ -88,10 +88,21 @@ export const courseImages = pgTable("course_images", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Course ID mapping table - maps new course IDs to previous/old course IDs
+export const courseIdMapping = pgTable("course_id_mapping", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  newCourseId: text("new_course_id").notNull().unique(), // Current/new course ID
+  oldCourseId: text("old_course_id").notNull(), // Previous/old course ID
+  description: text("description"), // Optional description of the mapping
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertCoursePricingSchema = createInsertSchema(coursePricing);
 export const insertUserPurchaseSchema = createInsertSchema(userPurchases);
 export const insertPaymentTransactionSchema = createInsertSchema(paymentTransactions);
 export const insertCourseImageSchema = createInsertSchema(courseImages);
+export const insertCourseIdMappingSchema = createInsertSchema(courseIdMapping);
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -100,3 +111,4 @@ export type CoursePricing = typeof coursePricing.$inferSelect;
 export type UserPurchase = typeof userPurchases.$inferSelect;
 export type PaymentTransaction = typeof paymentTransactions.$inferSelect;
 export type CourseImage = typeof courseImages.$inferSelect;
+export type CourseIdMapping = typeof courseIdMapping.$inferSelect;

@@ -144,7 +144,8 @@ const DEMO_MODULES: Module[] = [
     lessons: [
       { id: "m6-v1", title: "Module 6A: Key Trends in AI", duration: "10:00", completed: false, vimeoId: "1141841026?fl=tl&fe=ec", type: "video" },
       { id: "m6-v2", title: "Module 6B: AI & Your Future", duration: "10:00", completed: false, vimeoId: "1141841037?fl=tl&fe=ec", type: "video" },
-      { id: "m6-q1", title: "Module 6 Assessment", duration: "5:00", completed: false, type: "quiz" },
+      { id: "m6-v3", title: "Course Recap", duration: "1:42", completed: false, vimeoId: "1141841045?fl=tl&fe=ec", type: "video" },
+      { id: "m6-q1", title: "Final Assessment", duration: "5:00", completed: false, type: "quiz" },
     ]
   }
 ];
@@ -152,7 +153,7 @@ const DEMO_MODULES: Module[] = [
 const STORAGE_PREFIX = "course-progress";
 // Increment this version number whenever you update course content (videos, quizzes, etc.)
 // This will force all users to reload fresh data from the updated DEMO_MODULES
-const COURSE_VERSION = "v2"; // Change to v3, v4, etc. when you update content
+const COURSE_VERSION = "v3"; // Updated: Added Module 6C Course Recap video
 
 export default function CourseProgressPage() {
   const [modules, setModules] = useState<Module[]>([]);

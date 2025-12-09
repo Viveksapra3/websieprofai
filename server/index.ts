@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
+import compression from "compression";
 import { registerRoutes } from "./routes";
 import { testDbConnection, ensureSchema, pool } from "./db";
 import { paymentService } from "./payment-service";
@@ -23,6 +24,19 @@ function log(message: string, source = "express") {
 }
 
 const app = express();
+
+// Enable gzip/brotli compression for all responses
+app.use(compression({
+  filter: (req, res) => {
+    // Don't compress responses with this request header
+    if (req.headers['x-no-compression']) {
+      return false;
+    }
+    // Use compression for all other requests
+    return compression.filter(req, res);
+  },
+  level: 6, // Compression level (0-9, 6 is good balance)
+}));
 
 // Increase limits for large file uploads and long processing times
 app.use(express.json({ limit: '500mb' }));

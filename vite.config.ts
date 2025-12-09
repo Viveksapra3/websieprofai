@@ -27,14 +27,31 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // Increase chunk size warning limit
+    chunkSizeWarningLimit: 1000,
+    // Enable minification with esbuild (faster than terser)
+    minify: 'esbuild',
+    target: 'es2015',
+    // Source maps for debugging (disable in production for smaller size)
+    sourcemap: false,
     rollupOptions: {
       output: {
         // Add content hash to filenames for cache busting
         entryFileNames: 'assets/[name].[hash].js',
         chunkFileNames: 'assets/[name].[hash].js',
-        assetFileNames: 'assets/[name].[hash].[ext]'
-      }
-    }
+        assetFileNames: 'assets/[name].[hash].[ext]',
+        // Manual chunk splitting for better caching
+        manualChunks: {
+          // Vendor chunks
+          'react-vendor': ['react', 'react-dom', 'react-router-dom', 'wouter'],
+          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select', '@radix-ui/react-tabs'],
+          'query-vendor': ['@tanstack/react-query'],
+          'firebase-vendor': ['firebase/app', 'firebase/auth'],
+          // Three.js and 3D libraries (if used)
+          'three-vendor': ['three', '@react-three/fiber', '@react-three/drei'],
+        },
+      },
+    },
   },
   server: {
     fs: {

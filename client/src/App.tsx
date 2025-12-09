@@ -1,4 +1,5 @@
 import { Switch, Route } from "wouter";
+import { lazy, Suspense } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -6,31 +7,45 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { SetPasswordModal } from "@/components/set-password-modal";
 import { IndiaAIPopup } from "@/components/india-ai-popup";
+
+// Eager load critical pages
 import Home from "@/pages/home";
 import NotFound from "@/pages/not-found";
-import Signup from "@/pages/signup";
-import Dashboard from "@/pages/Dashboard";
-import SignInTeacher from "@/pages/signin-teacher";
-import SignInStudent from "@/pages/signin-student";
-import ForgotPassword from "@/pages/forgot-password";
-import PostAuthPage from "@/pages/post-auth";
-import CoursesPage from "@/pages/courses";
-import TeacherUploadPage from "@/pages/teacher-upload";
-import CoursePage from "@/pages/course";
-import TermsPage from "@/pages/terms";
-import CourseQuizPage from "@/pages/course-quiz";
-import UnlockCoursePage from "@/pages/unlock-course";
-import HowItWorks from "@/pages/how-it-works";
-import OrganizationContact from "@/pages/organization-contact";
-import PaymentPage from "@/pages/payment";
-import TeachPage from "@/pages/teach";
-import ProfAIBusinessPage from "@/pages/profai-business";
-import CareerGPTPage from "@/pages/career-gpt";
-import CourseProgressPage from "@/pages/india-ai-course";
-import CourseManager from "@/pages/admin/course-manager";
-import IndiaAIMissionPage from "@/pages/india-ai-mission";
-import SuggestionsPage from "@/pages/suggestions";
-import ComparisonPage from "@/pages/comparison";
+
+// Lazy load non-critical pages
+const Signup = lazy(() => import("@/pages/signup"));
+const Dashboard = lazy(() => import("@/pages/Dashboard"));
+const SignInTeacher = lazy(() => import("@/pages/signin-teacher"));
+const SignInStudent = lazy(() => import("@/pages/signin-student"));
+const ForgotPassword = lazy(() => import("@/pages/forgot-password"));
+const PostAuthPage = lazy(() => import("@/pages/post-auth"));
+const CoursesPage = lazy(() => import("@/pages/courses"));
+const TeacherUploadPage = lazy(() => import("@/pages/teacher-upload"));
+const CoursePage = lazy(() => import("@/pages/course"));
+const TermsPage = lazy(() => import("@/pages/terms"));
+const CourseQuizPage = lazy(() => import("@/pages/course-quiz"));
+const UnlockCoursePage = lazy(() => import("@/pages/unlock-course"));
+const HowItWorks = lazy(() => import("@/pages/how-it-works"));
+const OrganizationContact = lazy(() => import("@/pages/organization-contact"));
+const PaymentPage = lazy(() => import("@/pages/payment"));
+const TeachPage = lazy(() => import("@/pages/teach"));
+const ProfAIBusinessPage = lazy(() => import("@/pages/profai-business"));
+const CareerGPTPage = lazy(() => import("@/pages/career-gpt"));
+const CourseProgressPage = lazy(() => import("@/pages/india-ai-course"));
+const CourseManager = lazy(() => import("@/pages/admin/course-manager"));
+const IndiaAIMissionPage = lazy(() => import("@/pages/india-ai-mission"));
+const SuggestionsPage = lazy(() => import("@/pages/suggestions"));
+const ComparisonPage = lazy(() => import("@/pages/comparison"));
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p className="text-gray-600">Loading...</p>
+    </div>
+  </div>
+);
 
 function Router() {
   return (
@@ -73,7 +88,9 @@ function App() {
           <Toaster />
           <SetPasswordModal />
           <IndiaAIPopup />
-          <Router />
+          <Suspense fallback={<PageLoader />}>
+            <Router />
+          </Suspense>
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>

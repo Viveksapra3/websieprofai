@@ -103,7 +103,7 @@ const INDIA_AI_MODULES = [
       { title: "6A: Key Trends in AI", type: "video", duration: "10 min" },
       { title: "6B: AI & Your Future", type: "video", duration: "10 min" },
       { title: "6C: Course Recap", type: "video", duration: "10 min" },
-      { title: "Module 6 Assessment", type: "quiz", duration: "5 min" },
+      { title: "Final Assessment", type: "quiz", duration: "5 min" },
     ],
     icon: TrendingUp,
     color: "from-teal-500 to-teal-600"

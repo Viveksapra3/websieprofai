@@ -83,6 +83,7 @@ export const paymentTransactions = pgTable("payment_transactions", {
 export const courseImages = pgTable("course_images", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   courseId: text("course_id").notNull().unique(), // External API course ID
+  courseName: text("course_name"), // Course name/title
   imageUrl: text("image_url").notNull(), // Custom image URL for the course
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

@@ -7,12 +7,18 @@ import { CheckCircle2, XCircle } from "lucide-react";
 
 interface IndiaAIModuleQuizProps {
   moduleNumber: IndiaAIModuleId;
+  quizType?: "mid" | "end"; // "mid" for mid-module quiz, "end" for end-of-module quiz
   onComplete: (score: number, answers: number[]) => void;
 }
 
-export function IndiaAIModuleQuiz({ moduleNumber, onComplete }: IndiaAIModuleQuizProps) {
+export function IndiaAIModuleQuiz({ moduleNumber, quizType = "end", onComplete }: IndiaAIModuleQuizProps) {
   const key = `Module - ${moduleNumber}` as const;
-  const questions = INDIA_AI_MCQS[key] || [];
+  const moduleData = INDIA_AI_MCQS[key];
+  
+  // Get questions based on quiz type
+  const questions = quizType === "mid" && moduleData?.midModule 
+    ? moduleData.midModule.questions 
+    : moduleData?.endModule || [];
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -72,7 +78,7 @@ export function IndiaAIModuleQuiz({ moduleNumber, onComplete }: IndiaAIModuleQui
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-semibold">
-            Module {moduleNumber} Assessment
+            {quizType === "mid" ? `Module ${moduleNumber} Mid-Quiz` : `Module ${moduleNumber} Assessment`}
           </CardTitle>
           <div className="text-sm text-gray-300">
             Question {currentIndex + 1} of {total}

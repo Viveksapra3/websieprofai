@@ -6,10 +6,22 @@ export interface IndiaAIModuleQuestion {
 
 export type IndiaAIModuleId = 1 | 2 | 3 | 4 | 5 | 6;
 
-export type IndiaAIModuleQuestionMap = Record<`Module - ${IndiaAIModuleId}` , IndiaAIModuleQuestion[]>;
+// Structure for module quizzes: can have mid-module quiz (after specific video) and end-of-module quiz
+export interface IndiaAIModuleQuizzes {
+  midModule?: {
+    afterVideo: string; // e.g., "module1B", "module2C"
+    questions: IndiaAIModuleQuestion[];
+  };
+  endModule: IndiaAIModuleQuestion[];
+}
+
+export type IndiaAIModuleQuestionMap = Record<`Module - ${IndiaAIModuleId}`, IndiaAIModuleQuizzes>;
 
 export const INDIA_AI_MCQS: IndiaAIModuleQuestionMap = {
-  "Module - 1": [
+  "Module - 1": {
+    midModule: {
+      afterVideo: "module1B",
+      questions: [
     {
       Question: "How does human intelligence work?",
       Options: [
@@ -29,7 +41,10 @@ export const INDIA_AI_MCQS: IndiaAIModuleQuestionMap = {
         "He didn't use AI at all"
       ],
       "Correct Option": "Many times throughout his day"
+    }
+      ]
     },
+    endModule: [
     {
       Question: "What does 'intelligence becoming free' mean in today's world?",
       Options: [
@@ -70,8 +85,12 @@ export const INDIA_AI_MCQS: IndiaAIModuleQuestionMap = {
       ],
       "Correct Option": "Speed, scale, pattern recognition, and stamina"
     }
-  ],
-  "Module - 2": [
+    ]
+  },
+  "Module - 2": {
+    midModule: {
+      afterVideo: "module2C",
+      questions: [
     {
       Question: "In the cooking analogy, what is the main difference between Ravi (with the Magic Food Box) and Priya (the skilled cook)?",
       Options: [
@@ -91,7 +110,10 @@ export const INDIA_AI_MCQS: IndiaAIModuleQuestionMap = {
         "Data, Training, Model, Inference"
       ],
       "Correct Option": "Data, Training, Module, Inference"
+    }
+      ]
     },
+    endModule: [
     {
       Question: "What does 'Garbage in, garbage out' mean when it comes to AI?",
       Options: [
@@ -127,8 +149,12 @@ export const INDIA_AI_MCQS: IndiaAIModuleQuestionMap = {
       ],
       "Correct Option": "Prompt Engineering"
     }
-  ],
-  "Module - 3": [
+    ]
+  },
+  "Module - 3": {
+    midModule: {
+      afterVideo: "module3B",
+      questions: [
     {
       Question:
         "Priya is a Class 12 student in Jaipur preparing for her chemistry exam. She finds organic chemistry reactions confusing. Using the CRAFT method, which of these would be the best prompt for her to use?",
@@ -151,7 +177,10 @@ export const INDIA_AI_MCQS: IndiaAIModuleQuestionMap = {
         "It also works in Indian languages"
       ],
       "Correct Option": "It provides sources and links to verify information in real-time"
+    }
+      ]
     },
+    endModule: [
     {
       Question:
         "Vikram runs a mobile repair shop in Indore and wants to create an Instagram post about his new screen replacement service. Based on the CRAFT framework, which element is he missing in this prompt: 'Create an Instagram post about mobile screen replacement'?",
@@ -192,8 +221,12 @@ export const INDIA_AI_MCQS: IndiaAIModuleQuestionMap = {
       ],
       "Correct Option": "Verify the insights by checking actual data and getting human feedback"
     }
-  ],
-  "Module - 4": [
+    ]
+  },
+  "Module - 4": {
+    midModule: {
+      afterVideo: "module4A",
+      questions: [
     {
       Question:
         "Rajesh wants to start a small catering business in Nagpur specializing in Maharashtrian food for office parties. Using CRAFT, which prompt would help him brainstorm the best initial ideas?",
@@ -217,7 +250,10 @@ export const INDIA_AI_MCQS: IndiaAIModuleQuestionMap = {
       ],
       "Correct Option":
         "Because AI doesn't understand local context, community behavior, and real-world feasibility"
+    }
+      ]
     },
+    endModule: [
     {
       Question:
         "Which AI Model should you use to keep in touch with the latest research in your industry?",
@@ -258,8 +294,12 @@ export const INDIA_AI_MCQS: IndiaAIModuleQuestionMap = {
       "Correct Option":
         "Upload his data and ask AI to identify patterns, then verify findings with local market knowledge and customer feedback"
     }
-  ],
-  "Module - 5": [
+    ]
+  },
+  "Module - 5": {
+    midModule: {
+      afterVideo: "module5B",
+      questions: [
     {
       Question: "What are the FAST principles of AI Ethics?",
       Options: [
@@ -279,7 +319,10 @@ export const INDIA_AI_MCQS: IndiaAIModuleQuestionMap = {
         "None of the above"
       ],
       "Correct Option": "AI should treat similar people in similar ways"
+    }
+      ]
     },
+    endModule: [
     {
       Question: "What is sampling bias in AI?",
       Options: [
@@ -320,8 +363,10 @@ export const INDIA_AI_MCQS: IndiaAIModuleQuestionMap = {
       ],
       "Correct Option": "All of the above"
     }
-  ],
-  "Module - 6": [
+    ]
+  },
+  "Module - 6": {
+    endModule: [
     {
       Question: "What is the difference between AI tools and AI agents?",
       Options: [
@@ -364,5 +409,6 @@ export const INDIA_AI_MCQS: IndiaAIModuleQuestionMap = {
       ],
       "Correct Option": "Understanding and working with AI"
     }
-  ]
+    ]
+  }
 };

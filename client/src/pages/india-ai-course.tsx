@@ -25,6 +25,7 @@ interface Lesson {
   completed: boolean;
   vimeoId?: string; // Optional Vimeo video ID
   type: "video" | "reading" | "quiz";
+  quizType?: "mid" | "end"; // Optional quiz type: mid-module or end-of-module
 }
 
 interface Module {
@@ -75,11 +76,12 @@ const DEMO_MODULES: Module[] = [
     title: "What is Artificial Intelligence?",
     description: "Learn what AI really means, how it has evolved over time, and where you can already see it in your daily life",
     lessons: [
-      { id: "m1-v1", title: "Module 1A: Introduction to AI & Machine Learning", duration: "10:00", completed: false, vimeoId: "1141840737", type: "video" },
-      { id: "m1-v2", title: "Module 1B: Evolution of AI", duration: "10:00", completed: false, vimeoId: "1141840888", type: "video" },
-      { id: "m1-v3", title: "Module 1C: AI in Daily Life", duration: "10:00", completed: false, vimeoId: "1141840894", type: "video" },
-      { id: "m1-v4", title: "Module 1D: AI Capabilities & Limitations", duration: "10:00", completed: false, vimeoId: "1141840905?fl=tl&fe=ec", type: "video" },
-      { id: "m1-q1", title: "Module 1 Assessment", duration: "5:00", completed: false, type: "quiz" },
+      { id: "m1-v1", title: "Module 1A: Introduction to AI & Machine Learning", duration: "12:25", completed: false, vimeoId: "1141840737", type: "video" },
+      { id: "m1-v2", title: "Module 1B: Evolution of AI", duration: "11:53", completed: false, vimeoId: "1141840888", type: "video" },
+      { id: "m1-q-mid", title: "Module 1 Mid-Quiz", duration: "3:00", completed: false, type: "quiz", quizType: "mid" },
+      { id: "m1-v3", title: "Module 1C: AI in Daily Life", duration: "09:44", completed: false, vimeoId: "1141840894", type: "video" },
+      { id: "m1-v4", title: "Module 1D: AI Capabilities & Limitations", duration: "07:51", completed: false, vimeoId: "1141840905?fl=tl&fe=ec", type: "video" },
+      { id: "m1-q1", title: "Module 1 Assessment", duration: "5:00", completed: false, type: "quiz", quizType: "end" },
     ]
   },
   
@@ -89,11 +91,12 @@ const DEMO_MODULES: Module[] = [
     title: "The Technology Behind Artificial Intelligence",
     description: "Understand how machines learn, what Generative AI is, and how to communicate effectively with AI tools using the CRAFT formula",
     lessons: [
-      { id: "m2-v1", title: "Module 2A: Learn the Language of AI", duration: "10:00", completed: false, vimeoId: "1141840913?fl=tl&fe=ec", type: "video" },
-      { id: "m2-v2", title: "Module 2B: How Machines Learn", duration: "12:00", completed: false, vimeoId: "1141840920?fl=tl&fe=ec", type: "video" },
-      { id: "m2-v3", title: "Module 2C: Introduction to Generative AI", duration: "12:00", completed: false, vimeoId: "1141840931?fl=tl&fe=ec", type: "video" },
-      { id: "m2-v4", title: "Module 2D: Prompt Engineering & the CRAFT Formula", duration: "12:00", completed: false, vimeoId: "1141840937?fl=tl&fe=ec", type: "video" },
-      { id: "m2-q1", title: "Module 2 Assessment", duration: "5:00", completed: false, type: "quiz" },
+      { id: "m2-v1", title: "Module 2A: Learn the Language of AI", duration: "09:12", completed: false, vimeoId: "1141840913?fl=tl&fe=ec", type: "video" },
+      { id: "m2-v2", title: "Module 2B: How Machines Learn", duration: "08:23", completed: false, vimeoId: "1141840920?fl=tl&fe=ec", type: "video" },
+      { id: "m2-v3", title: "Module 2C: Introduction to Generative AI", duration: "12:16", completed: false, vimeoId: "1141840931?fl=tl&fe=ec", type: "video" },
+      { id: "m2-q-mid", title: "Module 2 Mid-Quiz", duration: "3:00", completed: false, type: "quiz", quizType: "mid" },
+      { id: "m2-v4", title: "Module 2D: Prompt Engineering & the CRAFT Formula", duration: "12:53", completed: false, vimeoId: "1141840937?fl=tl&fe=ec", type: "video" },
+      { id: "m2-q1", title: "Module 2 Assessment", duration: "5:00", completed: false, type: "quiz", quizType: "end" },
     ]
   },
   
@@ -103,11 +106,12 @@ const DEMO_MODULES: Module[] = [
     title: "Using Artificial Intelligence to Learn and Create",
     description: "Explore popular GenAI tools and discover how AI can help you study better, create content, summarise information, and analyse data",
     lessons: [
-      { id: "m3-v1", title: "Module 3A: Popular AI Tools", duration: "10:00", completed: false, vimeoId: "1141840944?fl=tl&fe=ec", type: "video" },
-      { id: "m3-v2", title: "Module 3B: Demo - Use the CRAFT Formula to Learn Better", duration: "12:00", completed: false, vimeoId: "1141840950?fl=tl&fe=ec", type: "video" },
-      { id: "m3-v3", title: "Module 3C: Demo - Use the CRAFT Formula to Create Content", duration: "12:00", completed: false, vimeoId: "1141840963?fl=tl&fe=ec", type: "video" },
-      { id: "m3-v4", title: "Module 3D: Demo - Use the CRAFT Formula to Analyse Data", duration: "12:00", completed: false, vimeoId: "1141840973?fl=tl&fe=ec", type: "video" },
-      { id: "m3-q1", title: "Module 3 Assessment", duration: "5:00", completed: false, type: "quiz" },
+      { id: "m3-v1", title: "Module 3A: Popular AI Tools", duration: "06:10", completed: false, vimeoId: "1141840944?fl=tl&fe=ec", type: "video" },
+      { id: "m3-v2", title: "Module 3B: Demo - Use the CRAFT Formula to Learn Better", duration: "07:21", completed: false, vimeoId: "1141840950?fl=tl&fe=ec", type: "video" },
+      { id: "m3-q-mid", title: "Module 3 Mid-Quiz", duration: "3:00", completed: false, type: "quiz", quizType: "mid" },
+      { id: "m3-v3", title: "Module 3C: Demo - Use the CRAFT Formula to Create Content", duration: "11:50", completed: false, vimeoId: "1141840963?fl=tl&fe=ec", type: "video" },
+      { id: "m3-v4", title: "Module 3D: Demo - Use the CRAFT Formula to Analyse Data", duration: "07:22", completed: false, vimeoId: "1141840973?fl=tl&fe=ec", type: "video" },
+      { id: "m3-q1", title: "Module 3 Assessment", duration: "5:00", completed: false, type: "quiz", quizType: "end" },
     ]
   },
   
@@ -117,9 +121,10 @@ const DEMO_MODULES: Module[] = [
     title: "Using Artificial Intelligence to Think and Plan",
     description: "Learn how AI can act as a thinking partner — helping you plan projects, draft ideas, solve problems, and make better decisions",
     lessons: [
-      { id: "m4-v1", title: "Module 4A: Demo - Using AI as a Thinking Partner", duration: "12:00", completed: false, vimeoId: "1141840979?fl=tl&fe=ec", type: "video" },
-      { id: "m4-v2", title: "Module 4B: Demo - Using AI as a Planning Assistant", duration: "12:00", completed: false, vimeoId: "1141840988?fl=tl&fe=ec", type: "video" },
-      { id: "m4-q1", title: "Module 4 Assessment", duration: "5:00", completed: false, type: "quiz" },
+      { id: "m4-v1", title: "Module 4A: Demo - Using AI as a Thinking Partner", duration: "15:27", completed: false, vimeoId: "1141840979?fl=tl&fe=ec", type: "video" },
+      { id: "m4-q-mid", title: "Module 4 Mid-Quiz", duration: "3:00", completed: false, type: "quiz", quizType: "mid" },
+      { id: "m4-v2", title: "Module 4B: Demo - Using AI as a Planning Assistant", duration: "11:27", completed: false, vimeoId: "1141840988?fl=tl&fe=ec", type: "video" },
+      { id: "m4-q1", title: "Module 4 Assessment", duration: "5:00", completed: false, type: "quiz", quizType: "end" },
     ]
   },
   
@@ -129,10 +134,11 @@ const DEMO_MODULES: Module[] = [
     title: "Artificial Intelligence Ethics",
     description: "Understand why responsible AI use matters — learn the principles of AI ethics, risks, and how the FAST framework ensures safe technology usage",
     lessons: [
-      { id: "m5-v1", title: "Module 5A: Principles of AI Ethics & Introduction to the FAST Framework", duration: "12:00", completed: false, vimeoId: "1141840995?fl=tl&fe=ec", type: "video" },
-      { id: "m5-v2", title: "Module 5B: AI & Ethical Concerns", duration: "12:00", completed: false, vimeoId: "1141841005?fl=tl&fe=ec", type: "video" },
-      { id: "m5-v3", title: "Module 5C: Regulation of AI", duration: "12:00", completed: false, vimeoId: "1141841014?fl=tl&fe=ec", type: "video" },
-      { id: "m5-q1", title: "Module 5 Assessment", duration: "5:00", completed: false, type: "quiz" },
+      { id: "m5-v1", title: "Module 5A: Principles of AI Ethics & Introduction to the FAST Framework", duration: "07:47", completed: false, vimeoId: "1141840995?fl=tl&fe=ec", type: "video" },
+      { id: "m5-v2", title: "Module 5B: AI & Ethical Concerns", duration: "11:45", completed: false, vimeoId: "1141841005?fl=tl&fe=ec", type: "video" },
+      { id: "m5-q-mid", title: "Module 5 Mid-Quiz", duration: "3:00", completed: false, type: "quiz", quizType: "mid" },
+      { id: "m5-v3", title: "Module 5C: Regulation of AI", duration: "05:57", completed: false, vimeoId: "1141841014?fl=tl&fe=ec", type: "video" },
+      { id: "m5-q1", title: "Module 5 Assessment", duration: "5:00", completed: false, type: "quiz", quizType: "end" },
     ]
   },
   
@@ -142,10 +148,10 @@ const DEMO_MODULES: Module[] = [
     title: "The Future of Artificial Intelligence",
     description: "Explore key AI trends and opportunities for your future — how AI will shape careers, industries, and daily life",
     lessons: [
-      { id: "m6-v1", title: "Module 6A: Key Trends in AI", duration: "10:00", completed: false, vimeoId: "1141841026?fl=tl&fe=ec", type: "video" },
-      { id: "m6-v2", title: "Module 6B: AI & Your Future", duration: "10:00", completed: false, vimeoId: "1141841037?fl=tl&fe=ec", type: "video" },
+      { id: "m6-v1", title: "Module 6A: Key Trends in AI", duration: "11:53", completed: false, vimeoId: "1141841026?fl=tl&fe=ec", type: "video" },
+      { id: "m6-v2", title: "Module 6B: AI & Your Future", duration: "02:53", completed: false, vimeoId: "1141841037?fl=tl&fe=ec", type: "video" },
       { id: "m6-v3", title: "Course Recap", duration: "1:42", completed: false, vimeoId: "1141841045?fl=tl&fe=ec", type: "video" },
-      { id: "m6-q1", title: "Final Assessment", duration: "5:00", completed: false, type: "quiz" },
+      { id: "m6-q1", title: "Final Assessment", duration: "10:00", completed: false, type: "quiz", quizType: "end" },
     ]
   }
 ];
@@ -153,7 +159,7 @@ const DEMO_MODULES: Module[] = [
 const STORAGE_PREFIX = "course-progress";
 // Increment this version number whenever you update course content (videos, quizzes, etc.)
 // This will force all users to reload fresh data from the updated DEMO_MODULES
-const COURSE_VERSION = "v3"; // Updated: Added Module 6C Course Recap video
+const COURSE_VERSION = "v5"; // Updated: Corrected video durations and added mid-module quizzes
 
 export default function CourseProgressPage() {
   const [modules, setModules] = useState<Module[]>([]);
@@ -682,7 +688,15 @@ export default function CourseProgressPage() {
                       score={quizResult.score}
                       totalQuestions={quizResult.totalQuestions}
                       answers={quizResult.answers}
-                      questions={INDIA_AI_MCQS[`Module - ${quizResult.moduleNumber}` as keyof typeof INDIA_AI_MCQS] || []}
+                      questions={(() => {
+                        const moduleData = INDIA_AI_MCQS[`Module - ${quizResult.moduleNumber}` as keyof typeof INDIA_AI_MCQS];
+                        // Get questions based on quiz type from the current lesson
+                        const currentLessonData = getCurrentLesson();
+                        if (currentLessonData?.quizType === "mid" && moduleData?.midModule) {
+                          return moduleData.midModule.questions;
+                        }
+                        return moduleData?.endModule || [];
+                      })()}
                       onRetake={() => {
                         setQuizResult(null);
                         // Reset quiz lesson completion to allow retake
@@ -701,6 +715,7 @@ export default function CourseProgressPage() {
                     <div className="bg-gray-900 rounded-lg p-4 sm:p-6">
                       <IndiaAIModuleQuiz
                         moduleNumber={(modules.findIndex(m => m.id === currentLesson!.moduleId) + 1) as any}
+                        quizType={currentLessonData?.quizType || "end"}
                         onComplete={(score, answers) => {
                           const moduleNumber = modules.findIndex(m => m.id === currentLesson!.moduleId) + 1;
                           setQuizResult({

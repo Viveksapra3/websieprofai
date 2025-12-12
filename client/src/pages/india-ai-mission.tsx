@@ -5,6 +5,7 @@ import { AuthNavbar } from "@/components/auth-navbar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { StickyVideoPlayer } from "@/components/StickyVideoPlayer";
 import { 
   BookOpen, Clock, Users, Award, CheckCircle2, 
   PlayCircle, FileText, Brain, Cpu, Database, Shield, 
@@ -220,6 +221,27 @@ export default function IndiaAIMissionPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Section - Module 1A */}
+      <section className="py-8 sm:py-12 bg-gray-900/50">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 mb-3">
+                <PlayCircle className="h-4 w-4 text-blue-400" />
+                <span className="text-sm text-blue-300 font-medium">Start Your Learning Journey</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">Module 1A: Introduction to AI & Machine Learning</h2>
+              <p className="text-gray-400 text-sm sm:text-base">Watch this introductory video to begin your AI learning journey</p>
+            </div>
+            
+            <StickyVideoPlayer 
+              vimeoId="1141840737" 
+              title="Module 1A: Introduction to AI & Machine Learning"
+            />
           </div>
         </div>
       </section>

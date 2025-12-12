@@ -127,10 +127,14 @@ export async function ensureSchema() {
     CREATE TABLE IF NOT EXISTS course_images (
       id text PRIMARY KEY DEFAULT gen_random_uuid()::text,
       course_id text NOT NULL UNIQUE,
+      course_name text,
       image_url text NOT NULL,
       created_at timestamp DEFAULT now(),
       updated_at timestamp DEFAULT now()
     );
+    
+    -- Add course_name column if it doesn't exist
+    ALTER TABLE course_images ADD COLUMN IF NOT EXISTS course_name text;
 
     -- Course ID mapping table
     CREATE TABLE IF NOT EXISTS course_id_mapping (

@@ -139,45 +139,6 @@ export default function Navigation() {
                 How it works
               </button>
             </Link>
-            
-            {/* Curriculum Builder Dropdown */}
-            <div className="relative group">
-              <button
-                className={`${textColor} ${hoverColor} transition-colors hover:scale-110 flex items-center`}
-                data-testid="nav-curriculum-builder"
-              >
-                Curriculum Builder
-                <ChevronDown className="w-4 h-4 ml-1 transition-transform duration-200 group-hover:rotate-180" />
-              </button>
-              
-              {/* Curriculum Builder Dropdown Menu */}
-              <div className="absolute top-full left-0 mt-2 w-72 bg-black/90 backdrop-blur-md 
-                rounded-lg shadow-2xl border border-white/20 overflow-hidden z-50 
-                opacity-0 invisible group-hover:opacity-100 group-hover:visible 
-                transition-all duration-300">
-                
-                <Link href="/teacher-upload">
-                  <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer border-b border-white/10">
-                    <div className="text-white font-semibold">Generate Curriculum Outline</div>
-                  </div>
-                </Link>
-                <Link href="/teacher-upload">
-                  <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer border-b border-white/10">
-                    <div className="text-white font-semibold">Module Content Generator</div>
-                  </div>
-                </Link>
-                <Link href="/teacher-upload">
-                  <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer border-b border-white/10">
-                    <div className="text-white font-semibold">Create Module Quizzes</div>
-                  </div>
-                </Link>
-                <Link href="/teacher-upload">
-                  <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer">
-                    <div className="text-white font-semibold">Final Course Assessment</div>
-                  </div>
-                </Link>
-              </div>
-            </div>
 
             {/* ProfAI Business Link */}
             <Link href="/profai-business">
@@ -367,31 +328,6 @@ export default function Navigation() {
                 How it works
               </button>
             </Link>
-            
-            {/* Mobile Curriculum Builder Section */}
-            <div className="border-b border-white/20 pb-2 mb-2">
-              <div className="text-white font-semibold mb-2">Curriculum Builder</div>
-              <Link href="/teacher-upload">
-                <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
-                  Generate Curriculum Outline
-                </button>
-              </Link>
-              <Link href="/teacher-upload">
-                <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
-                  Module Content Generator
-                </button>
-              </Link>
-              <Link href="/teacher-upload">
-                <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
-                  Create Module Quizzes
-                </button>
-              </Link>
-              <Link href="/teacher-upload">
-                <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
-                  Final Course Assessment
-                </button>
-              </Link>
-            </div>
 
             {/* Mobile ProfAI Business Link */}
             <Link href="/profai-business">

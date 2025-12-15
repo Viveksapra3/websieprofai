@@ -69,7 +69,7 @@ export default function ProfAIBusinessPage() {
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mb-6 sm:mb-8">
                 <div className="flex items-center gap-2 text-sm sm:text-base text-gray-300">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 flex-shrink-0" />
-                  <span>Unlimited access to 10,000+ courses</span>
+                  <span>Unlimited access to courses</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm sm:text-base text-gray-300">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 flex-shrink-0" />
@@ -246,16 +246,16 @@ export default function ProfAIBusinessPage() {
           
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-10 md:gap-12 text-center">
             <div>
-              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-purple-400 mb-2 sm:mb-3">14,000+</div>
-              <div className="text-base sm:text-lg md:text-xl text-gray-300">Organizations</div>
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-purple-400 mb-2 sm:mb-3">15,000+</div>
+              <div className="text-base sm:text-lg md:text-xl text-gray-300">Students</div>
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-blue-400 mb-2 sm:mb-3">90%</div>
-              <div className="text-base sm:text-lg md:text-xl text-gray-300">Skill improvement</div>
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-blue-400 mb-2 sm:mb-3">500+</div>
+              <div className="text-base sm:text-lg md:text-xl text-gray-300">Schools Supported </div>
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-400 mb-2 sm:mb-3">4.5/5</div>
-              <div className="text-base sm:text-lg md:text-xl text-gray-300">Average rating</div>
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-400 mb-2 sm:mb-3">4.5M</div>
+              <div className="text-base sm:text-lg md:text-xl text-gray-300">Awards of Avatar interaction</div>
             </div>
           </div>
         </div>

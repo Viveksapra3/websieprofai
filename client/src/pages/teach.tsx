@@ -1,8 +1,7 @@
-import { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { BookOpen, Users, TrendingUp, Video, Award, DollarSign, Globe, Clock } from "lucide-react";
+import { Users, Video, Award, DollarSign, Globe, Clock, ArrowRight } from "lucide-react";
 import Navigation from "@/components/navigation";
 
 export default function TeachPage() {
@@ -11,19 +10,35 @@ export default function TeachPage() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
-        <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
-            Come teach with us
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
-            Become an instructor and change lives — including your own
-          </p>
-          <Link href="/signup">
-            <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-6 text-lg rounded-full">
-              Get Started
-            </Button>
-          </Link>
+      <section className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-20">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="mb-12">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight">
+              Touch Lives,<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400">
+                Inspire Millions
+              </span>
+            </h1>
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-300 leading-relaxed max-w-4xl mx-auto mb-12">
+              If you are a teacher or knowledge practitioner, join us on a mission to touch lives—simply upload your exclusive content and let millions across the world learn, grow, and be inspired by you.
+            </p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center">
+            <Link href="/signup">
+              <Button className="bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 hover:from-purple-700 hover:via-blue-700 hover:to-cyan-700 text-white px-10 py-7 text-lg sm:text-xl rounded-full shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105 group">
+                Get Started
+                <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform duration-300" />
+              </Button>
+            </Link>
+            
+            <Link href="/teacher-upload">
+              <Button className="bg-gradient-to-r from-orange-600 via-amber-600 to-orange-600 hover:from-orange-700 hover:via-amber-700 hover:to-orange-700 text-white px-10 py-7 text-lg sm:text-xl rounded-full shadow-2xl hover:shadow-orange-500/50 transition-all duration-300 transform hover:scale-105 group border border-orange-400/50">
+                Curriculum Builder
+                <ArrowRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform duration-300" />
+              </Button>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -31,16 +46,16 @@ export default function TeachPage() {
       <section className="py-16 px-4 bg-black/30">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="text-center">
-            <div className="text-4xl font-bold text-purple-400 mb-2">15,000++</div>
+            <div className="text-4xl font-bold text-purple-400 mb-2">15,000+</div>
             <div className="text-gray-300">Students</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl font-bold text-blue-400 mb-2">75+</div>
+            <div className="text-4xl font-bold text-blue-400 mb-2">12+</div>
             <div className="text-gray-300">Languages</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl font-bold text-green-400 mb-2">1B+</div>
-            <div className="text-gray-300">Enrollments</div>
+            <div className="text-4xl font-bold text-green-400 mb-2">500+</div>
+            <div className="text-gray-300">Colleges Supporteds</div>
           </div>
         </div>
       </section>

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Link } from "wouter";
 import Navigation from "@/components/navigation";
 import PaymentLoadingOverlay from "@/components/PaymentLoadingOverlay";
+import CoursesLoadingAnimation from "@/components/CoursesLoadingAnimation";
 
 // Define the core structure of a Course
 type Course = {
@@ -276,14 +277,7 @@ export default function CoursesPage() {
   }, [courses, query, levelFilter, viewMode]);
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100">
-        <div className="space-y-4 w-80">
-          <div className="animate-pulse h-6 bg-gray-200 rounded"></div>
-          <div className="animate-pulse h-40 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    );
+    return <CoursesLoadingAnimation />;
   }
 
   if (error) {

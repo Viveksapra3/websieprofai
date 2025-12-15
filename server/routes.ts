@@ -1,6 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db, pool } from "./db";
-import { users, coursePricing, userPurchases, courseImages } from "@shared/schema";
+import { users, coursePricing, userPurchases, courseImages, courseIdMapping } from "@shared/schema";
 import { eq, or, sql, and, asc } from "drizzle-orm";
 import crypto from "crypto";
 import multer from "multer";
@@ -26,6 +26,28 @@ function verifyPassword(password: string, stored: string): boolean {
   const hashBuffer = Buffer.from(key, "hex");
   const derived = crypto.scryptSync(password, salt, 64);
   return crypto.timingSafeEqual(hashBuffer, derived);
+}
+
+// Helper function to get old course ID from new course ID using mapping table
+async function getOldCourseId(newCourseId: string): Promise<string> {
+  try {
+    const mapping = await db
+      .select()
+      .from(courseIdMapping)
+      .where(eq(courseIdMapping.newCourseId, newCourseId))
+      .limit(1);
+    
+    if (mapping[0]) {
+      return mapping[0].oldCourseId;
+    }
+    
+    // If no mapping found, return the original ID (silently)
+    return newCourseId;
+  } catch (error) {
+    // Only log actual errors, not missing mappings
+    console.error(`Error getting course ID mapping for ${newCourseId}:`, error);
+    return newCourseId;
+  }
 }
 
 export async function registerRoutes(app: Express): Promise<void> {
@@ -925,11 +947,17 @@ export async function registerRoutes(app: Express): Promise<void> {
       // Set first 3 courses as free, rest as paid
       for (let i = 0; i < courses.length; i++) {
         const course = courses[i];
+        const courseId = String(course.id);
+        
+        // Get old course ID from mapping table
+        const oldCourseId = await getOldCourseId(courseId);
+        
         const isFree = i < 3;
         const price = isFree ? 0 : (course.price || 99); // Default price 99 INR
         
+        // Set pricing using the old course ID
         await paymentService.setCoursePricing(
-          course.id,
+          oldCourseId,
           price,
           isFree,
           i + 1 // display order
@@ -1009,17 +1037,28 @@ export async function registerRoutes(app: Express): Promise<void> {
         );
       }
 
+      // Get all course ID mappings for efficient lookup
+      const courseMappings = await db.select().from(courseIdMapping);
+      const mappingMap = new Map(courseMappings.map(m => [m.newCourseId, m.oldCourseId]));
+
       // Combine course data with pricing, access info, and custom images
       const coursesWithPricing = courses.map((course, index) => {
         const courseId = String(course.course_id || course.id);
-        const pricing = pricingData.find(p => p.courseId === courseId);
-        const customImage = courseImagesData.find(img => img.courseId === courseId);
         
-        // Default: first 3 courses are free, or if explicitly marked as free
-        const isFree = index < 3 || (pricing?.isFree ?? (index < 3));
-        const price = pricing?.price || (isFree ? "0.00" : "99.00");
-        // Only grant access if user is logged in AND (course is free OR user purchased it)
-        const hasAccess = user ? (isFree || purchasedCourseIds.has(courseId)) : false;
+        // Get the old course ID from mapping table for pricing/images lookup
+        const oldCourseId = mappingMap.get(courseId) || courseId;
+        
+        // Use old course ID to find pricing and images
+        const pricing = pricingData.find(p => p.courseId === oldCourseId);
+        const customImage = courseImagesData.find(img => img.courseId === oldCourseId);
+        
+        // Course is free if price is 0 or isFree flag is true
+        const price = pricing?.price || "99.00";
+        const priceValue = parseFloat(price);
+        const isFree = pricing?.isFree || priceValue === 0;
+        
+        // Only grant access if user is logged in AND (course is free OR user purchased it using old course ID)
+        const hasAccess = user ? (isFree || purchasedCourseIds.has(oldCourseId)) : false;
 
         return {
           id: courseId,
@@ -1027,12 +1066,12 @@ export async function registerRoutes(app: Express): Promise<void> {
           level: course.level || "Beginner",
           description: course.description || `${course.modules || 0} modules`,
           tag: course.tag,
-          price: parseFloat(price),
+          price: priceValue,
           currency: pricing?.currency || "INR",
           isFree,
           hasAccess,
           displayOrder: pricing?.displayOrder || (index + 1),
-          imageUrl: customImage?.imageUrl || null, // Add custom image URL
+          imageUrl: customImage?.imageUrl || null,
         };
       });
 

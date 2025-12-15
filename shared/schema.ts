@@ -42,6 +42,7 @@ export const signInSchema = z.object({
 export const coursePricing = pgTable("course_pricing", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   courseId: text("course_id").notNull().unique(), // External API course ID
+  courseName: text("course_name"), // Course name/title
   price: decimal("price", { precision: 10, scale: 2 }).notNull().default("0.00"),
   currency: text("currency").notNull().default("INR"),
   isFree: boolean("is_free").notNull().default(false),

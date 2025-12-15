@@ -1,7 +1,7 @@
 
 import crypto from "crypto";
 import { db } from "./db";
-import { coursePricing, userPurchases, paymentTransactions } from "@shared/schema";
+import { coursePricing, userPurchases, paymentTransactions, courseIdMapping } from "@shared/schema";
 import { eq, and } from "drizzle-orm";
 
 // CCAvenue configuration
@@ -80,67 +80,74 @@ class PaymentService {
     return `ORD_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 
+  // Helper function to get old course ID from new course ID using mapping table
+  private async getOldCourseId(newCourseId: string): Promise<string> {
+    try {
+      const mapping = await db
+        .select()
+        .from(courseIdMapping)
+        .where(eq(courseIdMapping.newCourseId, newCourseId))
+        .limit(1);
+      
+      if (mapping[0]) {
+        console.log(`🔄 Mapped course ID: ${newCourseId} → ${mapping[0].oldCourseId}`);
+        return mapping[0].oldCourseId;
+      }
+      
+      // If no mapping found, return the original ID (silently)
+      return newCourseId;
+    } catch (error) {
+      console.error(`❌ Error getting course ID mapping for ${newCourseId}:`, error);
+      return newCourseId;
+    }
+  }
+
   // Check if user has access to course
   async hasAccess(userId: string, courseId: string): Promise<boolean> {
     try {
       console.log(`🔍 Checking access for user ${userId} to course ${courseId}`);
       
-      // Always allow access to courses 1, 2, and 3 (free courses)
-      const alwaysFreeCourses = ["1", "2", "3", "s-101", "s-201", "s-310"];
-      if (alwaysFreeCourses.includes(courseId)) {
-        console.log(`✅ Course ${courseId} is in free courses list`);
-        return true;
-      }
-
-      // Get all pricing data to determine course order
-      const allPricing = await db
+      // Map new course ID to old course ID for pricing/purchase lookup
+      const oldCourseId = await this.getOldCourseId(courseId);
+      
+      // Get pricing data using the old course ID
+      const pricing = await db
         .select()
         .from(coursePricing)
-        .orderBy(coursePricing.displayOrder);
+        .where(eq(coursePricing.courseId, oldCourseId))
+        .limit(1);
 
-      // Check if course has explicit pricing
-      const pricing = allPricing.find(p => p.courseId === courseId);
-
-      if (pricing) {
-        // If course has pricing data, check if it's free
-        if (pricing.isFree) {
-          console.log(`✅ Course ${courseId} is marked as free in pricing`);
+      if (pricing[0]) {
+        // Check if course is free (price is 0 or isFree flag is true)
+        const price = parseFloat(pricing[0].price);
+        if (pricing[0].isFree || price === 0) {
+          console.log(`✅ Course ${courseId} (mapped to ${oldCourseId}) is free (price: ${pricing[0].price}, isFree: ${pricing[0].isFree})`);
           return true;
         }
       } else {
-        // For courses without pricing data, assume first 3 are free
-        // This is a fallback for when the system is not fully configured
-        const courseIndex = allPricing.length > 0 ? 
-          allPricing.findIndex(p => p.courseId === courseId) : 
-          -1;
-        
-        if (courseIndex >= 0 && courseIndex < 3) {
-          console.log(`✅ Course ${courseId} is in first 3 courses (fallback)`);
-          return true;
-        }
+        console.log(`⚠️ No pricing found for course ${courseId} (mapped to ${oldCourseId}) - treating as paid`);
       }
 
-      // Check if user has purchased the course
+      // Check if user has purchased the course using old course ID
       const purchase = await db
         .select()
         .from(userPurchases)
         .where(
           and(
             eq(userPurchases.userId, userId),
-            eq(userPurchases.courseId, courseId),
+            eq(userPurchases.courseId, oldCourseId),
             eq(userPurchases.status, "completed")
           )
         )
         .limit(1);
 
       const hasAccess = purchase.length > 0;
-      console.log(`${hasAccess ? '✅' : '❌'} User ${userId} ${hasAccess ? 'has' : 'does not have'} purchase access to course ${courseId}`);
+      console.log(`${hasAccess ? '✅' : '❌'} User ${userId} ${hasAccess ? 'has' : 'does not have'} purchase access to course ${courseId} (mapped to ${oldCourseId})`);
       return hasAccess;
     } catch (error) {
       console.error("❌ Error checking course access:", error);
-      // In case of error, allow access to default free courses
-      const defaultFreeCourses = ["s-101", "s-201", "s-310"];
-      return defaultFreeCourses.includes(courseId);
+      // In case of error, deny access by default
+      return false;
     }
   }
 
@@ -149,46 +156,43 @@ class PaymentService {
     try {
       console.log(`🔍 Getting pricing for course ${courseId}`);
       
+      // Map new course ID to old course ID for pricing lookup
+      const oldCourseId = await this.getOldCourseId(courseId);
+      
       const pricing = await db
         .select()
         .from(coursePricing)
-        .where(eq(coursePricing.courseId, courseId))
+        .where(eq(coursePricing.courseId, oldCourseId))
         .limit(1);
 
       if (pricing[0]) {
-        console.log(`✅ Found pricing for course ${courseId}:`, pricing[0]);
+        console.log(`✅ Found pricing for course ${courseId} (mapped to ${oldCourseId}):`, pricing[0]);
         return pricing[0];
       }
 
-      // If no pricing data exists, provide default based on course ID
-      const defaultFreeCourses = ["1", "2", "3", "s-101", "s-201", "s-310"];
-      const isFree = defaultFreeCourses.includes(courseId);
-      
+      // If no pricing data exists, default to paid course
       const defaultPricing = {
-        id: `default_${courseId}`,
-        courseId,
-        price: isFree ? "0.00" : "99.00",
+        id: `default_${oldCourseId}`,
+        courseId: oldCourseId,
+        price: "99.00",
         currency: "INR",
-        isFree,
+        isFree: false,
         displayOrder: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
       
-      console.log(`⚠️ No pricing found for course ${courseId}, using default:`, defaultPricing);
+      console.log(`⚠️ No pricing found for course ${courseId} (mapped to ${oldCourseId}), using default:`, defaultPricing);
       return defaultPricing;
     } catch (error) {
       console.error("❌ Error getting course pricing:", error);
-      // Return default pricing on error
-      const defaultFreeCourses = ["1", "2", "3", "s-101", "s-201", "s-310"];
-      const isFree = defaultFreeCourses.includes(courseId);
-      
+      // Return default paid pricing on error
       return {
         id: `error_${courseId}`,
-        courseId,
-        price: isFree ? "0.00" : "99.00",
+        courseId: courseId,
+        price: "99.00",
         currency: "INR",
-        isFree,
+        isFree: false,
         displayOrder: null,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -509,25 +513,28 @@ class PaymentService {
         const course = courses[i];
         const courseId = String(course.course_id || course.id);
         
+        // Get old course ID from mapping table
+        const oldCourseId = await this.getOldCourseId(courseId);
+        
         // Determine if course should be free (first 3 courses)
         const isFree = i < 3;
         const price = isFree ? 0 : 99; // Default price for paid courses
 
-        if (!existingCourseIds.has(courseId)) {
-          // New course - add to database
-          await this.setCoursePricing(courseId, price, isFree, i + 1);
+        if (!existingCourseIds.has(oldCourseId)) {
+          // New course - add to database using old course ID
+          await this.setCoursePricing(oldCourseId, price, isFree, i + 1);
           syncedCount++;
-          console.log(`✅ Added new course: ${courseId} (${course.course_title || course.title})`);
+          console.log(`✅ Added new course: ${courseId} → ${oldCourseId} (${course.course_title || course.title})`);
         } else {
           // Existing course - update display order if needed
-          const existing = existingPricing.find(p => p.courseId === courseId);
+          const existing = existingPricing.find(p => p.courseId === oldCourseId);
           if (existing && existing.displayOrder !== i + 1) {
             await db
               .update(coursePricing)
               .set({ displayOrder: i + 1, updatedAt: new Date() })
-              .where(eq(coursePricing.courseId, courseId));
+              .where(eq(coursePricing.courseId, oldCourseId));
             updatedCount++;
-            console.log(`🔄 Updated display order for course: ${courseId}`);
+            console.log(`🔄 Updated display order for course: ${courseId} → ${oldCourseId}`);
           }
         }
       }

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRoute, useLocation, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { AuthNavbar } from "@/components/auth-navbar";
+import CourseContentLoadingAnimation from "@/components/CourseContentLoadingAnimation";
 
 type CourseDetail = {
   course_id?: string | number;
@@ -491,14 +492,7 @@ export default function CoursePage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-100">
-        <div className="space-y-4 w-80">
-          <div className="animate-pulse h-6 bg-gray-200 rounded"></div>
-          <div className="animate-pulse h-40 bg-gray-200 rounded"></div>
-        </div>
-      </div>
-    );
+    return <CourseContentLoadingAnimation />;
   }
 
   if (error) {

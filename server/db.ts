@@ -86,6 +86,7 @@ export async function ensureSchema() {
     CREATE TABLE IF NOT EXISTS course_pricing (
       id text PRIMARY KEY DEFAULT gen_random_uuid()::text,
       course_id text NOT NULL UNIQUE,
+      course_name text,
       price decimal(10,2) NOT NULL DEFAULT 0.00,
       currency text NOT NULL DEFAULT 'INR',
       is_free boolean NOT NULL DEFAULT false,
@@ -93,6 +94,9 @@ export async function ensureSchema() {
       created_at timestamp DEFAULT now(),
       updated_at timestamp DEFAULT now()
     );
+    
+    -- Add course_name column if it doesn't exist
+    ALTER TABLE course_pricing ADD COLUMN IF NOT EXISTS course_name text;
 
     -- User purchases table
     CREATE TABLE IF NOT EXISTS user_purchases (

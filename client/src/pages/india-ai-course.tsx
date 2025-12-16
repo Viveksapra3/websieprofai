@@ -454,7 +454,7 @@ export default function CourseProgressPage() {
     // Load the certificate image
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = '/india-ai-certificate.jpg';
+    img.src = '/Ai Mission Certificate_updated.png';
     
     img.onload = () => {
       // Set canvas size to match image
@@ -475,6 +475,26 @@ export default function CourseProgressPage() {
       // Y position is approximately where the name space is (adjust as needed)
       const nameY = canvas.height * 0.45; // 40% from top (adjust based on your certificate)
       ctx.fillText(userName, canvas.width / 2, nameY);
+      
+      // Add date of completion above the "DATE OF COMPLETION" line (bottom left area)
+      const now = new Date();
+      const day = String(now.getDate()).padStart(2, '0');
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const year = String(now.getFullYear()).slice(-2);
+      const dateString = `${day}/${month}/${year}`;
+      
+      // Configure text styling - italic, same font
+      ctx.font = 'italic 80px "Times New Roman", serif';
+      ctx.fillStyle = '#000000';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      
+      // Position above the "DATE OF COMPLETION" text (bottom left area)
+      const dateX = canvas.width * 0.110; // Align with "DATE OF COMPLETION" label
+      const dateY = canvas.height * 0.835; // Just above the "DATE OF COMPLETION" line
+      
+      // Draw date
+      ctx.fillText(dateString, dateX, dateY);
       
       // Convert canvas to blob and download
       canvas.toBlob((blob) => {

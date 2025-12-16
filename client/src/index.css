@@ -172,6 +172,19 @@
   animation: blink 1s infinite;
 }
 
+@keyframes gentle-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+.animate-gentle-bounce {
+  animation: gentle-bounce 3s infinite;
+}
+
 .custom-select, .custom-select option {
   background-color: rgba(255,255,255,0.06); /* matches bg-white/10 */
   color: rgba(255,255,255,0.95);

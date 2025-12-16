@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { X, Sparkles, ArrowRight } from "lucide-react";
+import { X, Sparkles, ArrowRight, BookOpen, Award, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // IndiaAI Mission Logo - for minimized state
@@ -13,52 +13,58 @@ const ALLOWED_PAGES = ["/", "/courses"];
 
 export function IndiaAIPopup() {
   const [location] = useLocation();
-  const [isVisible, setIsVisible] = useState(false);
-  const [isDismissed, setIsDismissed] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Check if current page is allowed
   const isAllowedPage = ALLOWED_PAGES.includes(location);
 
+  // Hide/show body overflow and navbar when modal opens/closes
   useEffect(() => {
-    // Only show on allowed pages
-    if (!isAllowedPage) {
-      setIsVisible(false);
-      return;
+    if (isExpanded) {
+      document.body.style.overflow = 'hidden';
+      const navbar = document.querySelector('nav');
+      if (navbar) {
+        (navbar as HTMLElement).style.display = 'none';
+      }
+    } else {
+      document.body.style.overflow = '';
+      const navbar = document.querySelector('nav');
+      if (navbar) {
+        (navbar as HTMLElement).style.display = '';
+      }
     }
-
-    // Check if popup was dismissed in this session
-    const dismissed = sessionStorage.getItem('indiaAIPopupDismissed');
-    if (!dismissed) {
-      // Show popup after a short delay
-      const timer = setTimeout(() => {
-        setIsVisible(true);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [location, isAllowedPage]);
-
-  const handleDismiss = () => {
-    setIsVisible(false);
-    setIsDismissed(true);
-    sessionStorage.setItem('indiaAIPopupDismissed', 'true');
-  };
+    
+    return () => {
+      document.body.style.overflow = '';
+      const navbar = document.querySelector('nav');
+      if (navbar) {
+        (navbar as HTMLElement).style.display = '';
+      }
+    };
+  }, [isExpanded]);
 
   const handleMinimize = () => {
-    setIsVisible(false);
+    setIsExpanded(false);
   };
 
-  // Don't render anything if not on allowed page or dismissed
-  if (isDismissed || !isAllowedPage) return null;
+  const handleExpand = () => {
+    setIsExpanded(true);
+  };
+
+  // Don't render anything if not on allowed page
+  if (!isAllowedPage) return null;
 
   return (
-    <div 
-      className="fixed bottom-6 right-6 z-50"
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
-    >
+    <>
       {/* Minimized floating button */}
-      {!isVisible && !isDismissed && isAllowedPage && (
-        <div className="transition-all duration-1500 hover:scale-110 bg-white rounded-2xl p-3 shadow-lg animate-bounce cursor-pointer">
+      {!isExpanded && (
+        <div 
+          className="fixed bottom-6 right-6 z-50 transition-all duration-300 hover:scale-110 bg-white rounded-2xl p-3 shadow-lg cursor-pointer"
+          onClick={handleExpand}
+          style={{
+            animation: 'gentle-bounce 3s ease-in-out infinite'
+          }}
+        >
           <img 
             src={INDIA_AI_LOGO} 
             alt="IndiaAI Mission" 
@@ -67,89 +73,124 @@ export function IndiaAIPopup() {
         </div>
       )}
 
-      {/* Full popup */}
-      {isVisible && isAllowedPage && (
-        <div className="w-80 animate-in slide-in-from-bottom-5 duration-300">
-          <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl shadow-2xl border border-gray-700 overflow-hidden">
-            {/* Tricolor accent */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500 via-white to-green-500" />
-            
-            {/* Close button */}
-            <button
-              onClick={handleDismiss}
-              className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors z-10"
-              aria-label="Close popup"
+      {/* Expanded Modal */}
+      {isExpanded && (
+        <>
+          {/* Backdrop with blur */}
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 animate-in fade-in duration-300"
+            onClick={handleMinimize}
+          />
+          
+          {/* Modal Content */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
+            <div 
+              className="w-full max-w-5xl pointer-events-auto animate-in zoom-in-95 duration-300"
+              onClick={(e) => e.stopPropagation()}
             >
-              <X className="h-5 w-5" />
-            </button>
-
-            {/* Minimize button */}
-            <button
-              onClick={handleMinimize}
-              className="absolute top-3 right-10 text-gray-400 hover:text-white transition-colors z-10"
-              aria-label="Minimize popup"
-            >
-              <span className="text-lg font-bold">−</span>
-            </button>
-
-            {/* Content */}
-            <div className="p-5 pt-6">
-              {/* Header with Logo */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className="relative">
-                  <img 
-                    src={INDIA_AI_LOGO_EXTENDED} 
-                    alt="IndiaAI Mission" 
-                    className="w-16 h-16 object-contain"
-                  />
-                  <Sparkles className="absolute -top-1 -right-1 h-4 w-4 text-yellow-400 animate-pulse" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-white">IndiaAI Mission</h3>
-                  <p className="text-xs text-gray-400">Government of India Initiative</p>
-                </div>
-              </div>
-
-              {/* Description */}
-              <p className="text-sm text-gray-300 mb-4 leading-relaxed">
-                Join India's flagship AI education program. Learn cutting-edge AI skills and become part of the digital transformation journey.
-              </p>
-
-              {/* Features */}
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <div className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-                  <span>6 Comprehensive Modules</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <div className="w-1.5 h-1.5 rounded-full bg-white" />
-                  <span>Industry-Ready Curriculum</span>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-gray-400">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                  <span>Government Certified</span>
-                </div>
-              </div>
-
-              {/* CTA Button */}
-              <Link href="/india-ai-mission">
-                <Button 
-                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold group"
+              <div className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl shadow-2xl border border-gray-700 overflow-hidden backdrop-blur-xl max-h-[70vh]">
+                {/* Tricolor accent */}
+                <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-orange-500 via-white to-green-500" />
+                
+                {/* Close/Minimize button */}
+                <button
                   onClick={handleMinimize}
+                  className="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors z-10 bg-gray-800/50 rounded-full p-2 hover:bg-gray-700/50"
+                  aria-label="Minimize popup"
                 >
-                  Explore Course
-                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
+                  <X className="h-5 w-5" />
+                </button>
 
-              {/* Footer */}
-              <p className="text-center text-xs text-gray-500 mt-3">
-                Powered by ProfAI Academy
-              </p>
+                {/* Content - Landscape Layout */}
+                <div className="flex flex-col md:flex-row h-full overflow-y-auto">
+                  {/* Left Side - Logo and Title */}
+                  <div className="md:w-2/5 bg-gradient-to-br from-orange-600/20 to-green-600/20 p-6 flex flex-col justify-center items-center border-r border-gray-700">
+                    <div className="relative mb-4">
+                      <img 
+                        src={INDIA_AI_LOGO_EXTENDED} 
+                        alt="IndiaAI Mission" 
+                        className="w-32 h-32 object-contain"
+                      />
+                      <Sparkles className="absolute -top-2 -right-2 h-6 w-6 text-yellow-400 animate-pulse" />
+                    </div>
+                    <h3 className="text-3xl font-bold text-white text-center mb-2">IndiaAI Mission</h3>
+                    <p className="text-sm text-gray-300 text-center mb-4">Government of India Initiative</p>
+                    <h4 className="text-xl font-semibold text-white text-center">YuvAI for All</h4>
+                  </div>
+
+                  {/* Right Side - Content */}
+                  <div className="md:w-3/5 p-6">
+                    {/* Main Description */}
+                    <p className="text-sm text-gray-300 leading-relaxed mb-4">
+                      Join India's flagship AI education program designed to democratize AI literacy across the nation. 
+                      This comprehensive course empowers every learner to understand, use, and benefit from artificial 
+                      intelligence responsibly, contributing to India's digital transformation journey.
+                    </p>
+
+                    {/* Key Features Grid */}
+                    <div className="grid grid-cols-3 gap-3 mb-4">
+                      <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                        <BookOpen className="h-5 w-5 text-orange-500 mb-1" />
+                        <h5 className="text-xs font-semibold text-white mb-0.5">6 Modules</h5>
+                        <p className="text-xs text-gray-400">AI basics to advanced</p>
+                      </div>
+                      <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                        <Target className="h-5 w-5 text-white mb-1" />
+                        <h5 className="text-xs font-semibold text-white mb-0.5">Industry Skills</h5>
+                        <p className="text-xs text-gray-400">Practical tools</p>
+                      </div>
+                      <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700">
+                        <Award className="h-5 w-5 text-green-500 mb-1" />
+                        <h5 className="text-xs font-semibold text-white mb-0.5">Certified</h5>
+                        <p className="text-xs text-gray-400">Official certificate</p>
+                      </div>
+                    </div>
+
+                    {/* Course Highlights */}
+                    <div className="bg-gray-800/30 rounded-lg p-3 mb-4 border border-gray-700">
+                      <h5 className="text-xs font-semibold text-white mb-2">What You'll Learn:</h5>
+                      <div className="grid grid-cols-2 gap-1.5">
+                        <div className="flex items-start gap-1.5 text-xs text-gray-300">
+                          <div className="w-1 h-1 rounded-full bg-orange-500 mt-1.5 flex-shrink-0" />
+                          <span>AI fundamentals & ML concepts</span>
+                        </div>
+                        <div className="flex items-start gap-1.5 text-xs text-gray-300">
+                          <div className="w-1 h-1 rounded-full bg-white mt-1.5 flex-shrink-0" />
+                          <span>Generative AI & prompting</span>
+                        </div>
+                        <div className="flex items-start gap-1.5 text-xs text-gray-300">
+                          <div className="w-1 h-1 rounded-full bg-green-500 mt-1.5 flex-shrink-0" />
+                          <span>Practical AI tools</span>
+                        </div>
+                        <div className="flex items-start gap-1.5 text-xs text-gray-300">
+                          <div className="w-1 h-1 rounded-full bg-orange-500 mt-1.5 flex-shrink-0" />
+                          <span>AI ethics & responsible use</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CTA Button */}
+                    <Link href="/india-ai-mission">
+                      <Button 
+                        className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold group py-5 text-sm"
+                        onClick={handleMinimize}
+                      >
+                        Start Your AI Journey
+                        <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                    </Link>
+
+                    {/* Footer */}
+                    <p className="text-center text-xs text-gray-500 mt-3">
+                      Powered by ProfAI Academy • Free for All Indian Citizens
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </>
       )}
-    </div>
+    </>
   );
 }

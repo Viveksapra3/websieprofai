@@ -90,7 +90,7 @@ export default function HowItWorks() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+      <section className="pt-48 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <div className="mb-8">
             <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">

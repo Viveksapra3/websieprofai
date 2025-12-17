@@ -10,8 +10,21 @@ export default function TeachPage() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-20">
-        <div className="max-w-5xl mx-auto text-center">
+      <section className="relative min-h-[100vh] flex items-center justify-center px-4 py-20 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop" 
+            alt="Students learning and being inspired" 
+            className="w-full h-full object-cover"
+          />
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 via-black/90 to-gray-900/95"></div>
+          {/* Additional gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/60"></div>
+        </div>
+
+        <div className="max-w-5xl mx-auto text-center relative z-10">
           <div className="mb-12">
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight">
               Touch Lives,<br />

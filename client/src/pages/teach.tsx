@@ -19,7 +19,7 @@ export default function TeachPage() {
             className="w-full h-full object-cover"
           />
           {/* Dark overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 via-black/90 to-gray-900/95"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900/95 via-black/70 to-gray-900/95"></div>
           {/* Additional gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/60"></div>
         </div>
@@ -69,6 +69,110 @@ export default function TeachPage() {
           <div className="text-center">
             <div className="text-4xl font-bold text-green-400 mb-2">500+</div>
             <div className="text-gray-300">Colleges Supporteds</div>
+          </div>
+        </div>
+      </section>
+
+      {/* Digital Twin Section */}
+      <section className="py-20 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-cyan-900/20"></div>
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400">Digital Twin</span> Teacher
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              Create your AI-powered digital twin that teaches students on your behalf—24/7, in multiple languages, with your unique teaching style
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Avatar Display */}
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/30 to-blue-600/30 blur-3xl rounded-full"></div>
+              <div className="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/20 shadow-2xl">
+                <div className="aspect-[3/4] relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900">
+                  <img 
+                    src="/teacher-avatar.png"
+                    alt="Digital Twin Teacher Avatar" 
+                    className="w-full h-full object-cover object-top"
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="text-white font-semibold">AI Teacher Active</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Features List */}
+            <div className="space-y-6">
+              <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-purple-600/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Users className="w-6 h-6 text-purple-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-white mb-2">Personalized Teaching</h3>
+                      <p className="text-gray-300">
+                        Your digital twin adapts to each student's learning pace and style, providing personalized guidance just like you would.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-blue-600/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Globe className="w-6 h-6 text-blue-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-white mb-2">Multi-Language Support</h3>
+                      <p className="text-gray-300">
+                        Reach students worldwide as your digital twin teaches in 12+ languages, breaking down language barriers.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-cyan-600/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-6 h-6 text-cyan-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-white mb-2">Always Available</h3>
+                      <p className="text-gray-300">
+                        Your digital twin never sleeps—students can learn anytime, anywhere, while you focus on creating more content.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-green-600/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Video className="w-6 h-6 text-green-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold text-white mb-2">Interactive Learning</h3>
+                      <p className="text-gray-300">
+                        Students can ask questions, get instant feedback, and engage in real-time conversations with your digital twin.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </section>

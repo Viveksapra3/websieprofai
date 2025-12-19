@@ -27,7 +27,8 @@
     "migrate-course-ids": "tsx scripts/migrate-course-ids.ts",
     "view-course-mappings": "tsx scripts/view-course-mappings.ts",
     "sync-course-names": "tsx scripts/sync-course-names.ts",
-    "view-course-images": "tsx scripts/view-course-images.ts"
+    "view-course-images": "tsx scripts/view-course-images.ts",
+    "backup-db": "tsx scripts/backup-database.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

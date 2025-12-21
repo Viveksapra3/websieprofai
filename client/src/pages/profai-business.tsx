@@ -24,11 +24,11 @@ export default function ProfAIBusinessPage() {
     e.preventDefault();
     
     // Here you would typically send the form data to your backend
-    console.log("Demo request submitted:", formData);
+    console.log("Pricing inquiry submitted:", formData);
     
     toast({
-      title: "Request Submitted!",
-      description: "Our team will contact you within 24 hours.",
+      title: "Inquiry Submitted!",
+      description: "Our sales team will contact you within 24 hours with pricing details.",
     });
 
     // Reset form
@@ -61,23 +61,23 @@ export default function ProfAIBusinessPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-center">
             <div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
-                ProfAI for Business
+                Get ProfAI for Your Organization
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8">
-                Upskill your team with AI-powered learning. Build skills your team needs with our comprehensive learning platform.
+                Bring the power of AI-driven learning to your institution. Our comprehensive platform is designed to transform education for schools, colleges, universities, and training organizations.
               </p>
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 mb-6 sm:mb-8">
                 <div className="flex items-center gap-2 text-sm sm:text-base text-gray-300">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 flex-shrink-0" />
-                  <span>Unlimited access to courses</span>
+                  <span>Complete platform for your institution</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm sm:text-base text-gray-300">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 flex-shrink-0" />
-                  <span>AI-powered personalization</span>
+                  <span>Customizable for your organization</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm sm:text-base text-gray-300">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 flex-shrink-0" />
-                  <span>Advanced analytics & insights</span>
+                  <span>Dedicated support & training</span>
                 </div>
               </div>
             </div>
@@ -85,7 +85,7 @@ export default function ProfAIBusinessPage() {
             {/* Request Demo Form */}
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm">
               <CardContent className="p-4 sm:p-6 md:p-8">
-                <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Request a Demo</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-white mb-4 sm:mb-6">Get Pricing Information</h2>
                 <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
@@ -166,7 +166,7 @@ export default function ProfAIBusinessPage() {
 
                   <Textarea
                     name="message"
-                    placeholder="Tell us about your training needs..."
+                    placeholder="Tell us about your requirements and use case..."
                     value={formData.message}
                     onChange={handleChange}
                     rows={4}
@@ -177,7 +177,7 @@ export default function ProfAIBusinessPage() {
                     type="submit"
                     className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-4 sm:py-5 md:py-6 text-sm sm:text-base"
                   >
-                    Request Demo
+                    Request Pricing
                   </Button>
                 </form>
               </CardContent>
@@ -190,16 +190,16 @@ export default function ProfAIBusinessPage() {
       <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-black/30">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white text-center mb-10 sm:mb-12 md:mb-16">
-            Why choose ProfAI Business?
+            Why choose ProfAI for your organization?
           </h2>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="p-4 sm:p-6 text-center">
                 <Building2 className="w-10 h-10 sm:w-12 sm:h-12 text-purple-400 mx-auto mb-3 sm:mb-4" />
-                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">Enterprise-Grade</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">Enterprise-Grade Platform</h3>
                 <p className="text-sm sm:text-base text-gray-300">
-                  Secure, scalable platform built for organizations of all sizes.
+                  Robust, secure platform built specifically for educational institutions of all sizes.
                 </p>
               </CardContent>
             </Card>
@@ -207,9 +207,9 @@ export default function ProfAIBusinessPage() {
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="p-4 sm:p-6 text-center">
                 <Zap className="w-10 h-10 sm:w-12 sm:h-12 text-blue-400 mx-auto mb-3 sm:mb-4" />
-                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">AI-Powered</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">AI-Powered Learning</h3>
                 <p className="text-sm sm:text-base text-gray-300">
-                  Personalized learning paths powered by advanced AI technology.
+                  Advanced AI technology that delivers personalized learning experiences for every student.
                 </p>
               </CardContent>
             </Card>
@@ -217,9 +217,9 @@ export default function ProfAIBusinessPage() {
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="p-4 sm:p-6 text-center">
                 <TrendingUp className="w-10 h-10 sm:w-12 sm:h-12 text-green-400 mx-auto mb-3 sm:mb-4" />
-                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">Analytics</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">Institutional Analytics</h3>
                 <p className="text-sm sm:text-base text-gray-300">
-                  Track progress and measure ROI with detailed insights.
+                  Track student progress, engagement, and outcomes across your entire organization.
                 </p>
               </CardContent>
             </Card>
@@ -227,9 +227,9 @@ export default function ProfAIBusinessPage() {
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="p-4 sm:p-6 text-center">
                 <Shield className="w-10 h-10 sm:w-12 sm:h-12 text-red-400 mx-auto mb-3 sm:mb-4" />
-                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">Compliance</h3>
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2 sm:mb-3">Full Compliance</h3>
                 <p className="text-sm sm:text-base text-gray-300">
-                  Meet industry standards with certified training programs.
+                  Meets all educational standards, data protection regulations, and security requirements.
                 </p>
               </CardContent>
             </Card>
@@ -254,7 +254,7 @@ export default function ProfAIBusinessPage() {
               <div className="text-base sm:text-lg md:text-xl text-gray-300">Schools Supported </div>
             </div>
             <div>
-              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-400 mb-2 sm:mb-3">4.5M</div>
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-green-400 mb-2 sm:mb-3">4,500,000</div>
               <div className="text-base sm:text-lg md:text-xl text-gray-300">Awards of Avatar interaction</div>
             </div>
           </div>
@@ -265,13 +265,13 @@ export default function ProfAIBusinessPage() {
       <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-black/30">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6">
-            Ready to transform your team?
+            Ready to bring ProfAI to your organization?
           </h2>
           <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8">
-            Join thousands of organizations already using ProfAI Business to upskill their workforce.
+            Join thousands of institutions already using ProfAI to deliver exceptional learning experiences and transform education.
           </p>
           <Button className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 sm:px-8 py-4 sm:py-5 md:py-6 text-base sm:text-lg rounded-full">
-            Get Started Today
+            Request Pricing
           </Button>
         </div>
       </section>

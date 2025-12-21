@@ -140,15 +140,34 @@ export default function Navigation() {
               </button>
             </Link>
 
-            {/* ProfAI Business Link */}
-            <Link href="/profai-business">
-              <button 
-                className={`${textColor} ${hoverColor} transition-colors hover:scale-110`}
-                data-testid="nav-business"
+            {/* Education Suite Dropdown */}
+            <div className="relative group">
+              <button
+                className={`${textColor} ${hoverColor} transition-colors hover:scale-110 flex items-center`}
+                data-testid="nav-education-suite"
               >
-                ProfAI Business
+                Education Suite
+                <ChevronDown className="w-4 h-4 ml-1 transition-transform duration-200 group-hover:rotate-180" />
               </button>
-            </Link>
+              
+              {/* Education Suite Dropdown Menu */}
+              <div className="absolute top-full left-0 mt-2 w-56 bg-black/90 backdrop-blur-md 
+                rounded-lg shadow-2xl border border-white/20 overflow-hidden z-50 
+                opacity-0 invisible group-hover:opacity-100 group-hover:visible 
+                transition-all duration-300">
+                
+                <Link href="/education-suite/api">
+                  <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer border-b border-white/10">
+                    <div className="text-white font-semibold">API</div>
+                  </div>
+                </Link>
+                <Link href="/education-suite/product">
+                  <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer">
+                    <div className="text-white font-semibold">Product</div>
+                  </div>
+                </Link>
+              </div>
+            </div>
 
             {/* Career GPT Link */}
             <Link href="/career-gpt">
@@ -329,12 +348,20 @@ export default function Navigation() {
               </button>
             </Link>
 
-            {/* Mobile ProfAI Business Link */}
-            <Link href="/profai-business">
-              <button className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left border-b border-white/20 pb-2 mb-2`}>
-                ProfAI Business
-              </button>
-            </Link>
+            {/* Mobile Education Suite Section */}
+            <div className="border-b border-white/20 pb-2 mb-2">
+              <div className="text-white font-semibold mb-2">Education Suite</div>
+              <Link href="/education-suite/api">
+                <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
+                  API
+                </button>
+              </Link>
+              <Link href="/education-suite/product">
+                <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
+                  Product
+                </button>
+              </Link>
+            </div>
 
             {/* Mobile Career GPT Link */}
             <Link href="/career-gpt">

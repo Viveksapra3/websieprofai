@@ -150,6 +150,21 @@ export async function ensureSchema() {
       updated_at timestamp DEFAULT now()
     );
 
+    -- API Access Requests table
+    CREATE TABLE IF NOT EXISTS api_access_requests (
+      id text PRIMARY KEY DEFAULT gen_random_uuid()::text,
+      first_name text NOT NULL,
+      last_name text NOT NULL,
+      email text NOT NULL,
+      phone text NOT NULL,
+      company text NOT NULL,
+      job_title text NOT NULL,
+      use_case text,
+      status text NOT NULL DEFAULT 'pending',
+      created_at timestamp DEFAULT now(),
+      updated_at timestamp DEFAULT now()
+    );
+
     -- Create indexes for better performance
     CREATE INDEX IF NOT EXISTS idx_user_purchases_user_id ON user_purchases(user_id);
     CREATE INDEX IF NOT EXISTS idx_user_purchases_course_id ON user_purchases(course_id);
@@ -160,6 +175,9 @@ export async function ensureSchema() {
     CREATE INDEX IF NOT EXISTS idx_course_images_course_id ON course_images(course_id);
     CREATE INDEX IF NOT EXISTS idx_course_id_mapping_new_id ON course_id_mapping(new_course_id);
     CREATE INDEX IF NOT EXISTS idx_course_id_mapping_old_id ON course_id_mapping(old_course_id);
+    CREATE INDEX IF NOT EXISTS idx_api_access_requests_email ON api_access_requests(email);
+    CREATE INDEX IF NOT EXISTS idx_api_access_requests_status ON api_access_requests(status);
+    CREATE INDEX IF NOT EXISTS idx_api_access_requests_created_at ON api_access_requests(created_at);
   `;
   await pool.query(ddl);
 }

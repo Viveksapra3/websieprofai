@@ -6,7 +6,7 @@ const stats = [
   { value: '99.7%', label: 'Accuracy Rate', color: 'text-primary' },
   { value: '150+', label: 'Languages', color: 'text-accent' },
   { value: '24/7', label: 'Availability', color: 'text-green-500' },
-  { value: '5M+', label: 'Interactions', color: 'text-orange-500' },
+  { value: '5,000,000+', label: 'Interactions', color: 'text-orange-500' },
 ];
 
 export default function AboutSection() {

@@ -1262,6 +1262,34 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // API Access Request endpoint
+  app.post("/api/api-access-requests", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { firstName, lastName, email, phone, company, jobTitle, useCase } = req.body;
+
+      // Validate required fields
+      if (!firstName || !lastName || !email || !phone || !company || !jobTitle) {
+        return res.status(400).json({ error: "All required fields must be provided" });
+      }
+
+      // Insert into database
+      await pool.query(
+        `INSERT INTO api_access_requests 
+         (first_name, last_name, email, phone, company, job_title, use_case, status, created_at, updated_at) 
+         VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending', NOW(), NOW())`,
+        [firstName, lastName, email, phone, company, jobTitle, useCase || null]
+      );
+
+      return res.status(201).json({ 
+        success: true, 
+        message: "API access request submitted successfully" 
+      });
+    } catch (err) {
+      console.error("API access request error:", err);
+      next(err);
+    }
+  });
+
   // API 404
   app.all("/api/*", (req: Request, res: Response) => {
     res.status(404).json({ error: `No API route for ${req.method} ${req.originalUrl}` });

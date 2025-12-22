@@ -34,10 +34,7 @@ export default function SignInStudent() {
     setAuthError(null);
     
     try {
-      // Firebase email/password authentication
-      await signInWithEmail(formData.email, formData.password);
-      
-      // After successful Firebase auth, sync with backend
+      // Authenticate with backend database (supports both Firebase and traditional password users)
       const response = await fetch('/api/signin/student', {
         method: 'POST',
         headers: {

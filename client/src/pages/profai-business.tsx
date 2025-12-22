@@ -56,12 +56,28 @@ export default function ProfAIBusinessPage() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative min-h-screen w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&h=1080&fit=crop" 
+            alt="Business Team Collaboration" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/95 via-gray-900/85 to-gray-900/70"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/50 via-transparent to-gray-900/80"></div>
+        </div>
+        
+        {/* Decorative blur effects */}
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full blur-3xl opacity-20 z-0"></div>
+        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-cyan-600 to-green-600 rounded-full blur-3xl opacity-20 z-0"></div>
+        
+        {/* Content */}
+        <div className="max-w-6xl mx-auto relative z-10 py-20 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-center">
             <div>
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 sm:mb-6">
-                Get ProfAI for Your Organization
+                Get AI Trainer for Your Organization
               </h1>
               <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8">
                 Bring the power of AI-driven learning to your institution. Our comprehensive platform is designed to transform education for schools, colleges, universities, and training organizations.

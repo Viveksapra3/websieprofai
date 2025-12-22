@@ -72,30 +72,48 @@ export default function EducationSuitePage() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="pt-24 sm:pt-28 md:pt-32 pb-12 sm:pb-16 md:pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-2 mb-6">
-            <Zap className="w-4 h-4 text-purple-400" />
-            <span className="text-purple-300 text-sm font-medium">Complete Learning Platform</span>
-          </div>
-          
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-            Education Suite:
-            <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400">
-              Powering Intelligent Learning
-            </span>
-          </h1>
-          
-          <p className="text-lg sm:text-xl md:text-2xl text-gray-300 leading-relaxed max-w-4xl mx-auto mb-12">
-            Our comprehensive Education Suite provides powerful features for educational platforms, institutions, and EdTech startups. 
-            Access AI-powered course recommendations, progress tracking, personalized learning paths, and enterprise solutions.
-          </p>
-          
+      <section className="relative min-h-screen w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1920&h=1080&fit=crop" 
+            alt="API Dashboard Analytics" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-gray-900/95 via-gray-900/85 to-gray-900/70"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-gray-900/50 via-transparent to-gray-900/80"></div>
+        </div>
+        
+        {/* Decorative blur effects */}
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-purple-600 to-blue-600 rounded-full blur-3xl opacity-20 z-0"></div>
+        <div className="absolute bottom-1/4 left-1/4 w-96 h-96 bg-gradient-to-br from-cyan-600 to-green-600 rounded-full blur-3xl opacity-20 z-0"></div>
+        
+        {/* Content */}
+        <div className="max-w-6xl mx-auto relative z-10 py-20">
           <div className="text-center">
-            <p className="text-lg sm:text-xl text-purple-300 mb-8">
-              📚 Complete API documentation will be provided upon approval
+            <div className="inline-flex items-center gap-2 bg-purple-500/10 border border-purple-500/20 rounded-full px-4 py-2 mb-6">
+              <Zap className="w-4 h-4 text-purple-400" />
+              <span className="text-purple-300 text-sm font-medium">Complete AI  Learning Platform</span>
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+              Education Suite:
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400">
+                Powering Intelligent Learning
+              </span>
+            </h1>
+            
+            <p className="text-lg sm:text-xl md:text-2xl text-gray-300 leading-relaxed max-w-4xl mx-auto mb-12">
+              Our comprehensive Education Suite provides powerful features for educational platforms, institutions, and EdTech startups. 
+              Access AI-powered course recommendations, progress tracking, personalized learning paths, and enterprise solutions.
             </p>
+            
+            <div className="text-center">
+              {/* <p className="text-lg sm:text-xl text-purple-300 mb-8">
+                📚 Complete API documentation will be provided upon approval
+              </p> */}
+            </div>
           </div>
         </div>
       </section>
@@ -155,9 +173,17 @@ export default function EducationSuitePage() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6">
               Key Capabilities
             </h2>
-            <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
               Access a comprehensive suite of AI-powered features designed specifically for educational platforms
             </p>
+            <div className="relative max-w-4xl mx-auto rounded-xl overflow-hidden shadow-2xl border border-white/10 mb-12">
+              <img 
+                src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=400&fit=crop" 
+                alt="AI-Powered Learning Analytics" 
+                className="w-full h-64 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-900/80 via-blue-900/60 to-transparent"></div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -296,6 +322,42 @@ export default function EducationSuitePage() {
             </p>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-12">
+            <div className="relative rounded-xl overflow-hidden shadow-lg border border-white/10">
+              <img 
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=300&fit=crop" 
+                alt="EdTech Platform" 
+                className="w-full h-48 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-purple-900/90 to-transparent"></div>
+              <div className="absolute bottom-4 left-4 right-4">
+                <h3 className="text-xl font-bold text-white">EdTech Platforms</h3>
+              </div>
+            </div>
+            <div className="relative rounded-xl overflow-hidden shadow-lg border border-white/10">
+              <img 
+                src="https://images.unsplash.com/photo-1606761568499-6d2451b23c66?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D?w=400&h=300&fit=crop" 
+                alt="University Campus" 
+                className="w-full h-48 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-blue-900/90 to-transparent"></div>
+              <div className="absolute bottom-4 left-4 right-4">
+                <h3 className="text-xl font-bold text-white">Universities & Colleges</h3>
+              </div>
+            </div>
+            <div className="relative rounded-xl overflow-hidden shadow-lg border border-white/10">
+              <img 
+                src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&h=300&fit=crop" 
+                alt="Corporate Training" 
+                className="w-full h-48 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-cyan-900/90 to-transparent"></div>
+              <div className="absolute bottom-4 left-4 right-4">
+                <h3 className="text-xl font-bold text-white">Corporate Training</h3>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             <Card className="bg-white/5 border-white/10 backdrop-blur-sm hover:bg-white/10 transition-all">
               <CardContent className="p-6">
@@ -385,9 +447,20 @@ export default function EducationSuitePage() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6">
               Simple Integration Flow
             </h2>
-            <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
               Get started with ProfessorAI Products API in four easy steps
             </p>
+            <div className="relative max-w-3xl mx-auto rounded-xl overflow-hidden shadow-2xl border border-white/10 mb-12">
+              <img 
+                src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1000&h=400&fit=crop" 
+                alt="API Integration Code" 
+                className="w-full h-56 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-purple-900/50 to-blue-900/50"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Code className="w-20 h-20 text-white/30" />
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 sm:gap-8">
@@ -481,9 +554,20 @@ await client.progress.update({
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6">
               Authentication & Security
             </h2>
-            <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
               Enterprise-grade security built into every API call
             </p>
+            <div className="relative max-w-4xl mx-auto rounded-xl overflow-hidden shadow-2xl border border-white/10 mb-12">
+              <img 
+                src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&h=400&fit=crop" 
+                alt="Security and Authentication" 
+                className="w-full h-64 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-purple-900/60 to-transparent"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Shield className="w-24 h-24 text-white/20" />
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -617,9 +701,21 @@ await client.progress.update({
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6">
               Built for Scale
             </h2>
-            <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto">
+            <p className="text-lg sm:text-xl text-gray-300 max-w-3xl mx-auto mb-8">
               Infrastructure designed to grow with your platform
             </p>
+            <div className="relative max-w-5xl mx-auto rounded-xl overflow-hidden shadow-2xl border border-white/10 mb-12">
+              <img 
+                src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1400&h=500&fit=crop" 
+                alt="Global Infrastructure" 
+                className="w-full h-72 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent"></div>
+              <div className="absolute bottom-8 left-0 right-0 text-center">
+                <Globe className="w-16 h-16 text-white/40 mx-auto mb-4" />
+                <p className="text-2xl font-bold text-white">Global Edge Network</p>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">

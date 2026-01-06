@@ -37,6 +37,7 @@ const IndiaAIMissionPage = lazy(() => import("@/pages/india-ai-mission"));
 const SuggestionsPage = lazy(() => import("@/pages/suggestions"));
 const ComparisonPage = lazy(() => import("@/pages/comparison"));
 const EducationSuitePage = lazy(() => import("@/pages/products-api"));
+const TeamPage = lazy(() => import("@/pages/team"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -62,6 +63,7 @@ function Router() {
       <Route path="/teacher/upload" component={TeacherUploadPage} />
       <Route path="/teacher-upload" component={TeacherUploadPage} />
       <Route path="/how-it-works" component={HowItWorks} />
+      <Route path="/team" component={TeamPage} />
       <Route path="/organization-contact" component={OrganizationContact} />
       <Route path="/payment" component={PaymentPage} />
       <Route path="/teach" component={TeachPage} />

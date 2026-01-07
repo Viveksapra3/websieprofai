@@ -48,36 +48,52 @@ export default function AboutPage() {
 
   const leadershipTeam = [
     {
-      name: "Dr. Rajesh Kumar",
+      name: "Rohit Verma",
       role: "Founder & CEO",
       vectorImage: "https://api.dicebear.com/7.x/notionists/svg?seed=Rajesh&backgroundColor=dfe6f5",
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop",
-      bio: "Former IIT professor with 20+ years in AI research, passionate about democratizing education.",
-      linkedin: "#"
+      image: "rohit-verma-image.jpeg",
+      bio: "CEO of Aalgorix, leading innovation at the intersection of Artificial Intelligence, immersive technologies, and future-ready skill development.",
+      linkedin: "https://www.linkedin.com/in/rohitverma6789/"
     },
     {
-      name: "Priya Sharma",
-      role: "Chief Technology Officer",
+      name: "Ganga Tikkoo",
+      role: "Director-BD & Alliances",
       vectorImage: "https://api.dicebear.com/7.x/notionists/svg?seed=Priya&backgroundColor=ffe5f0",
-      image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop",
-      bio: "Ex-Google AI engineer specializing in NLP and adaptive learning systems.",
-      linkedin: "#"
+      image: "ganga-image.jpeg",
+      bio: "Director of Business Development and Alliances at Aalgorix, driving Web 3.0 adoption through strategic partnerships with focus on growth, execution, scalability.",
+      linkedin: "https://www.linkedin.com/in/ganga-tikkoo-68b12258/"
     },
     {
-      name: "Arjun Mehta",
-      role: "Head of Product",
+      name: "Mansi Singh",
+      role: "Head of Market Development",
       vectorImage: "https://api.dicebear.com/7.x/notionists/svg?seed=Arjun&backgroundColor=d9f0fc",
-      image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop",
-      bio: "Product visionary focused on creating intuitive learning experiences that scale.",
-      linkedin: "#"
+      image: "mansi-image.jpeg",
+      bio: "Head of Market Development at Aalgorix, advancing XR/VR adoption through strategic partnerships, research, and value-driven engagement.",
+      linkedin: "https://www.linkedin.com/in/mansi-singh12/"
     },
     {
-      name: "Dr. Meera Patel",
-      role: "Director of Education",
+      name: "Amar Singh",
+      role: "Technology Lead",
       vectorImage: "https://api.dicebear.com/7.x/notionists/svg?seed=Meera&backgroundColor=fff0d9",
-      image: "https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=400&h=400&fit=crop",
-      bio: "Curriculum expert with PhD in Educational Psychology, designing effective learning paths.",
-      linkedin: "#"
+      image: "amar-image.jpeg",
+      bio: "Tech Lead at Aalgorix, architecting scalable systems with expertise in AI-integrated platforms and immersive technology solutions.",
+      linkedin: "https://www.linkedin.com/in/mansi-singh12/"
+    },
+    {
+      name: "Vivek Sapra",
+      role: "Frontend Developer",
+      vectorImage: "https://api.dicebear.com/7.x/notionists/svg?seed=Vikram&backgroundColor=e5f0e5",
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+      bio: "Frontend Developer at Aalgorix, building high-performance interfaces using modern React and Next.js with focus on responsiveness and clean architecture.",
+      linkedin: "https://www.linkedin.com/in/viveksapracse/"
+    },
+    {
+      name: "Shivang Kanaujia",
+      role: "Junior Engineer",
+      vectorImage: "https://api.dicebear.com/7.x/notionists/svg?seed=Ananya&backgroundColor=ffe5e5",
+      image: "profile-shivang.jpeg",
+      bio: "Junior Engineer at Aalgorix, supporting deployment, development workflows, and production systems with focus on learning-driven execution and reliability.",
+      linkedin: "https://www.linkedin.com/in/shivang-kanaujia-973a6a175/"
     }
   ];
 
@@ -154,7 +170,7 @@ export default function AboutPage() {
                     <div className="relative flex-shrink-0 mx-auto sm:mx-0">
                       <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-full opacity-20 group-hover:opacity-30 blur-sm transition-all duration-500"></div>
                       <img 
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop"
+                        src="rohit-verma-image.jpeg"
                         alt="Founder"
                         className="relative w-48 h-48 sm:w-56 sm:h-56 rounded-full object-cover shadow-lg border-4 border-white"
                       />
@@ -164,14 +180,14 @@ export default function AboutPage() {
                     <div className="flex flex-col justify-center">
                       <div className="mb-5">
                         <h3 className="text-3xl font-bold text-gray-900 mb-2">Rohit Verma</h3>
-                        <p className="text-base font-semibold text-purple-600 uppercase tracking-wide mb-4">Founder & CEO</p>
-                        <div className="flex flex-wrap gap-2">
-                          <div className="px-4 py-1.5 bg-white/80 rounded-full text-sm font-medium text-gray-700">IIT Professor</div>
+                        <p className="text-base font-semibold text-purple-600 uppercase tracking-wide mb-4">CEO, Aalgorix</p>
+                        {/* <div className="flex flex-wrap gap-2">
+                          <div className="px-4 py-1.5 bg-white/80 rounded-full text-sm font-medium text-gray-700"></div>
                           <div className="px-4 py-1.5 bg-white/80 rounded-full text-sm font-medium text-gray-700">AI Researcher</div>
-                        </div>
+                        </div> */}
                       </div>
                       <p className="text-base text-gray-600 leading-relaxed">
-                        20+ years in AI research and education, passionate about democratizing learning through technology.
+                        {/* 20+ years in AI research and education, passionate about democratizing learning through technology. */}
                       </p>
                     </div>
                   </div>
@@ -183,22 +199,49 @@ export default function AboutPage() {
             <div>
               <div className="mb-6">
                 <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                  Why We Built
                   <span className="block mt-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                    ProfessorsAI
+                    Our Story
                   </span>
                 </h2>
               </div>
               
               <div className="space-y-5 text-base text-gray-700 leading-relaxed">
                 <p>
-                  During my years as a professor at IIT, I witnessed brilliant students struggle—not from lack of potential, but because traditional education couldn't adapt to individual learning styles.
+                  As we reflect on the year gone by, I am proud of the
+                  progress Aalgorix has made in advancing intelligent,
+                  immersive, and future-ready learning solutions. This year
+                  marked an important phase in our journey as we
+                  continued to strengthen our capabilities at the
+                  intersection of Artificial Intelligence, immersive
+                  technologies, and skill development.
                 </p>
                 <p>
-                  That sparked our mission: give every student a personal AI tutor that understands exactly how they learn, adapts in real-time, and provides personalized guidance 24/7.
+                  The rapid evolution of AI and emerging technologies is
+                  reshaping how people learn, work, and adapt. At
+                  Aalgorix, our focus has remained clear — to build
+                  responsible, scalable, and outcome-driven platforms
+                  that empower learners, educators, and enterprises to
+                  stay relevant in a fast-changing digital economy.
+                  Through continuous innovation, strategic collaborations,
+                  and a strong emphasis on practical application, we have
+                  worked to bridge the gap between education and
+                  industry readiness.
                 </p>
                 <p>
-                  Today, ProfessorsAI combines cutting-edge AI with proven pedagogical methods to democratize world-class education for millions.
+                  Our progress would not have been possible without the
+                  trust of our partners, institutions, clients, and the
+                  dedication of our team. Their commitment and belief in
+                  our vision continue to inspire us to raise the bar in
+                  everything we do.
+                </p>
+                <p>
+                  As we look ahead, Aalgorix remains committed to driving
+                  meaningful impact by enabling future-ready skills,
+                  immersive learning experiences, and intelligent AI-
+                  powered systems. We are confident that the foundation
+                  we have built will allow us to contribute significantly to
+                  India’s digital and innovation-led growth while creating
+                  long-term value for all our stakeholders.
                 </p>
               </div>
 
@@ -210,7 +253,7 @@ export default function AboutPage() {
                 <blockquote className="pl-10 border-l-4 border-purple-600 italic text-gray-600">
                   "Every student deserves a teacher who truly understands them. AI makes that possible at scale."
                 </blockquote>
-                <p className="pl-10 mt-2 text-sm font-semibold text-gray-900">— Dr. Rajesh Kumar</p>
+                <p className="pl-10 mt-2 text-sm font-semibold text-gray-900">— Rohit Verma</p>
               </div>
             </div>
           </div>
@@ -222,14 +265,15 @@ export default function AboutPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Meet Our Leadership
+              Meet Our Team
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Experienced innovators driving the future of AI-powered education
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {leadershipTeam.map((member, index) => (
               <div 
                 key={index} 
@@ -302,48 +346,7 @@ export default function AboutPage() {
                 </Card>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Section 4: Core Values */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              What Drives Us
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              The core principles that guide everything we build
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {coreValues.map((value, index) => (
-              <Card 
-                key={index} 
-                className="group bg-white border border-gray-200 hover:border-purple-300 hover:shadow-2xl transition-all duration-300 text-center overflow-hidden"
-              >
-                <CardContent className="p-8 relative">
-                  {/* Animated background gradient on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  
-                  <div className="relative z-10">
-                    <div className="flex justify-center mb-6">
-                      <div className="p-4 rounded-2xl bg-gradient-to-br from-gray-50 to-gray-100 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-md">
-                        {value.icon}
-                      </div>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-4 group-hover:text-purple-600 transition-colors">
-                      {value.title}
-                    </h3>
-                    <p className="text-gray-600 leading-relaxed">
-                      {value.description}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            </div>
           </div>
         </div>
       </section>

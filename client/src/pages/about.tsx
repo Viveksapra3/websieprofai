@@ -50,7 +50,7 @@ export default function AboutPage() {
     {
       name: "Rohit Verma",
       role: "Founder & CEO",
-      vectorImage: "https://api.dicebear.com/7.x/notionists/svg?seed=Rajesh&backgroundColor=dfe6f5",
+      vectorImage: "assets-ghibli/rohit-sir-ghibli.png",
       image: "rohit-verma-image.jpeg",
       bio: "CEO of Aalgorix, leading innovation at the intersection of Artificial Intelligence, immersive technologies, and future-ready skill development.",
       linkedin: "https://www.linkedin.com/in/rohitverma6789/"
@@ -58,7 +58,7 @@ export default function AboutPage() {
     {
       name: "Ganga Tikkoo",
       role: "Director-BD & Alliances",
-      vectorImage: "https://api.dicebear.com/7.x/notionists/svg?seed=Priya&backgroundColor=ffe5f0",
+      vectorImage: "assets-ghibli/ganga-cartoon.png",
       image: "ganga-image.jpeg",
       bio: "Director of Business Development and Alliances at Aalgorix, driving Web 3.0 adoption through strategic partnerships with focus on growth, execution, scalability.",
       linkedin: "https://www.linkedin.com/in/ganga-tikkoo-68b12258/"
@@ -66,7 +66,7 @@ export default function AboutPage() {
     {
       name: "Mansi Singh",
       role: "Head of Market Development",
-      vectorImage: "https://api.dicebear.com/7.x/notionists/svg?seed=Arjun&backgroundColor=d9f0fc",
+      vectorImage: "assets-ghibli/mansi-cartoon.png",
       image: "mansi-image.jpeg",
       bio: "Head of Market Development at Aalgorix, advancing XR/VR adoption through strategic partnerships, research, and value-driven engagement.",
       linkedin: "https://www.linkedin.com/in/mansi-singh12/"
@@ -74,7 +74,7 @@ export default function AboutPage() {
     {
       name: "Amar Singh",
       role: "Technology Lead",
-      vectorImage: "https://api.dicebear.com/7.x/notionists/svg?seed=Meera&backgroundColor=fff0d9",
+      vectorImage: "assets-ghibli/amar-ghibli.png",
       image: "amar-image.jpeg",
       bio: "Tech Lead at Aalgorix, architecting scalable systems with expertise in AI-integrated platforms and immersive technology solutions.",
       linkedin: "https://www.linkedin.com/in/mansi-singh12/"
@@ -82,16 +82,16 @@ export default function AboutPage() {
     {
       name: "Vivek Sapra",
       role: "Frontend Developer",
-      vectorImage: "https://api.dicebear.com/7.x/notionists/svg?seed=Vikram&backgroundColor=e5f0e5",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+      vectorImage: "assets-ghibli/vivek-cartoon.png",
+      image: "vivek-image.jpeg",
       bio: "Frontend Developer at Aalgorix, building high-performance interfaces using modern React and Next.js with focus on responsiveness and clean architecture.",
       linkedin: "https://www.linkedin.com/in/viveksapracse/"
     },
     {
       name: "Shivang Kanaujia",
       role: "Junior Engineer",
-      vectorImage: "https://api.dicebear.com/7.x/notionists/svg?seed=Ananya&backgroundColor=ffe5e5",
-      image: "profile-shivang.jpeg",
+      vectorImage: "assets-ghibli/shivang-cartoon.png",
+      image: "shivang-image.jpg",
       bio: "Junior Engineer at Aalgorix, supporting deployment, development workflows, and production systems with focus on learning-driven execution and reliability.",
       linkedin: "https://www.linkedin.com/in/shivang-kanaujia-973a6a175/"
     }
@@ -147,7 +147,7 @@ export default function AboutPage() {
               for every student. We believe every learner deserves adaptive, intelligent tutoring that 
               understands their unique needs, pace, and learning style.
             </p>
-            <Link href="/signup">
+            <Link href="/courses">
               <Button className="px-10 py-7 text-lg font-semibold bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl">
                 Start Learning Free
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -246,14 +246,16 @@ export default function AboutPage() {
               </div>
 
               {/* Founder Quote */}
-              <div className="mt-8 relative">
-                <div className="absolute -left-2 top-0 text-purple-200">
+              <div className="mt-8 flex gap-4">
+                <div className="flex-shrink-0 text-purple-200">
                   <Quote className="w-10 h-10" />
                 </div>
-                <blockquote className="pl-10 border-l-4 border-purple-600 italic text-gray-600">
-                  "Every student deserves a teacher who truly understands them. AI makes that possible at scale."
-                </blockquote>
-                <p className="pl-10 mt-2 text-sm font-semibold text-gray-900">— Rohit Verma</p>
+                <div className="border-l-4 border-purple-600 pl-6">
+                  <blockquote className="italic text-gray-600 text-md leading-relaxed">
+                    "Every student deserves a teacher who truly understands them. AI makes that possible at scale."
+                  </blockquote>
+                  <p className="mt-3 text-base font-semibold text-gray-900">— Rohit Verma</p>
+                </div>
               </div>
             </div>
           </div>
@@ -383,7 +385,7 @@ export default function AboutPage() {
             Start your personalized learning journey today—completely free.
           </p>
           <div className="flex flex-col sm:flex-row gap-5 justify-center">
-            <Link href="/signup">
+            <Link href="/courses">
               <Button className="px-10 py-7 text-lg font-semibold bg-white text-purple-600 hover:bg-gray-100 rounded-full transition-all duration-300 transform hover:scale-105 shadow-2xl">
                 Get Started Free
                 <ArrowRight className="w-5 h-5 ml-2" />

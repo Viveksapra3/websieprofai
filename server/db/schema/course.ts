@@ -6,6 +6,7 @@ export const courses = pgTable('courses', {
   id: uuid('id').defaultRandom().primaryKey(),
   title: text('title').notNull(),
   description: text('description').notNull(),
+  country: text('country'),
   thumbnail: text('thumbnail'),
   isPublished: boolean('is_published').default(false).notNull(),
   order: integer('order').default(0).notNull(),

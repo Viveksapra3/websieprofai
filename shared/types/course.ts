@@ -4,6 +4,7 @@ export interface Course {
   id: string;
   title: string;
   description: string;
+  country?: string | null;
   thumbnail?: string;
   createdAt: Date;
   updatedAt: Date;

@@ -417,6 +417,58 @@ class PaymentService {
     }
   }
 
+  async syncCoursePricing(apiBase?: string) {
+    try {
+      const base = apiBase || process.env.VITE_API_BASE;
+      if (!base) {
+        throw new Error("External API base not configured (VITE_API_BASE)");
+      }
+
+      const url = `${base.replace(/\/$/, "")}/api/courses`;
+      console.log("🔄 Syncing course pricing from:", url);
+
+      const response = await fetch(url);
+      const data = await response.json().catch(() => null);
+      if (!response.ok || !data) {
+        throw new Error(`Failed to fetch courses from API: ${response.status} ${response.statusText}`);
+      }
+
+      const rawCourses = Array.isArray(data?.courses)
+        ? data.courses
+        : Array.isArray(data)
+          ? data
+          : [data];
+
+      const freeCoursesCount = 3;
+      const defaultPrice = 999;
+      const currency = "INR";
+
+      let processed = 0;
+
+      for (let i = 0; i < rawCourses.length; i++) {
+        const course: any = rawCourses[i];
+        const externalId = String(course.course_id || course.id || `course_${i + 1}`);
+        const isFree = i < freeCoursesCount;
+        const price = isFree ? 0 : defaultPrice;
+
+        await this.setCoursePricing(externalId, price, isFree, i + 1);
+        processed++;
+      }
+
+      return {
+        success: true,
+        totalCourses: rawCourses.length,
+        processed,
+        freeCoursesCount,
+        defaultPrice,
+        currency,
+      };
+    } catch (error) {
+      console.error("❌ Error syncing course pricing:", error);
+      throw error;
+    }
+  }
+
   // Set course pricing (for admin/setup)
   async setCoursePricing(courseId: string, price: number, isFree: boolean = false, displayOrder?: number) {
     try {
@@ -476,81 +528,7 @@ class PaymentService {
       return [];
     }
   }
-
-  // Sync course pricing from external API
-  async syncCoursePricing(apiBase?: string) {
-    try {
-      console.log("🔄 Starting course pricing sync...");
-      
-      if (!apiBase) {
-        console.log("⚠️ No API base URL provided, skipping sync");
-        return { synced: 0, message: "No API base URL configured" };
-      }
-
-      // Fetch courses from external API
-      const apiUrl = `${apiBase}/api/courses`;
-      console.log(`📡 Fetching courses from: ${apiUrl}`);
-      
-      const response = await fetch(apiUrl);
-      if (!response.ok) {
-        throw new Error(`API returned ${response.status}`);
-      }
-
-      const data = await response.json();
-      const courses = Array.isArray(data.courses) ? data.courses : Array.isArray(data) ? data : [];
-      
-      console.log(`📚 Found ${courses.length} courses from API`);
-
-      // Get existing pricing from database
-      const existingPricing = await db.select().from(coursePricing);
-      const existingCourseIds = new Set(existingPricing.map(p => p.courseId));
-
-      let syncedCount = 0;
-      let updatedCount = 0;
-
-      // Sync each course
-      for (let i = 0; i < courses.length; i++) {
-        const course = courses[i];
-        const courseId = String(course.course_id || course.id);
-        
-        // Get old course ID from mapping table
-        const oldCourseId = await this.getOldCourseId(courseId);
-        
-        // Determine if course should be free (first 3 courses)
-        const isFree = i < 3;
-        const price = isFree ? 0 : 99; // Default price for paid courses
-
-        if (!existingCourseIds.has(oldCourseId)) {
-          // New course - add to database using old course ID
-          await this.setCoursePricing(oldCourseId, price, isFree, i + 1);
-          syncedCount++;
-          console.log(`✅ Added new course: ${courseId} → ${oldCourseId} (${course.course_title || course.title})`);
-        } else {
-          // Existing course - update display order if needed
-          const existing = existingPricing.find(p => p.courseId === oldCourseId);
-          if (existing && existing.displayOrder !== i + 1) {
-            await db
-              .update(coursePricing)
-              .set({ displayOrder: i + 1, updatedAt: new Date() })
-              .where(eq(coursePricing.courseId, oldCourseId));
-            updatedCount++;
-            console.log(`🔄 Updated display order for course: ${courseId} → ${oldCourseId}`);
-          }
-        }
-      }
-
-      console.log(`✅ Sync completed: ${syncedCount} new courses added, ${updatedCount} courses updated`);
-      return {
-        synced: syncedCount,
-        updated: updatedCount,
-        total: courses.length,
-        message: `Successfully synced ${syncedCount} new courses and updated ${updatedCount} existing courses`
-      };
-    } catch (error) {
-      console.error("❌ Error syncing course pricing:", error);
-      throw error;
-    }
-  }
 }
 
 export const paymentService = new PaymentService();
+

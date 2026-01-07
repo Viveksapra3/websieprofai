@@ -17,6 +17,7 @@ type Course = {
   level: string;
   tag?: string;
   description?: string;
+   country?: string | null;
   price?: number;
   currency?: string;
   isFree?: boolean;
@@ -44,6 +45,7 @@ export default function CoursesPage() {
   const [query, setQuery] = useState("");
   const [levelFilter, setLevelFilter] = useState<"all" | "beginner" | "intermediate" | "advanced">("all");
   const [viewMode, setViewMode] = useState<"all" | "my-courses">("all");
+  const [countryFilter, setCountryFilter] = useState<string>("all");
 
   // Get course type from URL parameters
   const urlParams = new URLSearchParams(window.location.search);
@@ -160,7 +162,7 @@ export default function CoursesPage() {
   }, [courses]); // Run when course list changes
 
 
-  // --- Main Course Data Fetching (Original Logic - Unchanged) ---
+  // --- Main Course Data Fetching ---
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -174,73 +176,36 @@ export default function CoursesPage() {
           setIsAuthenticated(false);
         }
 
-        const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
-        let normalized: Course[] = [];
-
         const fetchWithTimeout = (url: string, init: RequestInit = {}, timeoutMs = 8000) => {
           const controller = new AbortController();
           const id = setTimeout(() => controller.abort(), timeoutMs);
           return fetch(url, { ...init, signal: controller.signal }).finally(() => clearTimeout(id));
         };
 
-        const fetchAndNormalize = async (url: string, init?: RequestInit) => {
-          let res: Response;
-          try {
-            res = await fetchWithTimeout(url, init);
-          } catch (err: any) {
-            if (err?.name === "AbortError") {
-              throw new Error("Request timed out. Please try again.");
-            }
-            throw err;
-          }
-          const raw: any = await res.json().catch(() => null);
-          if (!res.ok) throw new Error((raw && (raw.error || raw.message)) || `Failed (${res.status})`);
-          const payload = raw && typeof raw === "object" && Array.isArray(raw.courses) ? raw.courses : raw;
-          const list = Array.isArray(payload) ? payload : payload && typeof payload === "object" ? [payload] : [];
-          return list.map((item: any) => ({
-            id: String(item.course_id ?? item.id ?? crypto.randomUUID()),
-            title: String(item.course_title ?? item.title ?? "Untitled Course"),
-            level: String(item.level ?? "Beginner"),
-            description:
-              typeof item.modules === "number"
-                ? `${item.modules} modules`
-                : item.description ?? (Array.isArray(item.modules) ? `${item.modules.length} modules` : undefined),
-            tag: item.tag ?? undefined,
-          }));
-        };
-
-        try {
-          // Use the new pricing API that combines external courses with pricing info
-          const res = await fetchWithTimeout(`/api/courses-with-pricing`, { credentials: "include" });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data?.error || `Failed (${res.status})`);
-          
-          normalized = data.courses.map((item: any) => ({
-            id: String(item.id),
-            title: String(item.title),
-            level: String(item.level),
-            description: item.description,
-            tag: item.tag,
-            price: item.price,
-            currency: item.currency,
-            isFree: item.isFree,
-            hasAccess: item.hasAccess,
-            imageUrl: item.imageUrl || null,
-          }));
-        } catch (err) {
-          console.warn("Pricing API failed, trying fallback:", err);
-          try {
-            if (apiBase) {
-              console.log(`[Courses] Fetching from external API: ${apiBase}/api/courses`);
-              normalized = await fetchAndNormalize(`${apiBase}/api/courses`);
-            } else {
-              normalized = await fetchAndNormalize(`/api/courses`, { method: "POST", credentials: "include" });
-            }
-          } catch (err2) {
-            console.error("All APIs failed:", err2);
-            throw err2;
-          }
+        // Build URL with optional country filter so backend can filter courses by country
+        const params = new URLSearchParams();
+        if (countryFilter !== "all") {
+          params.set("country", countryFilter);
         }
+        const url = `/api/courses-with-pricing${params.toString() ? `?${params.toString()}` : ""}`;
+
+        const res = await fetchWithTimeout(url, { credentials: "include" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || `Failed (${res.status})`);
+
+        const normalized: Course[] = data.courses.map((item: any) => ({
+          id: String(item.id),
+          title: String(item.title),
+          level: String(item.level),
+          description: item.description,
+          tag: item.tag,
+          country: item.country ?? null,
+          price: item.price,
+          currency: item.currency,
+          isFree: item.isFree,
+          hasAccess: item.hasAccess,
+          imageUrl: item.imageUrl || null,
+        }));
 
         if (!cancelled) setCourses(normalized);
       } catch (e: any) {
@@ -258,7 +223,7 @@ export default function CoursesPage() {
       }
     })();
     return () => { cancelled = true; };
-  }, [location]);
+  }, [location, countryFilter]);
 
   // --- Filtering Logic ---
   const filtered = useMemo(() => {
@@ -268,13 +233,18 @@ export default function CoursesPage() {
       
       // Filter by level
       if (levelFilter !== "all" && c.level.toLowerCase() !== levelFilter) return false;
+
+      // Filter by country
+      if (countryFilter !== "all") {
+        if (!c.country || c.country.toLowerCase() !== countryFilter.toLowerCase()) return false;
+      }
       
       // Filter by search query
       if (!query) return true;
       const q = query.toLowerCase();
       return c.title.toLowerCase().includes(q) || (c.tag || "").toLowerCase().includes(q) || (c.description || "").toLowerCase().includes(q);
     });
-  }, [courses, query, levelFilter, viewMode]);
+  }, [courses, query, levelFilter, viewMode, countryFilter]);
 
   if (loading) {
     return <CoursesLoadingAnimation />;
@@ -471,6 +441,20 @@ export default function CoursesPage() {
                 </SelectContent>
               </Select>
 
+              <Select onValueChange={(val: any) => setCountryFilter(val)} defaultValue={countryFilter}>
+                <SelectTrigger className="h-12 w-full sm:w-44 bg-zinc-900/90 backdrop-blur-xl border-zinc-800 text-white rounded-2xl">
+                  <SelectValue placeholder="Country" />
+                </SelectTrigger>
+                <SelectContent className="bg-zinc-900 border-zinc-800 text-white backdrop-blur-xl">
+                  <SelectItem value="all" className="focus:bg-violet-600">All Countries</SelectItem>
+                  {Array.from(new Set(courses.map(c => c.country).filter(Boolean))).map((country) => (
+                    <SelectItem key={String(country)} value={String(country)} className="focus:bg-violet-600">
+                      {String(country)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
               {isTeacher && (
                 <Link href="/teacher/upload">
                   <Button className="h-12 px-6 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 rounded-2xl font-semibold shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 hover:scale-105 transition-all">
@@ -487,7 +471,7 @@ export default function CoursesPage() {
           <div className="flex flex-col items-center justify-center py-32 animate-fade-in">
             <div className="text-gray-400 mb-6 text-xl">Nothing found</div>
             <Button 
-              onClick={() => { setQuery(""); setLevelFilter("all"); }}
+              onClick={() => { setQuery(""); setLevelFilter("all"); setCountryFilter("all"); }}
               className="bg-zinc-900 border border-zinc-800 text-white hover:bg-zinc-800 rounded-2xl"
             >
               Clear filters

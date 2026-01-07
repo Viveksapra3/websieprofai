@@ -1,6 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db, pool } from "./db";
 import { users, coursePricing, userPurchases, courseImages, courseIdMapping } from "@shared/schema";
+import { courses } from "./db/schema/course";
 import { eq, or, sql, and, asc } from "drizzle-orm";
 import crypto from "crypto";
 import multer from "multer";
@@ -974,45 +975,42 @@ export async function registerRoutes(app: Express): Promise<void> {
   app.get("/api/courses-with-pricing", async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = (req.session as any)?.user;
-      // Allow unauthenticated users to see pricing, but not access courses
+      const countryFilter = typeof req.query.country === "string" ? req.query.country.trim() : "";
 
-      // Get courses from external API or fallback to local
-      const apiBase = process.env.VITE_API_BASE as string | undefined;
-      let courses: any[] = [];
-
-      if (apiBase) {
-        try {
-          // Handle both absolute URLs and relative paths
-          let apiUrl: string;
-          if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
-            // Absolute URL - use as is
-            apiUrl = `${apiBase}/api/courses`;
-          } else {
-            // Relative path - convert to absolute URL using request host
-            const protocol = req.protocol || 'http';
-            const host = req.get('host') || 'localhost:5000';
-            apiUrl = `${protocol}://${host}${apiBase}/api/courses`;
-          }
-          
-          console.log(`Fetching courses from: ${apiUrl}`);
-          const response = await fetch(apiUrl);
-          const data = await response.json();
-          courses = Array.isArray(data.courses) ? data.courses : Array.isArray(data) ? data : [];
-        } catch (error) {
-          console.error("Failed to fetch courses from external API:", error);
-        }
+      let dbCourses;
+      if (countryFilter) {
+        dbCourses = await db
+          .select()
+          .from(courses)
+          .where(
+            and(
+              eq(courses.isPublished, true),
+              eq(courses.country, countryFilter)
+            )
+          )
+          .orderBy(asc(courses.order), asc(courses.createdAt));
+      } else {
+        dbCourses = await db
+          .select()
+          .from(courses)
+          .where(eq(courses.isPublished, true))
+          .orderBy(asc(courses.order), asc(courses.createdAt));
       }
 
-      // If no courses from external API, use fallback data
-      if (courses.length === 0) {
-        courses = [
-          { id: "s-101", title: "Study Skills Fundamentals", level: "Beginner", modules: 5 },
-          { id: "s-201", title: "Math with AI Tutors", level: "Intermediate", modules: 8 },
-          { id: "s-310", title: "Creative Coding with Three.js", level: "Intermediate", modules: 12 },
-          { id: "s-320", title: "Intro to Data Science", level: "Beginner", modules: 10 },
-          { id: "course_1", title: "Advanced Programming", level: "Advanced", modules: 15 },
-          { id: "course_2", title: "Machine Learning Basics", level: "Intermediate", modules: 20 }
-        ];
+      // Fallback: if no published courses found, return all matching by country (or all courses)
+      if (!dbCourses.length) {
+        if (countryFilter) {
+          dbCourses = await db
+            .select()
+            .from(courses)
+            .where(eq(courses.country, countryFilter))
+            .orderBy(asc(courses.order), asc(courses.createdAt));
+        } else {
+          dbCourses = await db
+            .select()
+            .from(courses)
+            .orderBy(asc(courses.order), asc(courses.createdAt));
+        }
       }
 
       // Get pricing information
@@ -1042,8 +1040,8 @@ export async function registerRoutes(app: Express): Promise<void> {
       const mappingMap = new Map(courseMappings.map(m => [m.newCourseId, m.oldCourseId]));
 
       // Combine course data with pricing, access info, and custom images
-      const coursesWithPricing = courses.map((course, index) => {
-        const courseId = String(course.course_id || course.id);
+      const coursesWithPricing = dbCourses.map((course, index) => {
+        const courseId = String(course.id);
         
         // Get the old course ID from mapping table for pricing/images lookup
         const oldCourseId = mappingMap.get(courseId) || courseId;
@@ -1054,7 +1052,7 @@ export async function registerRoutes(app: Express): Promise<void> {
         
         // Course is free if price is 0 or isFree flag is true
         const price = pricing?.price || "99.00";
-        const priceValue = parseFloat(price);
+        const priceValue = parseFloat(String(price));
         const isFree = pricing?.isFree || priceValue === 0;
         
         // Only grant access if user is logged in AND (course is free OR user purchased it using old course ID)
@@ -1062,16 +1060,17 @@ export async function registerRoutes(app: Express): Promise<void> {
 
         return {
           id: courseId,
-          title: course.course_title || course.title || "Untitled Course",
-          level: course.level || "Beginner",
-          description: course.description || `${course.modules || 0} modules`,
-          tag: course.tag,
+          title: course.title || "Untitled Course",
+          level: "Beginner",
+          description: course.description,
+          tag: undefined,
           price: priceValue,
           currency: pricing?.currency || "INR",
           isFree,
           hasAccess,
           displayOrder: pricing?.displayOrder || (index + 1),
           imageUrl: customImage?.imageUrl || null,
+          country: course.country || null,
         };
       });
 

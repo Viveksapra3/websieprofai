@@ -97,7 +97,7 @@ export default function EducationSuitePage() {
             </div>
             
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-              Education Suite:
+              AI Suite:
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400">
                 Powering Intelligent Learning
@@ -105,7 +105,7 @@ export default function EducationSuitePage() {
             </h1>
             
             <p className="text-lg sm:text-xl md:text-2xl text-gray-300 leading-relaxed max-w-4xl mx-auto mb-12">
-              Our comprehensive Education Suite provides powerful features for educational platforms, institutions, and EdTech startups. 
+              Our comprehensive AI Suite provides powerful features for educational platforms, institutions, and EdTech startups. 
               Access AI-powered course recommendations, progress tracking, personalized learning paths, and enterprise solutions.
             </p>
             
@@ -123,10 +123,10 @@ export default function EducationSuitePage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6">
-              What is the Education Suite?
+              What is the AI Suite?
             </h2>
             <p className="text-lg sm:text-xl text-gray-300 max-w-4xl mx-auto">
-              The ProfessorAI Education Suite is a comprehensive platform that provides educational institutions, 
+              The ProfessorAI AI Suite is a comprehensive platform that provides educational institutions, 
               EdTech startups, and enterprises with powerful AI-driven learning tools. From developer APIs to 
               enterprise products, we offer everything you need to deliver intelligent education at scale.
             </p>
@@ -782,7 +782,7 @@ await client.progress.update({
               Request API Access
             </h2>
             <p className="text-lg sm:text-xl text-gray-300 mb-4">
-              Fill out the form below to request access to our Education Suite API.
+              Fill out the form below to request access to our AI Suite API.
             </p>
             <p className="text-base text-purple-300">
               We'll review your request and provide you with complete documentation and API credentials.

@@ -140,16 +140,6 @@ export default function Navigation() {
               </button>
             </Link>
 
-            {/* About Link */}
-            <Link href="/about">
-              <button 
-                className={`${textColor} ${hoverColor} transition-colors hover:scale-110`}
-                data-testid="nav-about"
-              >
-                About
-              </button>
-            </Link>
-
             {/* AI Suite Dropdown */}
             <div className="relative group">
               <button
@@ -180,12 +170,22 @@ export default function Navigation() {
             </div>
 
             {/* Career GPT Link */}
-            <Link href="/career-gpt">
+            {/* <Link href="/career-gpt">
               <button 
                 className={`${textColor} ${hoverColor} transition-colors hover:scale-110`}
                 data-testid="nav-career-gpt"
               >
                 Career GPT
+              </button>
+            </Link> */}
+
+            {/* About Link */}
+            <Link href="/about">
+              <button 
+                className={`${textColor} ${hoverColor} transition-colors hover:scale-110`}
+                data-testid="nav-about"
+              >
+                About us
               </button>
             </Link>
 

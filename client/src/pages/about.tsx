@@ -130,7 +130,7 @@ export default function AboutPage() {
         <div className="absolute top-20 right-10 w-96 h-96 bg-gradient-to-br from-purple-200 to-blue-200 rounded-full blur-3xl opacity-20 animate-pulse-slow"></div>
         <div className="absolute bottom-10 left-10 w-[500px] h-[500px] bg-gradient-to-br from-pink-200 to-orange-200 rounded-full blur-3xl opacity-20 animate-pulse-slow"></div>
         
-        <div className="max-w-5xl mx-auto text-center relative z-10">
+        <div className="max-w-5xl mx-auto text-center relative">
           <div className="mb-8">
             <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-100 to-blue-100 rounded-full mb-8 shadow-sm">
               <Sparkles className="w-5 h-5 text-purple-600" />
@@ -138,7 +138,7 @@ export default function AboutPage() {
             </div>
             <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight">
               Transforming Education with
-              <span className="block mt-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <span className="block mt-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-normal">
                 Intelligent AI
               </span>
             </h1>

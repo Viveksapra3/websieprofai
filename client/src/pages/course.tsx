@@ -4,11 +4,41 @@ import { Button } from "@/components/ui/button";
 import { AuthNavbar } from "@/components/auth-navbar";
 import CourseContentLoadingAnimation from "@/components/CourseContentLoadingAnimation";
 
+type Topic = {
+  id?: number;
+  module_id?: number;
+  title: string;
+  content: string;
+  order_index?: number;
+  estimated_time?: string | null;
+  created_at?: string;
+};
+
+type Module = {
+  id?: number;
+  course_id?: number;
+  week?: number;
+  title: string;
+  description?: string;
+  learning_objectives?: string[];
+  order_index?: number;
+  created_at?: string;
+  topics?: Topic[];
+  sub_topics?: Topic[]; // legacy support
+};
+
 type CourseDetail = {
+  id?: string | number;
   course_id?: string | number;
+  title?: string;
   course_title?: string;
-  modules?: any; // can be number or array
   description?: string | Record<string, any>;
+  level?: string;
+  teacher_id?: number;
+  course_order?: number | null;
+  course_number?: number;
+  country?: string;
+  modules?: Module[];
   content?: any;
   [key: string]: any;
 };
@@ -115,8 +145,23 @@ export default function CoursePage() {
         if (!res.ok) throw new Error(data?.error || "Failed to load course");
 
         if (!cancelled) {
-          setCourse(data);
-          setActiveView(data);
+          // Normalize course data to handle both old and new API formats
+          const normalizedCourse = {
+            ...data,
+            // Support both 'title' and 'course_title'
+            course_title: data.course_title || data.title,
+            title: data.title || data.course_title,
+            // Normalize modules to have 'topics' array (handle both 'topics' and 'sub_topics')
+            modules: Array.isArray(data.modules) ? data.modules.map((mod: any, idx: number) => ({
+              ...mod,
+              week: mod.week ?? mod.order_index ?? idx + 1,
+              // Support both 'topics' and 'sub_topics'
+              topics: mod.topics || mod.sub_topics || [],
+              sub_topics: mod.sub_topics || mod.topics || [],
+            })) : data.modules,
+          };
+          setCourse(normalizedCourse);
+          setActiveView(normalizedCourse);
         }
       } catch (e: any) {
         if (!cancelled) setError(e?.message || "Failed to load course");
@@ -424,8 +469,8 @@ export default function CoursePage() {
                         </div>
                         <Button variant="outline" size="sm" onClick={() => setActiveView(course)}>Close</Button>
                       </div>
-                      {Array.isArray(mod.sub_topics) && mod.sub_topics.length > 0 ? (
-                        mod.sub_topics.map((st: any, i: number) => (
+                      {(Array.isArray(mod.topics) && mod.topics.length > 0) || (Array.isArray(mod.sub_topics) && mod.sub_topics.length > 0) ? (
+                        (mod.topics || mod.sub_topics).map((st: any, i: number) => (
                           <div key={i} className="mt-6 p-6 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
                             <h3 className="text-2xl font-semibold text-blue-700 mb-4">{st.title}</h3>
                             <div
@@ -481,7 +526,7 @@ export default function CoursePage() {
             <Button variant="outline" size="sm" onClick={() => setActiveView(course)}>Close</Button>
           </div>
         </div>
-        {mod.sub_topics.map((st: any, i: number) => (
+        {(mod.topics || mod.sub_topics || []).map((st: any, i: number) => (
           <div key={i} className="mt-6 p-6 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
             <h3 className="text-2xl font-semibold text-blue-700 mb-4">{st.title}</h3>
             <div className="prose max-w-none text-gray-800" dangerouslySetInnerHTML={{ __html: formatContent(typeof st.content === "string" ? st.content : JSON.stringify(st.content ?? {}, null, 2)) }} />
@@ -534,8 +579,8 @@ export default function CoursePage() {
         </header>
 
         <div id="mainContent" className="flex-1 p-8 overflow-y-auto">
-          {activeView && activeView.course_title && Array.isArray(activeView.modules) && renderCourseOverview()}
-          {activeView && Array.isArray(activeView.sub_topics) && renderModuleFull(activeView)}
+          {activeView && (activeView.course_title || activeView.title) && Array.isArray(activeView.modules) && renderCourseOverview()}
+          {activeView && (Array.isArray(activeView.topics) || Array.isArray(activeView.sub_topics)) && renderModuleFull(activeView)}
           {activeView && !activeView.course_title && !Array.isArray(activeView.sub_topics) && (
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="flex justify-between items-center mb-6">

@@ -45,9 +45,43 @@ export default function CoursesPage() {
   const [query, setQuery] = useState("");
   const [levelFilter, setLevelFilter] = useState<"all" | "beginner" | "intermediate" | "advanced">("all");
   const [viewMode, setViewMode] = useState<"all" | "my-courses">("all");
-  const [countryFilter, setCountryFilter] = useState<string>("all");
 
-  // Get course type from URL parameters
+  // Initialize country filter from ?country= URL param (e.g. India, USA) so
+  // navbar links like /courses?country=India work out of the box.
+  const [countryFilter, setCountryFilter] = useState<string>(() => {
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = params.get("country");
+    return fromUrl && fromUrl.trim() ? fromUrl.trim() : "all";
+  });
+
+  // Sync countryFilter with URL when location/search changes (e.g., clicking navbar links)
+  // We need to track window.location.search since wouter's location only gives pathname
+  const [searchString, setSearchString] = useState(window.location.search);
+
+  useEffect(() => {
+    // Update search string when location changes (wouter navigation)
+    setSearchString(window.location.search);
+  }, [location]);
+
+  useEffect(() => {
+    // Listen for popstate (browser back/forward) and manual URL changes
+    const handleLocationChange = () => {
+      setSearchString(window.location.search);
+    };
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchString);
+    const fromUrl = params.get("country");
+    const newFilter = fromUrl && fromUrl.trim() ? fromUrl.trim() : "all";
+    if (newFilter !== countryFilter) {
+      setCountryFilter(newFilter);
+    }
+  }, [searchString]);
+
+  // Get course type from URL parameters (legacy)
   const urlParams = new URLSearchParams(window.location.search);
   const courseType = urlParams.get('type');
 

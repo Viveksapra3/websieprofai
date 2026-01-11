@@ -280,6 +280,7 @@ export default function TeacherUploadPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isTeacher, setIsTeacher] = useState(false);
   const [courseName, setCourseName] = useState("");
+  const [country, setCountry] = useState("India");
   const [files, setFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -410,13 +411,14 @@ export default function TeacherUploadPage() {
       if (files.length === 0) throw new Error("Please select at least one PDF file");
       if (!courseName.trim()) throw new Error("Please enter a course name");
 
-      // Create FormData and append files + course_title + priority
+      // Create FormData and append files + course_title + country + priority
       const fd = new FormData();
       files.forEach((f) => {
         // key "files" used in your HTML sample
         fd.append("files", f, f.name);
       });
       fd.append("course_title", courseName.trim());
+      fd.append("country", country.trim());
       fd.append("priority", "1");
 
       // Prepare abort controller
@@ -557,6 +559,21 @@ export default function TeacherUploadPage() {
                   value={courseName}
                   onChange={(e) => setCourseName(e.target.value)}
                   placeholder="e.g., Deep Learning 101"
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="country" className="text-gray-900">
+                  Country
+                </Label>
+                <Input
+                  id="country"
+                  name="country"
+                  className="bg-white border border-gray-300 text-gray-900"
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  placeholder="e.g., India, USA, UK"
                   required
                 />
               </div>

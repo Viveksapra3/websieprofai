@@ -100,33 +100,28 @@ export default function Navigation() {
                 Learn
                 <ChevronDown className="w-4 h-4 ml-1 transition-transform duration-200 group-hover:rotate-180" />
               </button>
-              
+
               {/* Learn Dropdown Menu */}
               <div className="absolute top-full left-0 mt-2 w-56 bg-black/90 backdrop-blur-md 
                 rounded-lg shadow-2xl border border-white/20 overflow-hidden z-50 
                 opacity-0 invisible group-hover:opacity-100 group-hover:visible 
                 transition-all duration-300">
-                
-                <Link href="/courses?type=undergrad">
+
+                <a href="/courses?country=INDIA">
                   <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer border-b border-white/10">
-                    <div className="text-white font-semibold">Undergrad Courses</div>
+                    <div className="text-white font-semibold">Indian Courses</div>
                   </div>
-                </Link>
-                <Link href="/courses?type=high-school">
+                </a>
+                <a href="/courses?country=America">
                   <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer border-b border-white/10">
-                    <div className="text-white font-semibold">High School Courses</div>
+                    <div className="text-white font-semibold">American Courses</div>
                   </div>
-                </Link>
-                <Link href="/courses?type=skill-development">
-                  <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer border-b border-white/10">
-                    <div className="text-white font-semibold">Skill Development</div>
-                  </div>
-                </Link>
-                <Link href="/courses">
+                </a>
+                <a href="/courses">
                   <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer">
                     <div className="text-white font-semibold">All Courses</div>
                   </div>
-                </Link>
+                </a>
               </div>
             </div>
 
@@ -329,26 +324,21 @@ export default function Navigation() {
             {/* Mobile Learn Section */}
             <div className="border-b border-white/20 pb-2 mb-2">
               <div className="text-white font-semibold mb-2">Learn</div>
-              <Link href="/courses?type=undergrad">
+              <a href="/courses?country=INDIA">
                 <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
-                  Undergrad Courses
+                  Indian Courses
                 </button>
-              </Link>
-              <Link href="/courses?type=high-school">
+              </a>
+              <a href="/courses?country=America">
                 <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
-                  High School Courses
+                  American Courses
                 </button>
-              </Link>
-              <Link href="/courses?type=skill-development">
-                <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
-                  Skill Development
-                </button>
-              </Link>
-              <Link href="/courses">
+              </a>
+              <a href="/courses">
                 <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
                   All Courses
                 </button>
-              </Link>
+              </a>
             </div>
 
             {/* Mobile How it works Link */}

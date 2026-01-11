@@ -3,6 +3,7 @@ import { db, pool } from "./db";
 import { users, coursePricing, userPurchases, courseImages, courseIdMapping } from "@shared/schema";
 import { courses } from "./db/schema/course";
 import { eq, or, sql, and, asc } from "drizzle-orm";
+import { Pool as PgPool } from "pg";
 import crypto from "crypto";
 import multer from "multer";
 import path from "path";
@@ -28,6 +29,21 @@ function verifyPassword(password: string, stored: string): boolean {
   const derived = crypto.scryptSync(password, salt, 64);
   return crypto.timingSafeEqual(hashBuffer, derived);
 }
+
+// Optional external courses database (DATABASE_URL2) used for authoritative
+// course catalog; pricing & purchases still come from the primary DATABASE_URL.
+const externalCoursesPool = process.env.DATABASE_URL2
+  ? new PgPool({
+      connectionString: process.env.DATABASE_URL2,
+      ssl: false,
+    })
+  : null;
+
+// In-memory cache for courses from DATABASE_URL2
+// Key: country filter (empty string for all), Value: { data: rows, timestamp }
+// Cache is permanent until manually cleared (no TTL)
+type ExternalCoursesCacheEntry = { data: any[]; timestamp: number };
+const externalCoursesCache = new Map<string, ExternalCoursesCacheEntry>();
 
 // Helper function to get old course ID from new course ID using mapping table
 async function getOldCourseId(newCourseId: string): Promise<string> {
@@ -297,53 +313,45 @@ export async function registerRoutes(app: Express): Promise<void> {
     return res.json({ message: "Saved", additionalInfo: (req.session as any).additionalInfo });
   });
 
-  // COURSES: derive available courses using session details (simple demo rules)
-  app.post("/api/courses", (req: Request, res: Response) => {
-    const user = (req.session as any)?.user;
-    if (!user) return res.status(401).json({ error: "Not authenticated" });
-    const info = (req.session as any)?.additionalInfo || {};
-
-    const role = String(user.role || "student").toLowerCase();
-    const org = String(info.organization || "").toLowerCase();
-    const bio = String(info.bio || "").toLowerCase();
-
-    // Load uploaded courses from disk
-    const uploaded = readUploadedCourses();
-
-    // Map uploaded courses to client-facing shape
-    const mapCourse = (c: any) => ({
-      id: c.id,
-      title: c.title,
-      level: c.level || "Beginner",
-      tag: c.teacherId ? "uploaded" : undefined,
-      description: c.file?.originalName ? `Uploaded file: ${c.file.originalName}` : undefined,
-      image: undefined as string | undefined,
-    });
-
-    let courses: Array<{ id: string; title: string; level: string; tag?: string; description?: string; image?: string }> = [];
-
-    if (role === "teacher") {
-      // Show only the teacher's own uploads
-      const mine = uploaded.filter((c) => String(c.teacherId) === String(user.id)).map(mapCourse);
-      courses = mine;
-    } else {
-      // Students see ALL uploaded courses (from all teachers)
-      const allUploads = uploaded.map(mapCourse);
-      // Keep some sample courses as well (optional)
-      const samples: Array<{ id: string; title: string; level: string; tag?: string }> = [
-        { id: "s-101", title: "Study Skills Fundamentals", level: "Beginner" },
-        { id: "s-201", title: "Math with AI Tutors", level: "Intermediate" },
-      ];
-      if (bio.includes("art") || org.includes("design")) {
-        samples.push({ id: "s-310", title: "Creative Coding with Three.js", level: "Intermediate", tag: "interest" });
+  // GET /api/courses - Fetch all courses from external API
+  app.get("/api/courses", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const apiBase = process.env.VITE_API_BASE as string | undefined;
+      if (!apiBase) {
+        return res.status(500).json({ error: "External API base not configured (VITE_API_BASE)" });
       }
-      if (bio.includes("data") || org.includes("analytics")) {
-        samples.push({ id: "s-320", title: "Intro to Data Science", level: "Beginner", tag: "interest" });
+
+      // Build external API URL
+      let apiUrl: string;
+      if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
+        apiUrl = `${apiBase}/api/courses`;
+      } else {
+        const protocol = req.protocol || 'http';
+        const host = req.get('host') || 'localhost:5000';
+        const base = apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase;
+        apiUrl = `${protocol}://${host}${base}/api/courses`;
       }
-      courses = [...allUploads, ...samples];
+
+      // Add query parameters if present (e.g., country filter)
+      const queryParams = new URLSearchParams(req.query as any);
+      if (queryParams.toString()) {
+        apiUrl += `?${queryParams.toString()}`;
+      }
+
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      const data = await response.json().catch(() => null);
+      if (!response.ok) {
+        return res.status(response.status).json(data || { error: `Failed (${response.status})` });
+      }
+
+      return res.json(data);
+    } catch (err) {
+      next(err);
     }
-
-    return res.json({ courses });
   });
 
   // SIGNUP
@@ -977,40 +985,81 @@ export async function registerRoutes(app: Express): Promise<void> {
       const user = (req.session as any)?.user;
       const countryFilter = typeof req.query.country === "string" ? req.query.country.trim() : "";
 
-      let dbCourses;
-      if (countryFilter) {
-        dbCourses = await db
-          .select()
-          .from(courses)
-          .where(
-            and(
-              eq(courses.isPublished, true),
-              eq(courses.country, countryFilter)
-            )
-          )
-          .orderBy(asc(courses.order), asc(courses.createdAt));
-      } else {
-        dbCourses = await db
-          .select()
-          .from(courses)
-          .where(eq(courses.isPublished, true))
-          .orderBy(asc(courses.order), asc(courses.createdAt));
+      // Base course list can come from an external courses database (DATABASE_URL2)
+      // if configured. Pricing, purchases, images still come from the primary DB.
+      let baseCourses: any[] = [];
+
+      if (externalCoursesPool) {
+        // Check cache first (keyed by lowercase country filter)
+        const cacheKey = countryFilter.toLowerCase();
+        const cached = externalCoursesCache.get(cacheKey);
+        
+        if (cached) {
+          // Use cached data
+          baseCourses = cached.data;
+          console.log(`[Cache] Using cached courses for country="${cacheKey}" (${baseCourses.length} courses)`);
+        } else {
+          // Build query against external courses table
+          const values: any[] = [];
+          let whereSql = "";
+          if (countryFilter) {
+            // Match country in a case-insensitive way so values like INDIA/America
+            // work regardless of how the filter is cased in the query string.
+            whereSql = "WHERE LOWER(country) = LOWER($1)";
+            values.push(countryFilter);
+          }
+
+          const orderSql = "ORDER BY course_order NULLS LAST, id";
+          const sqlText = `SELECT * FROM courses ${whereSql} ${orderSql}`;
+          const result = await externalCoursesPool.query(sqlText, values);
+          baseCourses = result.rows;
+          
+          // Store in cache permanently
+          externalCoursesCache.set(cacheKey, { data: baseCourses, timestamp: Date.now() });
+          console.log(`[Cache] Stored courses for country="${cacheKey}" (${baseCourses.length} courses)`);
+        }
       }
 
-      // Fallback: if no published courses found, return all matching by country (or all courses)
-      if (!dbCourses.length) {
+      // Fallback to local Drizzle-managed courses table if external DB is not
+      // configured or returned no rows.
+      if (!externalCoursesPool || baseCourses.length === 0) {
+        let dbCourses;
         if (countryFilter) {
           dbCourses = await db
             .select()
             .from(courses)
-            .where(eq(courses.country, countryFilter))
+            .where(
+              and(
+                eq(courses.isPublished, true),
+                eq(courses.country, countryFilter)
+              )
+            )
             .orderBy(asc(courses.order), asc(courses.createdAt));
         } else {
           dbCourses = await db
             .select()
             .from(courses)
+            .where(eq(courses.isPublished, true))
             .orderBy(asc(courses.order), asc(courses.createdAt));
         }
+
+        // Fallback: if no published courses found, return all matching by country (or all courses)
+        if (!dbCourses.length) {
+          if (countryFilter) {
+            dbCourses = await db
+              .select()
+              .from(courses)
+              .where(eq(courses.country, countryFilter))
+              .orderBy(asc(courses.order), asc(courses.createdAt));
+          } else {
+            dbCourses = await db
+              .select()
+              .from(courses)
+              .orderBy(asc(courses.order), asc(courses.createdAt));
+          }
+        }
+
+        baseCourses = dbCourses;
       }
 
       // Get pricing information
@@ -1040,7 +1089,7 @@ export async function registerRoutes(app: Express): Promise<void> {
       const mappingMap = new Map(courseMappings.map(m => [m.newCourseId, m.oldCourseId]));
 
       // Combine course data with pricing, access info, and custom images
-      const coursesWithPricing = dbCourses.map((course, index) => {
+      const coursesWithPricing = baseCourses.map((course, index) => {
         const courseId = String(course.id);
         
         // Get the old course ID from mapping table for pricing/images lookup

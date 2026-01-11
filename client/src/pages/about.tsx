@@ -49,7 +49,7 @@ export default function AboutPage() {
   const leadershipTeam = [
     {
       name: "Rohit Verma",
-      role: "Founder & CEO",
+      role: "CEO",
       vectorImage: "assets-ghibli/rohit-sir-ghibli.png",
       image: "rohit-verma-image.jpeg",
       bio: "CEO of Aalgorix, leading innovation at the intersection of Artificial Intelligence, immersive technologies, and future-ready skill development.",
@@ -130,22 +130,20 @@ export default function AboutPage() {
         <div className="absolute top-20 right-10 w-96 h-96 bg-gradient-to-br from-purple-200 to-blue-200 rounded-full blur-3xl opacity-20 animate-pulse-slow"></div>
         <div className="absolute bottom-10 left-10 w-[500px] h-[500px] bg-gradient-to-br from-pink-200 to-orange-200 rounded-full blur-3xl opacity-20 animate-pulse-slow"></div>
         
-        <div className="max-w-5xl mx-auto text-center relative z-10">
+        <div className="max-w-5xl mx-auto text-center relative">
           <div className="mb-8">
             <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-100 to-blue-100 rounded-full mb-8 shadow-sm">
               <Sparkles className="w-5 h-5 text-purple-600" />
               <span className="text-sm font-semibold text-purple-700">About ProfessorsAI</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight">
-              Transforming Education with
-              <span className="block mt-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                Intelligent AI
+            <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+              Building AI that runs on a system of
+              <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-normal">
+                Judgements & Reasons
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-12">
-              ProfessorsAI uses artificial intelligence to deliver personalized learning experiences 
-              for every student. We believe every learner deserves adaptive, intelligent tutoring that 
-              understands their unique needs, pace, and learning style.
+            <p className="text-l md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-12">
+              ProfessorsAI uses artificial intelligence to deliver personalized learning experiences for every Student/Learner. Here AI is not a smart Chatbot but an entire organisation which is based on fine judgement in a precise way.with its advanced core design principles.
             </p>
             <Link href="/courses">
               <Button className="px-10 py-7 text-lg font-semibold bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl">
@@ -165,30 +163,23 @@ export default function AboutPage() {
             <div className="relative group">
               <Card className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-purple-50 to-blue-50">
                 <CardContent className="p-0">
-                  <div className="flex flex-col sm:flex-row gap-8 p-8">
+                  <div className="flex flex-col lg:flex-row items-center text-center lg:text-left gap-6 lg:gap-8 p-8 lg:p-8">
                     {/* Circular Image */}
-                    <div className="relative flex-shrink-0 mx-auto sm:mx-0">
+                    <div className="relative flex-shrink-0 lg:mx-0">
                       <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-full opacity-20 group-hover:opacity-30 blur-sm transition-all duration-500"></div>
                       <img 
                         src="rohit-verma-image.jpeg"
                         alt="Founder"
-                        className="relative w-48 h-48 sm:w-56 sm:h-56 rounded-full object-cover shadow-lg border-4 border-white"
+                        className="relative w-40 h-40 lg:w-56 lg:h-56 rounded-full object-cover shadow-lg border-4 border-white"
                       />
                     </div>
                     
                     {/* Info */}
-                    <div className="flex flex-col justify-center">
+                    <div className="flex flex-col lg:justify-center">
                       <div className="mb-5">
-                        <h3 className="text-3xl font-bold text-gray-900 mb-2">Rohit Verma</h3>
-                        <p className="text-base font-semibold text-purple-600 uppercase tracking-wide mb-4">CEO, Aalgorix</p>
-                        {/* <div className="flex flex-wrap gap-2">
-                          <div className="px-4 py-1.5 bg-white/80 rounded-full text-sm font-medium text-gray-700"></div>
-                          <div className="px-4 py-1.5 bg-white/80 rounded-full text-sm font-medium text-gray-700">AI Researcher</div>
-                        </div> */}
+                        <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">Rohit Verma</h3>
+                        <p className="text-sm lg:text-base font-semibold text-purple-600 uppercase tracking-wide mb-4">CEO, Aalgorix</p>
                       </div>
-                      <p className="text-base text-gray-600 leading-relaxed">
-                        {/* 20+ years in AI research and education, passionate about democratizing learning through technology. */}
-                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -197,7 +188,7 @@ export default function AboutPage() {
 
             {/* Story Content */}
             <div>
-              <div className="mb-6">
+              <div className="mb-6 text-center lg:text-left">
                 <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
                   <span className="block mt-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                     Our Story
@@ -207,41 +198,16 @@ export default function AboutPage() {
               
               <div className="space-y-5 text-base text-gray-700 leading-relaxed">
                 <p>
-                  As we reflect on the year gone by, I am proud of the
-                  progress Aalgorix has made in advancing intelligent,
-                  immersive, and future-ready learning solutions. This year
-                  marked an important phase in our journey as we
-                  continued to strengthen our capabilities at the
-                  intersection of Artificial Intelligence, immersive
-                  technologies, and skill development.
+                  This is our 11th year into business. As we reflect on the years gone by, I am proud of the progress Aalgorix has made in advancing intelligent, immersive, and future-ready learning solutions. This year marked an important phase in our journey as we continued to strengthen our capabilities at the intersection of Artificial Intelligence, immersive technologies, and skill development.
                 </p>
                 <p>
-                  The rapid evolution of AI and emerging technologies is
-                  reshaping how people learn, work, and adapt. At
-                  Aalgorix, our focus has remained clear — to build
-                  responsible, scalable, and outcome-driven platforms
-                  that empower learners, educators, and enterprises to
-                  stay relevant in a fast-changing digital economy.
-                  Through continuous innovation, strategic collaborations,
-                  and a strong emphasis on practical application, we have
-                  worked to bridge the gap between education and
-                  industry readiness.
+                  The rapid evolution of AI and emerging technologies is reshaping how people learn, work, and adapt. At Aalgorix, our focus has remained clear — to build responsible, scalable, and outcome-driven platforms that empower learners, educators, and enterprises to stay relevant in a fast-changing AI Led economy. Through continuous innovation, strategic collaborations, and a strong emphasis on practical application, we have worked to bridge the gap between education and industry readiness.
                 </p>
                 <p>
-                  Our progress would not have been possible without the
-                  trust of our partners, institutions, clients, and the
-                  dedication of our team. Their commitment and belief in
-                  our vision continue to inspire us to raise the bar in
-                  everything we do.
+                  Our progress would not have been possible without the trust of our mentors,  partners, institutions, and the dedication of our team. Their commitment and belief in our vision continue to inspire us to raise the bar in everything we do.
                 </p>
                 <p>
-                  As we look ahead, Aalgorix remains committed to driving
-                  meaningful impact by enabling future-ready skills,
-                  immersive learning experiences, and intelligent AI-
-                  powered systems. We are confident that the foundation
-                  we have built will allow us to contribute significantly to
-                  India’s digital and innovation-led growth while creating
-                  long-term value for all our stakeholders.
+                  As we look ahead, Aalgorix remains committed to driving meaningful impact by enabling future-ready skills, immersive learning experiences, and intelligent AI- powered systems. We are confident that the foundation we have built will allow us to contribute significantly to India’s digital and innovation-led growth while creating long-term value for all our stakeholders.
                 </p>
               </div>
 
@@ -251,8 +217,8 @@ export default function AboutPage() {
                   <Quote className="w-10 h-10" />
                 </div>
                 <div className="border-l-4 border-purple-600 pl-6">
-                  <blockquote className="italic text-gray-600 text-md leading-relaxed">
-                    "Every student deserves a teacher who truly understands them. AI makes that possible at scale."
+                  <blockquote className="italic text-gray-600 text-sm md:text-md leading-relaxed">
+                    "Theory can best be learnt with Digital Twins of Instructors and Practicals at Labs. Learning will see a fundamental shift from Industrial era teaching methods."
                   </blockquote>
                   <p className="mt-3 text-base font-semibold text-gray-900">— Rohit Verma</p>
                 </div>
@@ -275,7 +241,7 @@ export default function AboutPage() {
           </div>
 
           <div className="max-w-4xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-5">
             {leadershipTeam.map((member, index) => (
               <div 
                 key={index} 
@@ -287,7 +253,7 @@ export default function AboutPage() {
                 <Card className="relative bg-white rounded-2xl overflow-hidden border-0 shadow-lg group-hover:shadow-2xl transition-all duration-500 h-full flex flex-col">
                   <CardContent className="p-0 flex flex-col h-full">
                     {/* Image Container with Vector to Photo Transition */}
-                    <div className="relative overflow-hidden aspect-square flex-shrink-0">
+                    <div className="relative overflow-hidden aspect-square flex-shrink-0 max-h-[200px] md:max-h-none">
                       {/* Animated gradient background */}
                       <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100 animate-pulse-slow"></div>
                       
@@ -309,11 +275,11 @@ export default function AboutPage() {
                       <div className="absolute inset-0 bg-gradient-to-t from-purple-900/80 via-purple-900/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       
                       {/* Name & Role Overlay - Appears on Hover */}
-                      <div className="absolute inset-x-0 bottom-0 p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-10">
-                        <h3 className="text-xl font-bold text-white mb-1 drop-shadow-lg">
+                      <div className="absolute inset-x-0 bottom-0 p-3 md:p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500 z-10">
+                        <h3 className="text-sm md:text-xl font-bold text-white mb-1 drop-shadow-lg">
                           {member.name}
                         </h3>
-                        <p className="text-sm font-medium text-purple-200">
+                        <p className="text-xs md:text-sm font-medium text-purple-200">
                           {member.role}
                         </p>
                       </div>
@@ -321,26 +287,26 @@ export default function AboutPage() {
                       {/* LinkedIn Icon - Top Right Corner */}
                       <a 
                         href={member.linkedin}
-                        className="absolute top-4 right-4 p-2.5 bg-white/95 backdrop-blur-sm hover:bg-white rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 transform scale-0 group-hover:scale-100 hover:scale-110 shadow-lg z-10"
+                        className="absolute top-2 right-2 md:top-4 md:right-4 p-1.5 md:p-2.5 bg-white/95 backdrop-blur-sm hover:bg-white rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 transform scale-0 group-hover:scale-100 hover:scale-110 shadow-lg z-10"
                         aria-label="LinkedIn"
                       >
-                        <Linkedin className="w-4 h-4 text-blue-600" />
+                        <Linkedin className="w-3 h-3 md:w-4 md:h-4 text-blue-600" />
                       </a>
                     </div>
 
                     {/* Content - Minimalist Design */}
-                    <div className="p-5 bg-gradient-to-br from-gray-50 to-white">
-                      <div className="flex items-start justify-between mb-3">
+                    <div className="p-3 md:p-5 bg-gradient-to-br from-gray-50 to-white">
+                      <div className="flex items-start justify-between mb-2 md:mb-3">
                         <div className="flex-1">
-                          <h3 className="text-lg font-bold text-gray-900 mb-0.5 group-hover:text-purple-600 transition-colors line-clamp-1">
+                          <h3 className="text-s md:text-lg font-bold text-gray-900 mb-0.5 group-hover:text-purple-600 transition-colors line-clamp-1">
                             {member.name}
                           </h3>
-                          <p className="text-xs font-semibold text-purple-600 uppercase tracking-wide">
+                          <p className="text-[13px] md:text-xs font-semibold text-purple-600 uppercase tracking-wide">
                             {member.role}
                           </p>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+                      <p className="text-[12px]  md:text-sm text-gray-600 leading-relaxed line-clamp-2 md:line-clamp-3">
                         {member.bio}
                       </p>
                     </div>

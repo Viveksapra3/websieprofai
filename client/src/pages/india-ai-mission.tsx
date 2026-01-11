@@ -140,14 +140,14 @@ const COURSE_DETAILS = [
 ];
 
 const PARTNER_LOGOS = [
-  { name: "MeitY", src: "http://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/meity-logo_1.webp" },
-  { name: "IT-ITeS SSC", src: "http://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/IT-ITeS-SSC-logo_03.webp" },
-  { name: "C-DAC", src: "http://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/c-dac-logo_1.webp" },
-  { name: "NIELIT", src: "http://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/nielit-logo_1.webp" },
-  { name: "Skill India", src: "http://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/skill-india-logo_1.webp" },
-  { name: "AICTE", src: "http://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/aicte-logo_1.webp" },
-  { name: "NSDC", src: "http://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/nsdc-logo_1.webp" },
-  { name: "CII", src: "http://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/CII-Logo.webp" },
+  { name: "MeitY", src: "https://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/meity-logo_1.webp" },
+  { name: "IT-ITeS SSC", src: "https://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/IT-ITeS-SSC-logo_03.webp" },
+  { name: "C-DAC", src: "https://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/c-dac-logo_1.webp" },
+  { name: "NIELIT", src: "https://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/nielit-logo_1.webp" },
+  { name: "Skill India", src: "https://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/skill-india-logo_1.webp" },
+  { name: "AICTE", src: "https://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/aicte-logo_1.webp" },
+  { name: "NSDC", src: "https://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/nsdc-logo_1.webp" },
+  { name: "CII", src: "https://www.futureskillsprime.in/per/g10/pub/32914/iDH/instance/1/template/5/final/image/CII-Logo.webp" },
 ];
 
 export default function IndiaAIMissionPage() {
@@ -450,7 +450,7 @@ export default function IndiaAIMissionPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-center">
-              <div>
+              <div className="text-center md:text-left">
                 <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3 sm:mb-4">About IndiaAI Mission</h2>
                 <p className="text-sm sm:text-base text-gray-300 mb-3 sm:mb-4">
                   The IndiaAI Mission is a flagship initiative by the Government of India aimed at democratizing AI education and building a skilled workforce capable of driving India's AI revolution.
@@ -458,7 +458,7 @@ export default function IndiaAIMissionPage() {
                 <p className="text-sm sm:text-base text-gray-300 mb-4 sm:mb-6">
                   This comprehensive program covers everything from AI fundamentals to advanced applications, with a special focus on solving India-specific challenges across healthcare, agriculture, governance, and more.
                 </p>
-                <div className="space-y-2 sm:space-y-3">
+                <div className="space-y-2 sm:space-y-3 inline-block md:block text-left">
                   <div className="flex items-center gap-2 sm:gap-3">
                     <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-orange-500/20 flex items-center justify-center flex-shrink-0">
                       <Star className="h-3 w-3 sm:h-4 sm:w-4 text-orange-400" />
@@ -479,8 +479,8 @@ export default function IndiaAIMissionPage() {
                   </div>
                 </div>
               </div>
-              <div className="relative">
-                <div className="aspect-video rounded-xl sm:rounded-2xl bg-gradient-to-br from-orange-500/20 via-gray-800 to-green-500/20 border border-gray-700 flex items-center justify-center">
+              <div className="relative flex justify-center md:justify-end">
+                <div className="aspect-video w-full max-w-md rounded-xl sm:rounded-2xl bg-gradient-to-br from-orange-500/20 via-gray-800 to-green-500/20 border border-gray-700 flex items-center justify-center">
                   <div className="text-center p-4">
                     <img 
                       src={INDIA_AI_LOGO} 

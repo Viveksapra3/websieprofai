@@ -26,17 +26,18 @@ const socialLinks = [
 export default function Footer() {
   return (
     <footer className="bg-black text-white py-8 rounded-t-sm" data-testid="footer">
-      <div className="max-w-7xl mx-auto sm:px-6 lg:px-0">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div data-testid="footer-brand">
-            <div className="flex items-center mb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Brand Section - Full Width on Mobile */}
+        <div className="mb-8">
+          <div data-testid="footer-brand" className="text-center md:text-left">
+            <div className="flex items-center mb-4 justify-center md:justify-start">
               <Brain className="text-accent text-2xl w-8 h-8 mr-3" />
               <span className="text-2xl font-bold">ProfessorsAI</span>
             </div>
-            <p className="text-gray-300 mb-6">
+            <p className="text-gray-300 mb-4 text-sm md:text-base">
               Transforming education through intelligent, conversational AI that adapts to every learner's unique needs.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 justify-center md:justify-start">
               {socialLinks.map((social, index) => {
                 const IconComponent = social.icon;
                 return (
@@ -53,11 +54,14 @@ export default function Footer() {
               })}
             </div>
           </div>
-          
+        </div>
+
+        {/* Footer Sections - 2 Columns on Mobile, 3 Columns on Desktop */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 mb-8">
           {footerSections.map((section, index) => (
-            <div key={index} data-testid={`footer-section-${section.title.toLowerCase().replace(' ', '-')}`}>
-              <h4 className="text-lg font-semibold mb-6">{section.title}</h4>
-              <ul className="space-y-3">
+            <div key={index} data-testid={`footer-section-${section.title.toLowerCase().replace(' ', '-')}`} className="text-center md:text-left">
+              <h4 className="text-base md:text-lg font-semibold mb-3 md:mb-4">{section.title}</h4>
+              <ul className="space-y-2 md:space-y-3 text-xs md:text-sm">
                 {section.links.map((link, linkIndex) => (
                   <li key={linkIndex}>
                     <a 
@@ -77,9 +81,9 @@ export default function Footer() {
         {/* Suggestion Link */}
         <div className="border-t border-gray-700 py-6 mb-4">
           <Link href="/suggestions">
-            <div className="flex items-center justify-center gap-2 text-gray-300 hover:text-white transition-colors cursor-pointer group">
-              <Globe className="h-5 w-5 text-purple-400 group-hover:text-purple-300" />
-              <span className="text-sm">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-2 text-gray-300 hover:text-white transition-colors cursor-pointer group px-4">
+              <Globe className="h-5 w-5 text-purple-400 group-hover:text-purple-300 flex-shrink-0" />
+              <span className="text-xs md:text-sm text-center md:text-left">
                 Can't find your country or syllabus or want to suggest improvements? <span className="text-purple-400 group-hover:text-purple-300 font-medium underline underline-offset-2">Drop us a line.</span>
               </span>
             </div>
@@ -87,8 +91,9 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-700 text-center pt-6" data-testid="footer-bottom">
-          <p className="text-gray-400" >
-            © 2025 ProfessorsAI. All rights reserved @iPredictt Data Labs Pvt. Ltd.| {' '}
+          <p className="text-gray-400 text-xs md:text-sm px-4" >
+            © 2025 ProfessorsAI. All rights reserved @iPredictt Data Labs Pvt. Ltd.{' '}
+            <span className="block md:inline mt-2 md:mt-0">| {' '}
             <a href="#" className="hover:text-white transition-colors" data-testid="link-privacy">
               Privacy Policy
             </a>{' '}
@@ -96,6 +101,7 @@ export default function Footer() {
             <a href="#" className="hover:text-white transition-colors" data-testid="link-terms">
               Terms of Service
             </a>
+            </span>
           </p>
         </div>
       </div>

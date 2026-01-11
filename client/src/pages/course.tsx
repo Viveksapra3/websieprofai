@@ -313,7 +313,8 @@ export default function CoursePage() {
         id: authData.user?.id,
         username: authData.user?.username,
         email: authData.user?.email,
-        role: authData.user?.role
+        role: authData.user?.role,
+        user_number: authData.user?.user_number
       };
       
       // Create a session token from the current session data

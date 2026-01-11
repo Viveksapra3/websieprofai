@@ -73,6 +73,79 @@ export async function registerRoutes(app: Express): Promise<void> {
     res.json({ status: "ok", message: "API is running" });
   });
 
+  // Admin Login (direct database authentication)
+  app.post("/api/admin/login", async (req: Request, res: Response) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+
+      // Find user by email
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.email, email))
+        .limit(1);
+
+      if (!user) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      // Check if user is admin
+      if (user.role !== 'admin') {
+        return res.status(403).json({ error: "Access denied. Admin privileges required." });
+      }
+
+      // Verify password (handle both old SHA256 and new scrypt formats)
+      let passwordValid = false;
+      if (user.password.includes(':')) {
+        // New scrypt format
+        passwordValid = verifyPassword(password, user.password);
+      } else {
+        // Old SHA256 format
+        const sha256Hash = crypto.createHash("sha256").update(password).digest("hex");
+        passwordValid = user.password === sha256Hash;
+      }
+
+      if (!passwordValid) {
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      // Create session
+      (req.session as any).adminUser = {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        role: user.role
+      };
+
+      res.json({
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          role: user.role
+        }
+      });
+    } catch (error) {
+      console.error('[Admin Login] Error:', error);
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  // Admin Session Check
+  app.get("/api/admin/session", (req: Request, res: Response) => {
+    const adminUser = (req.session as any)?.adminUser;
+    if (adminUser) {
+      res.json({ authenticated: true, user: adminUser });
+    } else {
+      res.json({ authenticated: false });
+    }
+  });
+
   // Database health check with performance metrics
   app.get("/api/health/db", async (_req: Request, res: Response) => {
     const start = Date.now();
@@ -274,13 +347,31 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // SESSION: return current authenticated user from session cookie
-  app.get("/api/session", (req: Request, res: Response) => {
+  app.get("/api/session", async (req: Request, res: Response) => {
     const user = (req.session as any)?.user;
     const additionalInfo = (req.session as any)?.additionalInfo;
     if (!user) {
       return res.status(401).json({ authenticated: false });
     }
-    return res.json({ authenticated: true, user, additionalInfo });
+    
+    // Fetch user_number from database
+    try {
+      const [dbUser] = await db
+        .select({ user_number: sql`user_number` })
+        .from(users)
+        .where(eq(users.id, user.id))
+        .limit(1);
+      
+      const userWithNumber = {
+        ...user,
+        user_number: dbUser?.user_number || null
+      };
+      
+      return res.json({ authenticated: true, user: userWithNumber, additionalInfo });
+    } catch (err) {
+      // If fetching user_number fails, return user without it
+      return res.json({ authenticated: true, user, additionalInfo });
+    }
   });
 
   // LOGOUT: destroy session and clear cookie

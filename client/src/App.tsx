@@ -33,6 +33,10 @@ const ProfAIBusinessPage = lazy(() => import("@/pages/profai-business"));
 const CareerGPTPage = lazy(() => import("@/pages/career-gpt"));
 const CourseProgressPage = lazy(() => import("@/pages/india-ai-course"));
 const CourseManager = lazy(() => import("@/pages/admin/course-manager"));
+const AdminDashboard = lazy(() => import("@/pages/admin/dashboard"));
+const AdminUsers = lazy(() => import("@/pages/admin/users"));
+const AdminUserDetail = lazy(() => import("@/pages/admin/user-detail"));
+const AdminLogin = lazy(() => import("@/pages/admin/login"));
 const IndiaAIMissionPage = lazy(() => import("@/pages/india-ai-mission"));
 const SuggestionsPage = lazy(() => import("@/pages/suggestions"));
 const ComparisonPage = lazy(() => import("@/pages/comparison"));
@@ -76,6 +80,10 @@ function Router() {
       <Route path="/education-suite/api" component={EducationSuitePage} />
       <Route path="/education-suite/product" component={ProfAIBusinessPage} />
       <Route path="/admin/course-manager" component={CourseManager} />
+      <Route path="/admin/dashboard" component={AdminDashboard} />
+      <Route path="/admin/users" component={AdminUsers} />
+      <Route path="/admin/users/:id" component={AdminUserDetail} />
+      <Route path="/admin/login" component={AdminLogin} />
       <Route path="/course/:id" component={CoursePage} />
       <Route path="/unlock-course" component={UnlockCoursePage} />
       <Route path="/course/:id/quiz/:quizId" component={CourseQuizPage} />

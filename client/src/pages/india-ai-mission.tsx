@@ -168,40 +168,23 @@ export default function IndiaAIMissionPage() {
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900">
       <AuthNavbar />
       
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        {/* Tricolor gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-transparent to-green-500/10" />
-        
-        {/* Background pattern */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
+      {/* Hero Section with Banner */}
+      <section className="relative overflow-hidden bg-gray-900">
+        {/* Banner Image */}
+        <div className="relative w-full">
+          <img 
+            src="india-ai-banner.jpeg" 
+            alt="National AI Literacy Program - YUVA AI for ALL" 
+            className="w-full h-auto object-cover max-h-[500px] md:max-h-[600px]"
+          />
+          {/* Gradient overlay for better text visibility if needed */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-gray-900/80" />
+        </div>
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 relative">
+        {/* Content Below Banner */}
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 relative">
           <div className="max-w-4xl mx-auto text-center">
-            {/* Badges */}
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-6">
-              <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-orange-500/20 via-white/10 to-green-500/20 border border-orange-500/30 rounded-full px-3 sm:px-4 py-1.5 sm:py-2">
-                <Sparkles className="h-3 w-3 sm:h-4 sm:w-4 text-orange-400" />
-                <span className="text-xs sm:text-sm font-medium text-white">Government of India Initiative</span>
-              </div>
-              <div className="inline-flex items-center gap-1.5 sm:gap-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/40 rounded-full px-3 sm:px-4 py-1.5 sm:py-2">
-                <Brain className="h-3 w-3 sm:h-4 sm:w-4 text-purple-400" />
-                <span className="text-xs sm:text-sm font-medium text-white">Yuva AI for All</span>
-              </div>
-            </div>
-
-            {/* Title */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">
-              <span className="text-orange-500">India</span>
-              <span className="text-white">AI</span>
-              <span className="text-green-500"> Mission</span>
-            </h1>
-
-            <p className="text-base sm:text-lg md:text-xl text-gray-300 mb-6 sm:mb-8 max-w-2xl mx-auto px-4">
-              Empowering India's workforce with cutting-edge AI skills. Join the national movement to build an AI-ready India.
-            </p>
-
-            {/* CTA Buttons */}
+            {/* CTA Button */}
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12 px-4">
               <Link href="/india-ai-course">
                 <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold px-6 sm:px-8 py-3">

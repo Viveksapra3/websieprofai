@@ -514,7 +514,7 @@ export default function IndiaAIMissionPage() {
       <footer className="py-6 sm:py-8 border-t border-gray-800">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-gray-500 text-xs sm:text-sm">
-            © 2025 IndiaAI Mission. An initiative by Government of India. Powered by ProfAI Academy.
+            © 2026 IndiaAI Mission. An initiative by Government of India. Powered by ProfAI Academy.
           </p>
         </div>
       </footer>

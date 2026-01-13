@@ -68,7 +68,7 @@ export default function TeachPage() {
           </div>
           <div className="text-center">
             <div className="text-4xl font-bold text-green-400 mb-2">500+</div>
-            <div className="text-gray-300">Colleges Supporteds</div>
+            <div className="text-gray-300">Colleges Supported</div>
           </div>
         </div>
       </section>

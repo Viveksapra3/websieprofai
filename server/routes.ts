@@ -146,6 +146,246 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  
+  // Admin Dashboard Data
+  app.get("/api/admin/dashboard", async (req: Request, res: Response) => {
+    try {
+      // Check admin authentication
+      const adminUser = (req.session as any)?.adminUser;
+      if (!adminUser || adminUser.role !== 'admin') {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      // Fetch all dashboard statistics in parallel
+      const [
+        totalUsersResult,
+        usersByRoleResult,
+        totalCoursesResult,
+        totalEnrollmentsResult,
+        totalPurchasesResult,
+        totalRevenueResult,
+        paidEnrollmentsResult,
+        activeSessionsResult,
+        recentUsersResult,
+        totalMessagesResult,
+      ] = await Promise.all([
+        // Total users
+        db.execute(sql`SELECT COUNT(*) as count FROM users`),
+        
+        // Users by role
+        db.execute(sql`
+          SELECT role, COUNT(*) as count 
+          FROM users 
+          GROUP BY role
+        `),
+        
+        // Total courses
+        db.execute(sql`SELECT COUNT(*) as count FROM courses`),
+        
+        // Total enrollments (assuming user_purchases table tracks enrollments)
+        db.execute(sql`SELECT COUNT(*) as count FROM user_purchases`),
+        
+        // Total purchases (completed only)
+        db.execute(sql`
+          SELECT COUNT(*) as count 
+          FROM user_purchases 
+          WHERE status = 'completed'
+        `),
+        
+        // Total revenue
+        db.execute(sql`
+          SELECT COALESCE(SUM(CAST(amount AS DECIMAL)), 0) as total 
+          FROM user_purchases 
+          WHERE status = 'completed'
+        `),
+        
+        // Paid enrollments (non-free courses)
+        db.execute(sql`
+          SELECT COUNT(*) as count 
+          FROM user_purchases up
+          JOIN course_pricing cp ON up.course_id = cp.course_id
+          WHERE up.status = 'completed' AND cp.is_free = false
+        `),
+        
+        // Active sessions in last 24 hours
+        db.execute(sql`
+          SELECT COUNT(DISTINCT sid) as count 
+          FROM session 
+          WHERE expire > NOW()
+        `),
+        
+        // Recent users (last 10)
+        db.execute(sql`
+          SELECT id, username, email, role, created_at 
+          FROM users 
+          ORDER BY created_at DESC 
+          LIMIT 10
+        `),
+        
+        // Total messages (if you have a messages table, otherwise return 0)
+        db.execute(sql`
+          SELECT COUNT(*) as count 
+          FROM chat_messages
+        `).catch(() => ({ rows: [{ count: 0 }] })),
+      ]);
+
+      // Parse users by role
+      const usersByRole: any = {
+        admin: 0,
+        teacher: 0,
+        student: 0,
+      };
+      
+      for (const row of (usersByRoleResult as any).rows) {
+        usersByRole[row.role] = parseInt(row.count);
+      }
+
+      // Session activity for last 7 days (mock data for now)
+      const sessionActivity7d = [65, 45, 78, 52, 89, 67, 82];
+
+      const dashboardData = {
+        total_users: parseInt((totalUsersResult as any).rows[0]?.count || 0),
+        users_by_role: usersByRole,
+        total_courses: parseInt((totalCoursesResult as any).rows[0]?.count || 0),
+        total_enrollments: parseInt((totalEnrollmentsResult as any).rows[0]?.count || 0),
+        total_purchases: parseInt((totalPurchasesResult as any).rows[0]?.count || 0),
+        total_revenue: parseFloat((totalRevenueResult as any).rows[0]?.total || 0),
+        paid_enrollments: parseInt((paidEnrollmentsResult as any).rows[0]?.count || 0),
+        active_sessions_24h: parseInt((activeSessionsResult as any).rows[0]?.count || 0),
+        recent_users: (recentUsersResult as any).rows || [],
+        total_messages: parseInt((totalMessagesResult as any).rows[0]?.count || 0),
+        session_activity_7d: sessionActivity7d,
+        courses: [], // Can be populated if needed
+      };
+
+      res.json({ 
+        success: true, 
+        data: dashboardData 
+      });
+    } catch (error) {
+      console.error('[Admin Dashboard] Error:', error);
+      res.status(500).json({ error: "Failed to fetch dashboard data" });
+    }
+  });
+
+  // Admin Users List
+  app.get("/api/admin/users", async (req: Request, res: Response) => {
+    try {
+      // Check admin authentication
+      const adminUser = (req.session as any)?.adminUser;
+      if (!adminUser || adminUser.role !== 'admin') {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      // Fetch all users with their details
+      const allUsers = await db
+        .select()
+        .from(users)
+        .orderBy(sql`created_at DESC`);
+
+      // Get total count
+      const totalCount = allUsers.length;
+
+      res.json({
+        total_count: totalCount,
+        limit: totalCount,
+        offset: 0,
+        users: allUsers
+      });
+    } catch (error) {
+      console.error('[Admin Users] Error:', error);
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  // Admin User Detail
+  app.get("/api/admin/users/:id", async (req: Request, res: Response) => {
+    try {
+      // Check admin authentication
+      const adminUser = (req.session as any)?.adminUser;
+      if (!adminUser || adminUser.role !== 'admin') {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { id } = req.params;
+
+      // Fetch user by ID
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, id))
+        .limit(1);
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json(user);
+    } catch (error) {
+      console.error('[Admin User Detail] Error:', error);
+      res.status(500).json({ error: "Failed to fetch user details" });
+    }
+  });
+
+  // Admin User Quiz Statistics
+  app.get("/api/admin/user/:userId/quiz-stats", async (req: Request, res: Response) => {
+    try {
+      // Check admin authentication
+      const adminUser = (req.session as any)?.adminUser;
+      if (!adminUser || adminUser.role !== 'admin') {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { userId } = req.params;
+
+      // Fetch quiz statistics
+      const statsResult = await db.execute(sql`
+        SELECT 
+          COUNT(*) as total_attempts,
+          COALESCE(AVG(score), 0) as avg_score,
+          COALESCE(MAX(score), 0) as best_score,
+          COUNT(CASE WHEN score >= 70 THEN 1 END) as passed_count
+        FROM quiz_responses
+        WHERE user_id = ${userId}
+      `);
+
+      // Fetch recent quiz attempts (last 10)
+      const attemptsResult = await db.execute(sql`
+        SELECT 
+          id,
+          quiz_id,
+          score,
+          total_questions,
+          submitted_at
+        FROM quiz_responses
+        WHERE user_id = ${userId}
+        ORDER BY submitted_at DESC
+        LIMIT 10
+      `);
+
+      const stats = (statsResult as any).rows[0] || {
+        total_attempts: 0,
+        avg_score: 0,
+        best_score: 0,
+        passed_count: 0
+      };
+
+      res.json({
+        user_id: userId,
+        quiz_statistics: {
+          total_attempts: parseInt(stats.total_attempts) || 0,
+          avg_score: parseFloat(stats.avg_score) || 0,
+          best_score: parseInt(stats.best_score) || 0,
+          passed_count: parseInt(stats.passed_count) || 0
+        },
+        recent_attempts: (attemptsResult as any).rows || []
+      });
+    } catch (error) {
+      console.error('[Admin User Quiz Stats] Error:', error);
+      res.status(500).json({ error: "Failed to fetch quiz statistics" });
+    }
+  });
+
   // Database health check with performance metrics
   app.get("/api/health/db", async (_req: Request, res: Response) => {
     const start = Date.now();

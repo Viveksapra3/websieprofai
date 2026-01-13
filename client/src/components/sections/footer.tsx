@@ -92,7 +92,7 @@ export default function Footer() {
 
         <div className="border-t border-gray-700 text-center pt-6" data-testid="footer-bottom">
           <p className="text-gray-400 text-xs md:text-sm px-4" >
-            © 2025 ProfessorsAI. All rights reserved @iPredictt Data Labs Pvt. Ltd.{' '}
+            © 2026 ProfessorsAI. All rights reserved @iPredictt Data Labs Pvt. Ltd.{' '}
             <span className="block md:inline mt-2 md:mt-0">| {' '}
             <a href="#" className="hover:text-white transition-colors" data-testid="link-privacy">
               Privacy Policy

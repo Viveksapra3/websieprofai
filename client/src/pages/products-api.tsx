@@ -890,7 +890,7 @@ await client.progress.update({
       {/* Footer */}
       <footer className="py-8 px-4 sm:px-6 lg:px-8 border-t border-white/10">
         <div className="max-w-6xl mx-auto text-center text-gray-400">
-          <p>&copy; 2025 ProfessorsAI. All rights reserved.</p>
+          <p>&copy; 2026 ProfessorsAI. All rights reserved.</p>
         </div>
       </footer>
     </div>

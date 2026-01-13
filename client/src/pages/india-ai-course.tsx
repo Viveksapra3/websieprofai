@@ -541,17 +541,17 @@ export default function CourseProgressPage() {
           }}
         >
           {/* Course Header */}
-          <div className="p-4 sm:p-6 border-b border-gray-700">
-            <h1 className="text-lg sm:text-xl font-bold text-white mb-2">{DEMO_COURSE.title}</h1>
-            <p className="text-xs sm:text-sm text-gray-400 mb-3 sm:mb-4">by {DEMO_COURSE.instructor}</p>
+          <div className="p-3 sm:p-4 border-b border-gray-700">
+            <h1 className="text-base sm:text-lg font-bold text-white mb-1">{DEMO_COURSE.title}</h1>
+            <p className="text-xs text-gray-400 mb-2">by {DEMO_COURSE.instructor}</p>
             
             {/* Progress */}
-            <div className="space-y-1.5 sm:space-y-2">
-              <div className="flex justify-between text-xs sm:text-sm">
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs">
                 <span className="text-gray-400">Course Progress</span>
                 <span className="text-white font-semibold">{progressPercentage}%</span>
               </div>
-              <Progress value={progressPercentage} className="h-1.5 sm:h-2" />
+              <Progress value={progressPercentage} className="h-1.5" />
               <p className="text-xs text-gray-500">
                 {completedLessons} of {totalLessons} lessons completed
               </p>
@@ -674,11 +674,11 @@ export default function CourseProgressPage() {
         )}
 
         {/* Main Content - Video Player */}
-        <div className="flex-1 bg-gray-900 flex flex-col overflow-hidden">
+        <div className="flex-1 bg-gray-900 flex flex-col overflow-y-auto">
           {currentLessonData ? (
             <>
               {/* Video Player */}
-              <div className="flex-1 flex items-start justify-center bg-gray-900 pt-2 sm:pt-4">
+              <div className="flex-1 flex items-start justify-center bg-gray-900 pt-2 sm:pt-4 overflow-y-auto">
                 {currentLessonData.type === "video" && currentLessonData.vimeoId ? (
                   <div className="w-full max-w-5xl mx-auto px-2 sm:px-4">
                     <VimeoPlayer
@@ -755,7 +755,7 @@ export default function CourseProgressPage() {
               {/* Lesson Info Bar */}
               <div className="flex-shrink-0 bg-gray-900 border-t border-gray-800 p-3 sm:p-4">
                 <div className="max-w-5xl mx-auto">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
                     <div className="flex-1 min-w-0 w-full sm:w-auto">
                       <h2 className="text-base sm:text-lg md:text-xl font-bold text-white mb-1 truncate">{currentLessonData.title}</h2>
                       <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm text-gray-400">
@@ -769,13 +769,13 @@ export default function CourseProgressPage() {
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+                    <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 w-full sm:w-auto justify-end">
                       <Checkbox
                         checked={currentLessonData.completed}
                         onCheckedChange={() => toggleLessonCompletion(currentLesson!.moduleId, currentLesson!.lessonId)}
-                        className="h-4 w-4 sm:h-5 sm:w-5 border-white data-[state=checked]:bg-white data-[state=checked]:text-gray-900"
+                        className="h-5 w-5 sm:h-5 sm:w-5 border-white data-[state=checked]:bg-white data-[state=checked]:text-gray-900"
                       />
-                      <span className="text-xs sm:text-sm text-white">Mark as complete</span>
+                      <span className="text-sm sm:text-sm text-white font-medium">Mark as complete</span>
                     </div>
                   </div>
                 </div>

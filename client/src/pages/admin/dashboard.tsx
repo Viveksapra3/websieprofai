@@ -26,6 +26,7 @@ import {
   RefreshCw,
   ExternalLink
 } from "lucide-react";
+import { buildApiUrl } from "@/lib/api-url";
 
 interface DashboardData {
   active_sessions_24h: number;
@@ -148,9 +149,7 @@ export default function AdminDashboard() {
   const fetchDashboard = async (showRefresh = false) => {
     if (showRefresh) setRefreshing(true);
     try {
-      const response = await fetch('/api/admin/dashboard', {
-        credentials: 'include'
-      });
+      const response = await fetch(buildApiUrl('/api/admin/dashboard'));
       if (response.ok) {
         const result = await response.json();
         setDashboardData(result.data);

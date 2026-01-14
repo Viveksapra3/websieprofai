@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
+import { buildApiUrl } from "@/lib/api-url";
 import {
   Users,
   Mail,
@@ -125,9 +126,7 @@ export default function AdminUserDetail() {
 
   const fetchUserDetails = async () => {
     try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        credentials: 'include'
-      });
+      const response = await fetch(buildApiUrl(`/api/admin/users/${userId}`));
       if (response.ok) {
         const data = await response.json();
         setUser(data);
@@ -147,9 +146,7 @@ export default function AdminUserDetail() {
 
   const fetchQuizStats = async () => {
     try {
-      const response = await fetch(`/api/admin/user/${userId}/quiz-stats`, {
-        credentials: 'include'
-      });
+      const response = await fetch(buildApiUrl(`/api/admin/user/${userId}/quiz-stats`));
       if (response.ok) {
         const data = await response.json();
         setQuizStats(data);

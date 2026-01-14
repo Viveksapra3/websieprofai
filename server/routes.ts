@@ -298,34 +298,34 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  // Admin User Detail
-  app.get("/api/admin/users/:id", async (req: Request, res: Response) => {
-    try {
-      // Check admin authentication
-      const adminUser = (req.session as any)?.adminUser;
-      if (!adminUser || adminUser.role !== 'admin') {
-        return res.status(403).json({ error: "Admin access required" });
-      }
+  // // Admin User Detail
+  // app.get("/api/admin/users/:id", async (req: Request, res: Response) => {
+  //   try {
+  //     // Check admin authentication
+  //     const adminUser = (req.session as any)?.adminUser;
+  //     if (!adminUser || adminUser.role !== 'admin') {
+  //       return res.status(403).json({ error: "Admin access required" });
+  //     }
 
-      const { id } = req.params;
+  //     const { id } = req.params;
 
-      // Fetch user by ID
-      const [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, id))
-        .limit(1);
+  //     // Fetch user by ID
+  //     const [user] = await db
+  //       .select()
+  //       .from(users)
+  //       .where(eq(users.id, id))
+  //       .limit(1);
 
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
+  //     if (!user) {
+  //       return res.status(404).json({ error: "User not found" });
+  //     }
 
-      res.json(user);
-    } catch (error) {
-      console.error('[Admin User Detail] Error:', error);
-      res.status(500).json({ error: "Failed to fetch user details" });
-    }
-  });
+  //     res.json(user);
+  //   } catch (error) {
+  //     console.error('[Admin User Detail] Error:', error);
+  //     res.status(500).json({ error: "Failed to fetch user details" });
+  //   }
+  // });
 
   // Admin User Quiz Statistics
   app.get("/api/admin/user/:userId/quiz-stats", async (req: Request, res: Response) => {

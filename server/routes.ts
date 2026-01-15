@@ -1461,6 +1461,10 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   app.get("/api/course/:courseId", async (req: Request, res: Response, next: NextFunction) => {
+    // Remove timeout for course content fetching
+    req.setTimeout(0);
+    res.setTimeout(0);
+    
     try {
       const { courseId } = req.params;
       const apiBase = process.env.VITE_API_BASE as string | undefined;

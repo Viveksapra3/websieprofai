@@ -1,6 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db, pool } from "./db";
-import { users, coursePricing, userPurchases, courseImages, courseIdMapping } from "@shared/schema";
+import { users, coursePricing, userPurchases, courseImages, courseIdMapping, courseProgress } from "@shared/schema";
 import { courses } from "./db/schema/course";
 import { eq, or, sql, and, asc } from "drizzle-orm";
 import { Pool as PgPool } from "pg";
@@ -371,6 +371,90 @@ export async function registerRoutes(app: Express): Promise<void> {
     } catch (err) {
       // If fetching user_number fails, return user without it
       return res.json({ authenticated: true, user, additionalInfo });
+    }
+  });
+
+  app.get("/api/course-progress/:courseKey", async (req: Request, res: Response) => {
+    const user = (req.session as any)?.user;
+    if (!user) return res.status(401).json({ error: "Not authenticated" });
+
+    const courseKey = String((req.params as any)?.courseKey || "").trim();
+    const courseVersion = typeof (req.query as any)?.version === "string" ? String((req.query as any).version).trim() : "";
+
+    if (!courseKey) return res.status(400).json({ error: "courseKey is required" });
+    if (!courseVersion) return res.status(400).json({ error: "version is required" });
+
+    try {
+      const [row] = await db
+        .select({
+          progress: courseProgress.progress,
+          updatedAt: courseProgress.updatedAt,
+        })
+        .from(courseProgress)
+        .where(
+          and(
+            eq(courseProgress.userId, user.id),
+            eq(courseProgress.courseKey, courseKey),
+            eq(courseProgress.courseVersion, courseVersion),
+          ),
+        )
+        .limit(1);
+
+      return res.json({
+        courseKey,
+        courseVersion,
+        progress: row?.progress ?? null,
+        updatedAt: row?.updatedAt ?? null,
+      });
+    } catch (err: any) {
+      return res.status(500).json({ error: "Failed to fetch course progress" });
+    }
+  });
+
+  app.put("/api/course-progress/:courseKey", async (req: Request, res: Response) => {
+    const user = (req.session as any)?.user;
+    if (!user) return res.status(401).json({ error: "Not authenticated" });
+
+    const courseKey = String((req.params as any)?.courseKey || "").trim();
+    const courseVersion = typeof (req.query as any)?.version === "string" ? String((req.query as any).version).trim() : "";
+    const progress = (req.body as any)?.progress;
+
+    if (!courseKey) return res.status(400).json({ error: "courseKey is required" });
+    if (!courseVersion) return res.status(400).json({ error: "version is required" });
+    if (progress === undefined) return res.status(400).json({ error: "progress is required" });
+
+    try {
+      const now = new Date();
+      const [saved] = await db
+        .insert(courseProgress)
+        .values({
+          userId: user.id,
+          courseKey,
+          courseVersion,
+          progress,
+          createdAt: now,
+          updatedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: [courseProgress.userId, courseProgress.courseKey, courseProgress.courseVersion],
+          set: {
+            progress,
+            updatedAt: now,
+          },
+        })
+        .returning({
+          courseKey: courseProgress.courseKey,
+          courseVersion: courseProgress.courseVersion,
+          updatedAt: courseProgress.updatedAt,
+        });
+
+      return res.json({
+        courseKey: saved?.courseKey ?? courseKey,
+        courseVersion: saved?.courseVersion ?? courseVersion,
+        updatedAt: saved?.updatedAt ?? now,
+      });
+    } catch (err: any) {
+      return res.status(500).json({ error: "Failed to save course progress" });
     }
   });
 

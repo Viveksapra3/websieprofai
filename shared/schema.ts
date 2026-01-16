@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, boolean, decimal, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, boolean, decimal, integer, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -100,11 +100,22 @@ export const courseIdMapping = pgTable("course_id_mapping", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+export const courseProgress = pgTable("course_progress", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  courseKey: text("course_key").notNull(),
+  courseVersion: text("course_version").notNull(),
+  progress: jsonb("progress").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertCoursePricingSchema = createInsertSchema(coursePricing);
 export const insertUserPurchaseSchema = createInsertSchema(userPurchases);
 export const insertPaymentTransactionSchema = createInsertSchema(paymentTransactions);
 export const insertCourseImageSchema = createInsertSchema(courseImages);
 export const insertCourseIdMappingSchema = createInsertSchema(courseIdMapping);
+export const insertCourseProgressSchema = createInsertSchema(courseProgress);
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -114,3 +125,4 @@ export type UserPurchase = typeof userPurchases.$inferSelect;
 export type PaymentTransaction = typeof paymentTransactions.$inferSelect;
 export type CourseImage = typeof courseImages.$inferSelect;
 export type CourseIdMapping = typeof courseIdMapping.$inferSelect;
+export type CourseProgress = typeof courseProgress.$inferSelect;

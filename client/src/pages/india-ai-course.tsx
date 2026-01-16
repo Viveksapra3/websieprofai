@@ -160,6 +160,7 @@ const STORAGE_PREFIX = "course-progress";
 // Increment this version number whenever you update course content (videos, quizzes, etc.)
 // This will force all users to reload fresh data from the updated DEMO_MODULES
 const COURSE_VERSION = "v5"; // Updated: Corrected video durations and added mid-module quizzes
+const COURSE_KEY = "india-ai-course";
 
 export default function CourseProgressPage() {
   const [modules, setModules] = useState<Module[]>([]);
@@ -167,6 +168,9 @@ export default function CourseProgressPage() {
   const { toast } = useToast();
   const { currentUser, loading } = useAuth();
   const [, setLocation] = useLocation();
+  const [progressLoaded, setProgressLoaded] = useState(false);
+  const saveDebounceRef = useRef<number | null>(null);
+  const skipNextServerSaveRef = useRef(true);
   
   // Quiz result state
   const [quizResult, setQuizResult] = useState<{
@@ -238,9 +242,34 @@ export default function CourseProgressPage() {
     return currentUser ? `${STORAGE_PREFIX}-${COURSE_VERSION}-${currentUser.uid}` : null;
   };
 
-  // Load progress from localStorage on mount (per user)
+  const migrateModules = (raw: any): Module[] => {
+    try {
+      const parsed = Array.isArray(raw) ? raw : JSON.parse(String(raw));
+      if (!Array.isArray(parsed)) return DEMO_MODULES;
+
+      return parsed.map((module: Module, moduleIndex: number) => ({
+        ...module,
+        lessons: module.lessons.map((lesson: Lesson, lessonIndex: number) => {
+          if (!lesson.type) {
+            const demoModule = DEMO_MODULES[moduleIndex];
+            const demoLesson = demoModule?.lessons[lessonIndex];
+            return {
+              ...lesson,
+              type: demoLesson?.type || 'video',
+              vimeoId: lesson.vimeoId || demoLesson?.vimeoId,
+            };
+          }
+          return lesson;
+        }),
+      }));
+    } catch {
+      return DEMO_MODULES;
+    }
+  };
+
   useEffect(() => {
     if (!currentUser) return;
+    setProgressLoaded(false);
     
     const storageKey = getStorageKey();
     if (!storageKey) return;
@@ -251,35 +280,62 @@ export default function CourseProgressPage() {
         localStorage.removeItem(key);
       }
     });
-    
+
     const stored = localStorage.getItem(storageKey);
-    if (stored) {
+    const localModules = stored ? migrateModules(stored) : DEMO_MODULES;
+    setModules(localModules);
+
+    let cancelled = false;
+    (async () => {
       try {
-        const parsed = JSON.parse(stored);
-        // Migrate old data: ensure all lessons have a type property
-        const migratedModules = parsed.map((module: Module, moduleIndex: number) => ({
-          ...module,
-          lessons: module.lessons.map((lesson: Lesson, lessonIndex: number) => {
-            // If lesson doesn't have a type, infer it from DEMO_MODULES or default to 'video'
-            if (!lesson.type) {
-              const demoModule = DEMO_MODULES[moduleIndex];
-              const demoLesson = demoModule?.lessons[lessonIndex];
-              return {
-                ...lesson,
-                type: demoLesson?.type || 'video',
-                vimeoId: lesson.vimeoId || demoLesson?.vimeoId
-              };
-            }
-            return lesson;
-          })
-        }));
-        setModules(migratedModules);
+        const res = await fetch(`/api/course-progress/${encodeURIComponent(COURSE_KEY)}?version=${encodeURIComponent(COURSE_VERSION)}`, {
+          credentials: "include",
+        });
+
+        if (res.status === 401) {
+          if (!cancelled) {
+            storeRedirectUrl();
+            toast({
+              title: "Session Expired",
+              description: "Please sign in again to sync your course progress.",
+              variant: "destructive",
+            });
+            setLocation("/signin/student");
+          }
+          return;
+        }
+
+        const data = await res.json().catch(() => null);
+        if (!res.ok) return;
+        if (cancelled) return;
+
+        const serverProgress = data?.progress;
+
+        if (serverProgress) {
+          setModules(migrateModules(serverProgress));
+        } else {
+          const hasAnyCompletion = localModules.some(m => m.lessons.some(l => l.completed));
+          if (hasAnyCompletion) {
+            await fetch(`/api/course-progress/${encodeURIComponent(COURSE_KEY)}?version=${encodeURIComponent(COURSE_VERSION)}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({ progress: localModules }),
+            });
+          }
+        }
       } catch {
-        setModules(DEMO_MODULES);
+      } finally {
+        if (!cancelled) {
+          skipNextServerSaveRef.current = true;
+          setProgressLoaded(true);
+        }
       }
-    } else {
-      setModules(DEMO_MODULES);
-    }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [currentUser]);
 
   // Save progress to localStorage whenever modules change (per user)
@@ -293,6 +349,39 @@ export default function CourseProgressPage() {
       localStorage.setItem(storageKey, JSON.stringify(modules));
     }
   }, [modules, currentUser]);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    if (!progressLoaded) return;
+    if (modules.length === 0) return;
+
+    if (skipNextServerSaveRef.current) {
+      skipNextServerSaveRef.current = false;
+      return;
+    }
+
+    if (saveDebounceRef.current) {
+      window.clearTimeout(saveDebounceRef.current);
+    }
+
+    saveDebounceRef.current = window.setTimeout(async () => {
+      try {
+        await fetch(`/api/course-progress/${encodeURIComponent(COURSE_KEY)}?version=${encodeURIComponent(COURSE_VERSION)}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ progress: modules }),
+        });
+      } catch {
+      }
+    }, 800);
+
+    return () => {
+      if (saveDebounceRef.current) {
+        window.clearTimeout(saveDebounceRef.current);
+      }
+    };
+  }, [modules, currentUser, progressLoaded]);
 
   // Set first video lesson as current on mount
   useEffect(() => {

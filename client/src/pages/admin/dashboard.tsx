@@ -26,6 +26,7 @@ import {
   RefreshCw,
   ExternalLink
 } from "lucide-react";
+import { buildApiUrl } from "@/lib/api-url";
 
 interface DashboardData {
   active_sessions_24h: number;
@@ -74,7 +75,7 @@ function StatCard({ title, value, subtitle, icon, trend, color }: StatCardProps)
         <div className="flex items-start justify-between">
           <div className="space-y-2">
             <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</p>
-            <p className="text-3xl font-bold text-gray-900 dark:text-white">{value}</p>
+            <p className="text-3xl font-bold text-gray-300">{value}</p>
             {subtitle && (
               <p className="text-xs text-gray-500 dark:text-gray-400">{subtitle}</p>
             )}
@@ -148,9 +149,7 @@ export default function AdminDashboard() {
   const fetchDashboard = async (showRefresh = false) => {
     if (showRefresh) setRefreshing(true);
     try {
-      const response = await fetch('/api/admin/dashboard', {
-        credentials: 'include'
-      });
+      const response = await fetch(buildApiUrl('/api/admin/dashboard'));
       if (response.ok) {
         const result = await response.json();
         setDashboardData(result.data);

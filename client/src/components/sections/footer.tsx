@@ -29,6 +29,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Brand Section - Full Width on Mobile */}
         <div className="mb-8">
+          <div className="flex justify-between items-start">
           <div data-testid="footer-brand" className="text-center md:text-left">
             <div className="flex items-center mb-4 justify-center md:justify-start">
               <Brain className="text-accent text-2xl w-8 h-8 mr-3" />
@@ -53,6 +54,22 @@ export default function Footer() {
                 );
               })}
             </div>
+          </div>
+          
+          {/* ElevenLabs Grant Badge */}
+          <a 
+            href="https://elevenlabs.io/startup-grants" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex flex-col items-center md:items-end gap-2 flex-shrink-0"
+          >
+            <span className="text-gray-400 text-xs md:text-sm font-medium">Powered by</span>
+            <img 
+              src="https://eleven-public-cdn.elevenlabs.io/payloadcms/cy7rxce8uki-IIElevenLabsGrants%201.webp" 
+              alt="ElevenLabs" 
+              className="w-[180px] md:w-[280px] hover:opacity-80 transition-opacity"
+            />
+          </a>
           </div>
         </div>
 

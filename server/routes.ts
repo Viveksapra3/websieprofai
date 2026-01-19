@@ -73,6 +73,54 @@ export async function registerRoutes(app: Express): Promise<void> {
     res.json({ status: "ok", message: "API is running" });
   });
 
+  const requireAdmin = (req: Request, res: Response): { id: any; role: any } | null => {
+    const adminUser = (req.session as any)?.adminUser;
+    if (!adminUser || adminUser.role !== "admin") {
+      res.status(403).json({ error: "Admin access required" });
+      return null;
+    }
+    return adminUser;
+  };
+
+  const buildUpstreamUrl = (pathPart: string) => {
+    const base = String(process.env.VITE_API_BASE || "");
+    if (!base) return "";
+    const cleanBase = base.endsWith("/") ? base.slice(0, -1) : base;
+    const cleanPath = pathPart.startsWith("/") ? pathPart : `/${pathPart}`;
+    return `${cleanBase}${cleanPath}`;
+  };
+
+  const proxyToUpstream = async (req: Request, res: Response, upstreamPath: string) => {
+    const url = buildUpstreamUrl(upstreamPath);
+    if (!url) {
+      return res.status(500).json({ error: "VITE_API_BASE is not set" });
+    }
+
+    res.setHeader("x-proxied-to", url);
+
+    const headers: Record<string, string> = {};
+    for (const [key, value] of Object.entries(req.headers)) {
+      if (typeof value === "undefined") continue;
+      if (Array.isArray(value)) headers[key] = value.join(",");
+      else headers[key] = value;
+    }
+    delete headers.host;
+
+    const upstreamResp = await axios.request({
+      url,
+      method: req.method as any,
+      headers,
+      data: req.body,
+      responseType: "arraybuffer",
+      validateStatus: () => true,
+    });
+
+    const contentType = upstreamResp.headers?.["content-type"];
+    if (contentType) res.setHeader("content-type", contentType);
+
+    res.status(upstreamResp.status).send(Buffer.from(upstreamResp.data));
+  };
+
   // Admin Login (direct database authentication)
   app.post("/api/admin/login", async (req: Request, res: Response) => {
     try {
@@ -146,186 +194,30 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  
-  // Admin Dashboard Data
   app.get("/api/admin/dashboard", async (req: Request, res: Response) => {
-    try {
-      // Check admin authentication
-      const adminUser = (req.session as any)?.adminUser;
-      if (!adminUser || adminUser.role !== 'admin') {
-        return res.status(403).json({ error: "Admin access required" });
-      }
-
-      // Fetch all dashboard statistics in parallel
-      const [
-        totalUsersResult,
-        usersByRoleResult,
-        totalCoursesResult,
-        totalEnrollmentsResult,
-        totalPurchasesResult,
-        totalRevenueResult,
-        paidEnrollmentsResult,
-        activeSessionsResult,
-        recentUsersResult,
-        totalMessagesResult,
-      ] = await Promise.all([
-        // Total users
-        db.execute(sql`SELECT COUNT(*) as count FROM users`),
-        
-        // Users by role
-        db.execute(sql`
-          SELECT role, COUNT(*) as count 
-          FROM users 
-          GROUP BY role
-        `),
-        
-        // Total courses
-        db.execute(sql`SELECT COUNT(*) as count FROM courses`),
-        
-        // Total enrollments (assuming user_purchases table tracks enrollments)
-        db.execute(sql`SELECT COUNT(*) as count FROM user_purchases`),
-        
-        // Total purchases (completed only)
-        db.execute(sql`
-          SELECT COUNT(*) as count 
-          FROM user_purchases 
-          WHERE status = 'completed'
-        `),
-        
-        // Total revenue
-        db.execute(sql`
-          SELECT COALESCE(SUM(CAST(amount AS DECIMAL)), 0) as total 
-          FROM user_purchases 
-          WHERE status = 'completed'
-        `),
-        
-        // Paid enrollments (non-free courses)
-        db.execute(sql`
-          SELECT COUNT(*) as count 
-          FROM user_purchases up
-          JOIN course_pricing cp ON up.course_id = cp.course_id
-          WHERE up.status = 'completed' AND cp.is_free = false
-        `),
-        
-        // Active sessions in last 24 hours
-        db.execute(sql`
-          SELECT COUNT(DISTINCT sid) as count 
-          FROM session 
-          WHERE expire > NOW()
-        `),
-        
-        // Recent users (last 10)
-        db.execute(sql`
-          SELECT id, username, email, role, created_at 
-          FROM users 
-          ORDER BY created_at DESC 
-          LIMIT 10
-        `),
-        
-        // Total messages (if you have a messages table, otherwise return 0)
-        db.execute(sql`
-          SELECT COUNT(*) as count 
-          FROM chat_messages
-        `).catch(() => ({ rows: [{ count: 0 }] })),
-      ]);
-
-      // Parse users by role
-      const usersByRole: any = {
-        admin: 0,
-        teacher: 0,
-        student: 0,
-      };
-      
-      for (const row of (usersByRoleResult as any).rows) {
-        usersByRole[row.role] = parseInt(row.count);
-      }
-
-      // Session activity for last 7 days (mock data for now)
-      const sessionActivity7d = [65, 45, 78, 52, 89, 67, 82];
-
-      const dashboardData = {
-        total_users: parseInt((totalUsersResult as any).rows[0]?.count || 0),
-        users_by_role: usersByRole,
-        total_courses: parseInt((totalCoursesResult as any).rows[0]?.count || 0),
-        total_enrollments: parseInt((totalEnrollmentsResult as any).rows[0]?.count || 0),
-        total_purchases: parseInt((totalPurchasesResult as any).rows[0]?.count || 0),
-        total_revenue: parseFloat((totalRevenueResult as any).rows[0]?.total || 0),
-        paid_enrollments: parseInt((paidEnrollmentsResult as any).rows[0]?.count || 0),
-        active_sessions_24h: parseInt((activeSessionsResult as any).rows[0]?.count || 0),
-        recent_users: (recentUsersResult as any).rows || [],
-        total_messages: parseInt((totalMessagesResult as any).rows[0]?.count || 0),
-        session_activity_7d: sessionActivity7d,
-        courses: [], // Can be populated if needed
-      };
-
-      res.json({ 
-        success: true, 
-        data: dashboardData 
-      });
-    } catch (error) {
-      console.error('[Admin Dashboard] Error:', error);
-      res.status(500).json({ error: "Failed to fetch dashboard data" });
-    }
+    if (!requireAdmin(req, res)) return;
+    await proxyToUpstream(req, res, "/api/admin/dashboard");
   });
 
-  // Admin Users List
   app.get("/api/admin/users", async (req: Request, res: Response) => {
-    try {
-      // Check admin authentication
-      const adminUser = (req.session as any)?.adminUser;
-      if (!adminUser || adminUser.role !== 'admin') {
-        return res.status(403).json({ error: "Admin access required" });
-      }
-
-      // Fetch all users with their details
-      const allUsers = await db
-        .select()
-        .from(users)
-        .orderBy(sql`created_at DESC`);
-
-      // Get total count
-      const totalCount = allUsers.length;
-
-      res.json({
-        total_count: totalCount,
-        limit: totalCount,
-        offset: 0,
-        users: allUsers
-      });
-    } catch (error) {
-      console.error('[Admin Users] Error:', error);
-      res.status(500).json({ error: "Failed to fetch users" });
-    }
+    if (!requireAdmin(req, res)) return;
+    await proxyToUpstream(req, res, "/api/admin/users");
   });
 
-  // // Admin User Detail
-  // app.get("/api/admin/users/:id", async (req: Request, res: Response) => {
-  //   try {
-  //     // Check admin authentication
-  //     const adminUser = (req.session as any)?.adminUser;
-  //     if (!adminUser || adminUser.role !== 'admin') {
-  //       return res.status(403).json({ error: "Admin access required" });
-  //     }
+  app.get("/api/admin/users/:id", async (req: Request, res: Response) => {
+    if (!requireAdmin(req, res)) return;
+    const id = encodeURIComponent(String(req.params.id));
+    await proxyToUpstream(req, res, `/api/admin/users/${id}`);
+  });
 
-  //     const { id } = req.params;
+  app.get("/api/admin/user/:userId/quiz-stats", async (req: Request, res: Response) => {
+    if (!requireAdmin(req, res)) return;
+    const userId = encodeURIComponent(String(req.params.userId));
+    await proxyToUpstream(req, res, `/api/admin/user/${userId}/quiz-stats`);
+  });
 
-  //     // Fetch user by ID
-  //     const [user] = await db
-  //       .select()
-  //       .from(users)
-  //       .where(eq(users.id, id))
-  //       .limit(1);
-
-  //     if (!user) {
-  //       return res.status(404).json({ error: "User not found" });
-  //     }
-
-  //     res.json(user);
-  //   } catch (error) {
-  //     console.error('[Admin User Detail] Error:', error);
-  //     res.status(500).json({ error: "Failed to fetch user details" });
-  //   }
-  // });
+  
+ 
 
   // Admin User Quiz Statistics
   app.get("/api/admin/user/:userId/quiz-stats", async (req: Request, res: Response) => {

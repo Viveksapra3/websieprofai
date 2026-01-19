@@ -61,8 +61,6 @@ import {
   LayoutDashboard
 } from "lucide-react";
 
-import { buildApiUrl } from "@/lib/api-url";
-
 interface User {
   id: number;
   username: string;
@@ -145,7 +143,7 @@ export default function AdminUsers() {
   const fetchUsers = async (showRefresh = false) => {
     if (showRefresh) setRefreshing(true);
     try {
-      const response = await fetch(buildApiUrl('/api/admin/users'));
+      const response = await fetch('/api/admin/users', { credentials: 'include' });
       if (response.ok) {
         const data = await response.json();
         setUsersData(data);

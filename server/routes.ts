@@ -85,18 +85,28 @@ export async function registerRoutes(app: Express): Promise<void> {
   const buildUpstreamUrl = (pathPart: string) => {
     const base = String(process.env.VITE_API_BASE || "");
     if (!base) return "";
+    if (!base.startsWith("http://") && !base.startsWith("https://")) {
+      return "";
+    }
     const cleanBase = base.endsWith("/") ? base.slice(0, -1) : base;
-    const cleanPath = pathPart.startsWith("/") ? pathPart : `/${pathPart}`;
+    let cleanPath = pathPart.startsWith("/") ? pathPart : `/${pathPart}`;
+
+    // If VITE_API_BASE already ends with /api, avoid producing /api/api/...
+    if (cleanBase.endsWith("/api") && cleanPath.startsWith("/api/")) {
+      cleanPath = cleanPath.slice("/api".length);
+    }
+
     return `${cleanBase}${cleanPath}`;
   };
 
   const proxyToUpstream = async (req: Request, res: Response, upstreamPath: string) => {
     const url = buildUpstreamUrl(upstreamPath);
     if (!url) {
-      return res.status(500).json({ error: "VITE_API_BASE is not set" });
+      return res.status(500).json({ error: "VITE_API_BASE must be an absolute http(s) URL" });
     }
 
     res.setHeader("x-proxied-to", url);
+    console.log(`[Admin Proxy] ${req.method} ${req.originalUrl} -> ${url}`);
 
     const headers: Record<string, string> = {};
     for (const [key, value] of Object.entries(req.headers)) {
@@ -196,24 +206,18 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   app.get("/api/admin/dashboard", async (req: Request, res: Response) => {
     if (!requireAdmin(req, res)) return;
-    await proxyToUpstream(req, res, "/api/admin/dashboard");
+    await proxyToUpstream(req, res, "/admin/dashboard");
   });
 
   app.get("/api/admin/users", async (req: Request, res: Response) => {
     if (!requireAdmin(req, res)) return;
-    await proxyToUpstream(req, res, "/api/admin/users");
+    await proxyToUpstream(req, res, "/admin/users");
   });
 
   app.get("/api/admin/users/:id", async (req: Request, res: Response) => {
     if (!requireAdmin(req, res)) return;
     const id = encodeURIComponent(String(req.params.id));
-    await proxyToUpstream(req, res, `/api/admin/users/${id}`);
-  });
-
-  app.get("/api/admin/user/:userId/quiz-stats", async (req: Request, res: Response) => {
-    if (!requireAdmin(req, res)) return;
-    const userId = encodeURIComponent(String(req.params.userId));
-    await proxyToUpstream(req, res, `/api/admin/user/${userId}/quiz-stats`);
+    await proxyToUpstream(req, res, `/admin/users/${id}`);
   });
 
   
@@ -221,61 +225,9 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   // Admin User Quiz Statistics
   app.get("/api/admin/user/:userId/quiz-stats", async (req: Request, res: Response) => {
-    try {
-      // Check admin authentication
-      const adminUser = (req.session as any)?.adminUser;
-      if (!adminUser || adminUser.role !== 'admin') {
-        return res.status(403).json({ error: "Admin access required" });
-      }
-
-      const { userId } = req.params;
-
-      // Fetch quiz statistics
-      const statsResult = await db.execute(sql`
-        SELECT 
-          COUNT(*) as total_attempts,
-          COALESCE(AVG(score), 0) as avg_score,
-          COALESCE(MAX(score), 0) as best_score,
-          COUNT(CASE WHEN score >= 70 THEN 1 END) as passed_count
-        FROM quiz_responses
-        WHERE user_id = ${userId}
-      `);
-
-      // Fetch recent quiz attempts (last 10)
-      const attemptsResult = await db.execute(sql`
-        SELECT 
-          id,
-          quiz_id,
-          score,
-          total_questions,
-          submitted_at
-        FROM quiz_responses
-        WHERE user_id = ${userId}
-        ORDER BY submitted_at DESC
-        LIMIT 10
-      `);
-
-      const stats = (statsResult as any).rows[0] || {
-        total_attempts: 0,
-        avg_score: 0,
-        best_score: 0,
-        passed_count: 0
-      };
-
-      res.json({
-        user_id: userId,
-        quiz_statistics: {
-          total_attempts: parseInt(stats.total_attempts) || 0,
-          avg_score: parseFloat(stats.avg_score) || 0,
-          best_score: parseInt(stats.best_score) || 0,
-          passed_count: parseInt(stats.passed_count) || 0
-        },
-        recent_attempts: (attemptsResult as any).rows || []
-      });
-    } catch (error) {
-      console.error('[Admin User Quiz Stats] Error:', error);
-      res.status(500).json({ error: "Failed to fetch quiz statistics" });
-    }
+    if (!requireAdmin(req, res)) return;
+    const userId = encodeURIComponent(String(req.params.userId));
+    await proxyToUpstream(req, res, `/admin/user/${userId}/quiz-stats`);
   });
 
   // Database health check with performance metrics

@@ -316,6 +316,18 @@ export default function SignInStudent() {
                 </Link>
               </p>
             </div>
+
+            {/* Admin Login Link */}
+            <div className="text-center pt-2">
+              <p className="text-white/70 text-sm">
+                Are you an Administrator?{' '}
+                <Link href="/admin/login">
+                  <span className="text-orange-400 hover:text-orange-300 font-medium cursor-pointer transition-colors">
+                    Admin Login
+                  </span>
+                </Link>
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>

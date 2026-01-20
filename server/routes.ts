@@ -104,13 +104,16 @@ export async function registerRoutes(app: Express): Promise<void> {
     const protocol = forwardedProto || req.protocol || "http";
     const host = forwardedHost || req.get("host") || "localhost:5000";
     const cleanBase = base.endsWith("/") ? base.slice(0, -1) : base;
+    // Your Nginx is configured as: location /backend-api/api/ { proxy_pass http://.../api/; }
+    // So when VITE_API_BASE is a relative path like /backend-api, we must target /backend-api/api/...
+    const effectiveBase = cleanBase.endsWith("/api") ? cleanBase : `${cleanBase}/api`;
     
     // If base ends with /api, avoid /api/api/...
-    if (cleanBase.endsWith("/api") && cleanPath.startsWith("/api/")) {
+    if (effectiveBase.endsWith("/api") && cleanPath.startsWith("/api/")) {
       cleanPath = cleanPath.slice("/api".length);
     }
     
-    return `${protocol}://${host}${cleanBase}${cleanPath}`;
+    return `${protocol}://${host}${effectiveBase}${cleanPath}`;
   };
 
   const proxyToUpstream = async (req: Request, res: Response, upstreamPath: string) => {

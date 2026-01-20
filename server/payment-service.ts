@@ -129,7 +129,7 @@ class PaymentService {
       }
 
       // Check if user has purchased the course using old course ID
-      const purchase = await db
+      const purchaseWithOldId = await db
         .select()
         .from(userPurchases)
         .where(
@@ -141,8 +141,21 @@ class PaymentService {
         )
         .limit(1);
 
-      const hasAccess = purchase.length > 0;
-      console.log(`${hasAccess ? '✅' : '❌'} User ${userId} ${hasAccess ? 'has' : 'does not have'} purchase access to course ${courseId} (mapped to ${oldCourseId})`);
+      // Also check with new course ID for backward compatibility with existing purchases
+      const purchaseWithNewId = await db
+        .select()
+        .from(userPurchases)
+        .where(
+          and(
+            eq(userPurchases.userId, userId),
+            eq(userPurchases.courseId, courseId),
+            eq(userPurchases.status, "completed")
+          )
+        )
+        .limit(1);
+
+      const hasAccess = purchaseWithOldId.length > 0 || purchaseWithNewId.length > 0;
+      console.log(`${hasAccess ? '✅' : '❌'} User ${userId} ${hasAccess ? 'has' : 'does not have'} purchase access to course ${courseId} (checked both old: ${oldCourseId} and new: ${courseId})`);
       return hasAccess;
     } catch (error) {
       console.error("❌ Error checking course access:", error);
@@ -389,9 +402,14 @@ class PaymentService {
       // If payment successful, create purchase record
       if (orderStatus === "Success") {
         console.log("✅ Payment successful, creating purchase record...");
+        
+        // Map new course ID to old course ID for purchase storage
+        const oldCourseId = await this.getOldCourseId(courseId);
+        console.log(`🔄 Mapping course ID for purchase: ${courseId} → ${oldCourseId}`);
+        
         await db.insert(userPurchases).values({
           userId,
-          courseId,
+          courseId: oldCourseId,
           paymentId: trackingId || "",
           amount: amount || "0",
           currency: currency || "INR",

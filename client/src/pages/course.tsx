@@ -140,22 +140,22 @@ export default function CoursePage() {
 
         console.log("Access granted, loading course content");
 
-        // Fetch course directly from VITE_AVI_URL (supports both relative and absolute URLs)
-        const aviBase = (import.meta.env.VITE_AVI_URL as string | undefined) || "";
-        if (!aviBase) {
-          throw new Error("VITE_AVI_URL is not configured");
+        // Fetch course directly from VITE_API_BASE (supports both relative and absolute URLs)
+        const apiBase = (import.meta.env.VITE_API_BASE as string | undefined) || "";
+        if (!apiBase) {
+          throw new Error("VITE_API_BASE is not configured");
         }
         
         // Handle both relative paths (e.g., /backend-api) and absolute URLs (e.g., http://...)
         let courseUrl: string;
-        if (aviBase.startsWith('http://') || aviBase.startsWith('https://')) {
+        if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
           // Absolute URL
-          const cleanAviBase = aviBase.endsWith('/') ? aviBase.slice(0, -1) : aviBase;
-          courseUrl = `${cleanAviBase}/api/course/${encodeURIComponent(courseId)}`;
+          const cleanApiBase = apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase;
+          courseUrl = `${cleanApiBase}/api/course/${encodeURIComponent(courseId)}`;
         } else {
           // Relative path for reverse proxy
-          const cleanAviBase = aviBase.endsWith('/') ? aviBase.slice(0, -1) : aviBase;
-          courseUrl = `${cleanAviBase}/api/course/${encodeURIComponent(courseId)}`;
+          const cleanApiBase = apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase;
+          courseUrl = `${cleanApiBase}/api/course/${encodeURIComponent(courseId)}`;
         }
         
         console.log('Fetching course from:', courseUrl);

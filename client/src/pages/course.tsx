@@ -140,7 +140,18 @@ export default function CoursePage() {
 
         console.log("Access granted, loading course content");
 
-        const res = await fetch(`/api/course/${encodeURIComponent(courseId)}`);
+        // Fetch course directly from VITE_AVI_URL
+        const aviBase = (import.meta.env.VITE_AVI_URL as string | undefined) || "";
+        if (!aviBase) {
+          throw new Error("VITE_AVI_URL is not configured");
+        }
+        
+        const cleanAviBase = aviBase.endsWith('/') ? aviBase.slice(0, -1) : aviBase;
+        const courseUrl = `${cleanAviBase}/api/course/${encodeURIComponent(courseId)}`;
+        
+        console.log('Fetching course from:', courseUrl);
+        
+        const res = await fetch(courseUrl);
         const data = await res.json();
         if (!res.ok) throw new Error(data?.error || "Failed to load course");
 

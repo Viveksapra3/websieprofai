@@ -82,27 +82,41 @@ export async function registerRoutes(app: Express): Promise<void> {
     return adminUser;
   };
 
-  const buildUpstreamUrl = (pathPart: string) => {
+  const buildUpstreamUrl = (req: Request, pathPart: string) => {
     const base = String(process.env.VITE_API_BASE || "");
     if (!base) return "";
-    if (!base.startsWith("http://") && !base.startsWith("https://")) {
-      return "";
-    }
-    const cleanBase = base.endsWith("/") ? base.slice(0, -1) : base;
+    
     let cleanPath = pathPart.startsWith("/") ? pathPart : `/${pathPart}`;
-
-    // If VITE_API_BASE already ends with /api, avoid producing /api/api/...
+    
+    // If VITE_API_BASE is absolute (http://...), use it directly
+    if (base.startsWith("http://") || base.startsWith("https://")) {
+      const cleanBase = base.endsWith("/") ? base.slice(0, -1) : base;
+      // If base ends with /api, avoid /api/api/...
+      if (cleanBase.endsWith("/api") && cleanPath.startsWith("/api/")) {
+        cleanPath = cleanPath.slice("/api".length);
+      }
+      return `${cleanBase}${cleanPath}`;
+    }
+    
+    // VITE_API_BASE is relative (e.g. /backend-api) - build full URL from request
+    const forwardedProto = String(req.headers["x-forwarded-proto"] || "").split(",")[0].trim();
+    const forwardedHost = String(req.headers["x-forwarded-host"] || "").split(",")[0].trim();
+    const protocol = forwardedProto || req.protocol || "http";
+    const host = forwardedHost || req.get("host") || "localhost:5000";
+    const cleanBase = base.endsWith("/") ? base.slice(0, -1) : base;
+    
+    // If base ends with /api, avoid /api/api/...
     if (cleanBase.endsWith("/api") && cleanPath.startsWith("/api/")) {
       cleanPath = cleanPath.slice("/api".length);
     }
-
-    return `${cleanBase}${cleanPath}`;
+    
+    return `${protocol}://${host}${cleanBase}${cleanPath}`;
   };
 
   const proxyToUpstream = async (req: Request, res: Response, upstreamPath: string) => {
-    const url = buildUpstreamUrl(upstreamPath);
+    const url = buildUpstreamUrl(req, upstreamPath);
     if (!url) {
-      return res.status(500).json({ error: "VITE_API_BASE must be an absolute http(s) URL" });
+      return res.status(500).json({ error: "VITE_API_BASE is not configured" });
     }
 
     res.setHeader("x-proxied-to", url);
@@ -116,14 +130,22 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
     delete headers.host;
 
-    const upstreamResp = await axios.request({
-      url,
-      method: req.method as any,
-      headers,
-      data: req.body,
-      responseType: "arraybuffer",
-      validateStatus: () => true,
-    });
+    let upstreamResp;
+    try {
+      upstreamResp = await axios.request({
+        url,
+        method: req.method as any,
+        headers,
+        data: req.body,
+        responseType: "arraybuffer",
+        validateStatus: () => true,
+      });
+    } catch (err: any) {
+      const message = err?.message ? String(err.message) : "Upstream request failed";
+      console.error(`[Admin Proxy] Upstream request failed: ${url}`, err);
+      res.setHeader("x-proxy-error", message);
+      return res.status(502).json({ error: "Upstream request failed", upstream: url, message });
+    }
 
     const contentType = upstreamResp.headers?.["content-type"];
     if (contentType) res.setHeader("content-type", contentType);

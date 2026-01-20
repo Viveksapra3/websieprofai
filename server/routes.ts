@@ -1388,8 +1388,8 @@ export async function registerRoutes(app: Express): Promise<void> {
         const priceValue = parseFloat(String(price));
         const isFree = pricing?.isFree || priceValue === 0;
         
-        // Only grant access if user is logged in AND (course is free OR user purchased it using old course ID)
-        const hasAccess = user ? (isFree || purchasedCourseIds.has(oldCourseId)) : false;
+        // Grant access if user is logged in AND (course is free OR user purchased it with either old or new course ID)
+        const hasAccess = user ? (isFree || purchasedCourseIds.has(oldCourseId) || purchasedCourseIds.has(courseId)) : false;
 
         return {
           id: courseId,

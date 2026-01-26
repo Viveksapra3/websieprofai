@@ -579,14 +579,14 @@ export default function CourseProgressPage() {
       
       // Configure text styling for the user's name
       // Position the name in the space provided (adjust these values based on certificate layout)
-      ctx.font = 'bold 70px "Times New Roman", serif';
-      ctx.fillStyle = '#2c3e50'; // Dark color for the name
+      ctx.font = 'italic 600 30px "Poppins", sans-serif';
+      ctx.fillStyle = '#000000ff'; // Dark color for the name
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       
       // Draw the user's name at the center of the certificate
       // Y position is approximately where the name space is (adjust as needed)
-      const nameY = canvas.height * 0.47; // 40% from top (adjust based on your certificate)
+      const nameY = canvas.height * 0.48; // 40% from top (adjust based on your certificate)
       ctx.fillText(userName, canvas.width / 2, nameY);
       
       // Add date of completion above the "DATE OF COMPLETION" line (bottom left area)

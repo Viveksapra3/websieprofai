@@ -196,21 +196,40 @@ export default function CourseProgressPage() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
   
-  // Redirect to login if not authenticated
+  // Check session authentication instead of Firebase
   useEffect(() => {
     if (loading) return; // Wait for auth to load
     
-    if (!currentUser) {
-      // Store the current URL to redirect back after login
-      storeRedirectUrl();
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to access your courses.",
-        variant: "destructive"
-      });
-      setLocation("/signin/student");
-    }
-  }, [currentUser, loading, setLocation, toast]);
+    // Check if user has a valid session by calling the session API
+    const checkSession = async () => {
+      try {
+        const res = await fetch('/api/session', { credentials: 'include' });
+        const data = await res.json();
+        
+        if (!data.authenticated) {
+          // Store the current URL to redirect back after login
+          storeRedirectUrl();
+          toast({
+            title: "Authentication Required",
+            description: "Please log in to access your courses.",
+            variant: "destructive"
+          });
+          setLocation("/signin/student");
+        }
+      } catch (error) {
+        // If session check fails, redirect to login
+        storeRedirectUrl();
+        toast({
+          title: "Authentication Error",
+          description: "Please log in to access your courses.",
+          variant: "destructive"
+        });
+        setLocation("/signin/student");
+      }
+    };
+    
+    checkSession();
+  }, [loading, setLocation, toast]);
   
   // Handle resizing
   useEffect(() => {
@@ -238,8 +257,9 @@ export default function CourseProgressPage() {
   }, [isResizing]);
 
   // Generate user-specific storage key with version
+  // Use a generic identifier since we're using session-based auth
   const getStorageKey = () => {
-    return currentUser ? `${STORAGE_PREFIX}-${COURSE_VERSION}-${currentUser.uid}` : null;
+    return currentUser ? `${STORAGE_PREFIX}-${COURSE_VERSION}-user` : null;
   };
 
   const migrateModules = (raw: any): Module[] => {
@@ -268,7 +288,7 @@ export default function CourseProgressPage() {
   };
 
   useEffect(() => {
-    if (!currentUser) return;
+    // Don't depend on Firebase currentUser, use session-based approach
     setProgressLoaded(false);
     
     const storageKey = getStorageKey();
@@ -336,22 +356,19 @@ export default function CourseProgressPage() {
     return () => {
       cancelled = true;
     };
-  }, [currentUser]);
+  }, []);
 
-  // Save progress to localStorage whenever modules change (per user)
+  // Save progress to localStorage whenever modules change
   useEffect(() => {
-    if (!currentUser) return;
-    
     const storageKey = getStorageKey();
     if (!storageKey) return;
     
     if (modules.length > 0) {
       localStorage.setItem(storageKey, JSON.stringify(modules));
     }
-  }, [modules, currentUser]);
+  }, [modules]);
 
   useEffect(() => {
-    if (!currentUser) return;
     if (!progressLoaded) return;
     if (modules.length === 0) return;
 
@@ -381,7 +398,7 @@ export default function CourseProgressPage() {
         window.clearTimeout(saveDebounceRef.current);
       }
     };
-  }, [modules, currentUser, progressLoaded]);
+  }, [modules, progressLoaded]);
 
   // Set first video lesson as current on mount
   useEffect(() => {
@@ -514,7 +531,7 @@ export default function CourseProgressPage() {
   const currentLessonData = getCurrentLesson();
 
   // Handle certificate download
-  const handleDownloadCertificate = () => {
+  const handleDownloadCertificate = async () => {
     if (!allCompleted) {
       toast({
         title: "Certificate Locked",
@@ -524,8 +541,15 @@ export default function CourseProgressPage() {
       return;
     }
 
-    // Get user's display name or email
-    const userName = currentUser?.displayName || currentUser?.email || "Student";
+    // Get user's display name from session instead of Firebase
+    let userName = "Student";
+    try {
+      const res = await fetch('/api/session', { credentials: 'include' });
+      const data = await res.json();
+      userName = data.user?.username || data.user?.email || "Student";
+    } catch {
+      // Keep default "Student" if session fetch fails
+    }
 
     // Create a canvas to draw the certificate with the user's name
     const canvas = document.createElement('canvas');
@@ -543,7 +567,7 @@ export default function CourseProgressPage() {
     // Load the certificate image
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = '/Ai Mission Certificate_updated.png';
+    img.src = '/New_certificate.png';
     
     img.onload = () => {
       // Set canvas size to match image
@@ -555,14 +579,14 @@ export default function CourseProgressPage() {
       
       // Configure text styling for the user's name
       // Position the name in the space provided (adjust these values based on certificate layout)
-      ctx.font = 'bold 180px "Times New Roman", serif';
+      ctx.font = 'bold 70px "Times New Roman", serif';
       ctx.fillStyle = '#2c3e50'; // Dark color for the name
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       
       // Draw the user's name at the center of the certificate
       // Y position is approximately where the name space is (adjust as needed)
-      const nameY = canvas.height * 0.45; // 40% from top (adjust based on your certificate)
+      const nameY = canvas.height * 0.47; // 40% from top (adjust based on your certificate)
       ctx.fillText(userName, canvas.width / 2, nameY);
       
       // Add date of completion above the "DATE OF COMPLETION" line (bottom left area)
@@ -573,14 +597,14 @@ export default function CourseProgressPage() {
       const dateString = `${day}/${month}/${year}`;
       
       // Configure text styling - italic, same font
-      ctx.font = 'italic 80px "Times New Roman", serif';
+      ctx.font = 'italic 40px "Times New Roman", serif';
       ctx.fillStyle = '#000000';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'middle';
       
       // Position above the "DATE OF COMPLETION" text (bottom left area)
-      const dateX = canvas.width * 0.110; // Align with "DATE OF COMPLETION" label
-      const dateY = canvas.height * 0.835; // Just above the "DATE OF COMPLETION" line
+      const dateX = canvas.width * 0.09; // Align with "DATE OF COMPLETION" label
+      const dateY = canvas.height * 0.845; // Just above the "DATE OF COMPLETION" line
       
       // Draw date
       ctx.fillText(dateString, dateX, dateY);

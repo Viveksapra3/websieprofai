@@ -74,12 +74,12 @@ const makeCountryMenu = (label: string, country: string, includeCompetitiveExams
 };
 
 const learnMenuItems: LearnMenuItem[] = [
-  makeCountryMenu('India', 'INDIA', true),
-  makeCountryMenu('USA', 'America', false),
-  makeCountryMenu('UAE', 'UAE', false),
-  makeCountryMenu('Indonesia', 'Indonesia', false),
-  makeCountryMenu('Saudi', 'Saudi', false),
-  makeCountryMenu('Nigeria', 'Nigeria', false),
+  makeCountryMenu('Indian Courses', 'INDIA', true),
+  makeCountryMenu('USA Courses', 'America', false),
+  makeCountryMenu('UAE Courses', 'UAE', false),
+  makeCountryMenu('Indonesian Courses', 'Indonesia', false),
+  makeCountryMenu('Saudi Courses', 'Saudi', false),
+  makeCountryMenu('Nigerian Courses', 'Nigeria', false),
   { label: 'All Courses', href: buildCoursesHref() },
 ];
 

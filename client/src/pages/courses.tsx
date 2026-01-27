@@ -82,11 +82,63 @@ export default function CoursesPage() {
   }, [searchString]);
 
   // Get course type from URL parameters (legacy)
-  const urlParams = new URLSearchParams(window.location.search);
+  const urlParams = new URLSearchParams(searchString);
   const courseType = urlParams.get('type');
 
-  // Determine page title based on course type
-  const getPageTitle = () => {
+  const pageTitle = useMemo(() => {
+    const params = new URLSearchParams(searchString);
+    const country = params.get('country')?.trim() || '';
+    const category = params.get('category')?.trim() || '';
+    const subcategory = params.get('subcategory')?.trim() || '';
+    const item = params.get('item')?.trim() || '';
+
+    const countryTitleMap: Record<string, string> = {
+      'INDIA': 'Indian',
+      'India': 'Indian',
+      'America': 'American',
+      'USA': 'American',
+      'UAE': 'UAE',
+      'Saudi': 'Saudi',
+      'Indonesia': 'Indonesian',
+      'Nigeria': 'Nigerian',
+    };
+
+    const categoryTitleMap: Record<string, string> = {
+      schools: 'Schools',
+      colleges: 'Colleges',
+      'competitive-exams': 'Competitive Exams',
+      skills: 'Skills',
+      language: 'Language',
+    };
+
+    const subcategoryTitleMap: Record<string, string> = {
+      primary: 'Primary',
+      secondary: 'Secondary',
+      senior: 'Senior Education',
+      'internship-projects': 'Internship Projects',
+    };
+
+    const itemTitleMap: Record<string, string> = {
+      'neet-ug': 'NEET UG',
+      jee: 'JEE',
+      'ugc-net': 'UGC NET',
+      cat: 'CAT',
+      upsc: 'UPSC',
+    };
+
+    const adjective = country ? (countryTitleMap[country] ?? country) : '';
+    const categoryLabel = category ? (categoryTitleMap[category] ?? category) : '';
+    const subcategoryLabel = subcategory ? (subcategoryTitleMap[subcategory] ?? subcategory) : '';
+    const itemLabel = item ? (itemTitleMap[item] ?? item) : '';
+
+    if (adjective) {
+      const parts = [`${adjective} Courses`];
+      if (categoryLabel) parts.push(categoryLabel);
+      if (subcategoryLabel) parts.push(subcategoryLabel);
+      if (itemLabel) parts.push(itemLabel);
+      return parts.join(' - ');
+    }
+
     switch (courseType) {
       case 'undergrad':
         return 'Undergrad Courses';
@@ -97,7 +149,9 @@ export default function CoursesPage() {
       default:
         return 'Available Courses';
     }
-  };
+  }, [searchString, courseType]);
+
+  const getPageTitle = () => pageTitle;
 
   // --- Pexels Image Fetching Logic ---
 

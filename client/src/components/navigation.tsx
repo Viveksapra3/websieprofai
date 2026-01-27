@@ -1,10 +1,87 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, Sparkles, ChevronDown } from 'lucide-react';
+import { Menu, X, Sparkles, ChevronDown, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Link } from 'wouter';
 import logoPath from "@assets/prof-ai-logo_1755775207766-DKA28TFR.avif";
 // import { useNavigate } from "react-router-dom";
+
+type LearnMenuItem = {
+  label: string;
+  href: string;
+  children?: LearnMenuItem[];
+};
+
+const buildCoursesHref = (opts?: {
+  country?: string;
+  category?: string;
+  subcategory?: string;
+  item?: string;
+}) => {
+  const params = new URLSearchParams();
+  if (opts?.country) params.set('country', opts.country);
+  if (opts?.category) params.set('category', opts.category);
+  if (opts?.subcategory) params.set('subcategory', opts.subcategory);
+  if (opts?.item) params.set('item', opts.item);
+  const qs = params.toString();
+  return `/courses${qs ? `?${qs}` : ''}`;
+};
+
+const makeCountryMenu = (label: string, country: string, includeCompetitiveExams: boolean): LearnMenuItem => {
+  const base: LearnMenuItem = {
+    label,
+    href: buildCoursesHref({ country }),
+    children: [
+      {
+        label: 'Schools',
+        href: buildCoursesHref({ country, category: 'schools' }),
+        children: [
+          { label: 'Primary', href: buildCoursesHref({ country, category: 'schools', subcategory: 'primary' }) },
+          { label: 'Secondary', href: buildCoursesHref({ country, category: 'schools', subcategory: 'secondary' }) },
+          { label: 'Senior Education', href: buildCoursesHref({ country, category: 'schools', subcategory: 'senior' }) },
+        ],
+      },
+      { label: 'Colleges', href: buildCoursesHref({ country, category: 'colleges' }) },
+      {
+        label: 'Skills',
+        href: buildCoursesHref({ country, category: 'skills' }),
+        children: [
+          {
+            label: 'Internship Projects',
+            href: buildCoursesHref({ country, category: 'skills', subcategory: 'internship-projects' }),
+          },
+        ],
+      },
+      { label: 'Language', href: buildCoursesHref({ country, category: 'language' }) },
+    ],
+  };
+
+  if (includeCompetitiveExams) {
+    base.children?.splice(2, 0, {
+      label: 'Competitive Exams',
+      href: buildCoursesHref({ country, category: 'competitive-exams' }),
+      children: [
+        { label: 'NEET UG', href: buildCoursesHref({ country, category: 'competitive-exams', item: 'neet-ug' }) },
+        { label: 'JEE', href: buildCoursesHref({ country, category: 'competitive-exams', item: 'jee' }) },
+        { label: 'UGC NET', href: buildCoursesHref({ country, category: 'competitive-exams', item: 'ugc-net' }) },
+        { label: 'CAT', href: buildCoursesHref({ country, category: 'competitive-exams', item: 'cat' }) },
+        { label: 'UPSC', href: buildCoursesHref({ country, category: 'competitive-exams', item: 'upsc' }) },
+      ],
+    });
+  }
+
+  return base;
+};
+
+const learnMenuItems: LearnMenuItem[] = [
+  makeCountryMenu('India', 'INDIA', true),
+  makeCountryMenu('USA', 'America', false),
+  makeCountryMenu('UAE', 'UAE', false),
+  makeCountryMenu('Indonesia', 'Indonesia', false),
+  makeCountryMenu('Saudi', 'Saudi', false),
+  makeCountryMenu('Nigeria', 'Nigeria', false),
+  { label: 'All Courses', href: buildCoursesHref() },
+];
 
 export default function Navigation() {
   // const navigate = useNavigate();
@@ -65,6 +142,105 @@ export default function Navigation() {
   const textColor = 'text-white';
   const hoverColor = 'hover:text-white';
 
+  const renderDesktopLearnItems = (items: LearnMenuItem[]) =>
+    items.map((item, idx) => {
+      const isLast = idx === items.length - 1;
+      const hasChildren = !!item.children?.length;
+
+      return (
+        <div key={item.label} className={hasChildren ? 'relative group/country' : 'relative'}>
+          <a href={item.href}>
+            <div
+              className={`px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer flex items-center justify-between ${
+                isLast ? '' : 'border-b border-white/10'
+              }`}
+            >
+              <div className="text-white font-semibold">{item.label}</div>
+              {hasChildren && <ChevronRight className="w-4 h-4 text-white/70" />}
+            </div>
+          </a>
+
+          {hasChildren && (
+            <div
+              className="absolute top-0 left-full ml-1 w-64 bg-black/90 backdrop-blur-md 
+                rounded-lg shadow-2xl border border-white/20 overflow-visible z-50 
+                opacity-0 invisible group-hover/country:opacity-100 group-hover/country:visible 
+                transition-all duration-200"
+            >
+              {item.children!.map((child, childIdx) => {
+                const childIsLast = childIdx === item.children!.length - 1;
+                const childHasChildren = !!child.children?.length;
+
+                return (
+                  <div
+                    key={`${item.label}-${child.label}`}
+                    className={childHasChildren ? 'relative group/category' : 'relative'}
+                  >
+                    <a href={child.href}>
+                      <div
+                        className={`px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer flex items-center justify-between ${
+                          childIsLast ? '' : 'border-b border-white/10'
+                        }`}
+                      >
+                        <div className="text-white font-semibold">{child.label}</div>
+                        {childHasChildren && <ChevronRight className="w-4 h-4 text-white/70" />}
+                      </div>
+                    </a>
+
+                    {childHasChildren && (
+                      <div
+                        className="absolute top-0 left-full ml-1 w-64 bg-black/90 backdrop-blur-md 
+                          rounded-lg shadow-2xl border border-white/20 overflow-visible z-50 
+                          opacity-0 invisible group-hover/category:opacity-100 group-hover/category:visible 
+                          transition-all duration-200"
+                      >
+                        {child.children!.map((grandChild, grandIdx) => {
+                          const grandIsLast = grandIdx === child.children!.length - 1;
+                          return (
+                            <a href={grandChild.href} key={`${item.label}-${child.label}-${grandChild.label}`}>
+                              <div
+                                className={`px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer ${
+                                  grandIsLast ? '' : 'border-b border-white/10'
+                                }`}
+                              >
+                                <div className="text-white font-semibold">{grandChild.label}</div>
+                              </div>
+                            </a>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    });
+
+  const renderMobileLearnItems = (items: LearnMenuItem[], depth = 0): JSX.Element[] => {
+    const pad = depth === 0 ? 'pl-0' : depth === 1 ? 'pl-4' : depth === 2 ? 'pl-8' : 'pl-12';
+
+    return items.flatMap((item) => {
+      const key = `m-${depth}-${item.label}`;
+
+      const thisRow = (
+        <a href={item.href} key={key}>
+          <button
+            className={`block py-2 ${pad} ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}
+          >
+            {item.label}
+          </button>
+        </a>
+      );
+
+      if (!item.children?.length) return [thisRow];
+
+      return [thisRow, ...renderMobileLearnItems(item.children, depth + 1)];
+    });
+  };
+
   return (
     <nav className={`fixed top-2 left-0 right-0 z-50 transition-all duration-300 bg-transparent`} data-testid="main-navigation">
       <div className="max-w-10xl mx-auto  px-4 sm:px-6 lg:px-10">
@@ -103,25 +279,11 @@ export default function Navigation() {
 
               {/* Learn Dropdown Menu */}
               <div className="absolute top-full left-0 mt-2 w-56 bg-black/90 backdrop-blur-md 
-                rounded-lg shadow-2xl border border-white/20 overflow-hidden z-50 
+                rounded-lg shadow-2xl border border-white/20 overflow-visible z-50 
                 opacity-0 invisible group-hover:opacity-100 group-hover:visible 
                 transition-all duration-300">
 
-                <a href="/courses?country=INDIA">
-                  <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer border-b border-white/10">
-                    <div className="text-white font-semibold">Indian Courses</div>
-                  </div>
-                </a>
-                <a href="/courses?country=America">
-                  <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer border-b border-white/10">
-                    <div className="text-white font-semibold">American Courses</div>
-                  </div>
-                </a>
-                <a href="/courses">
-                  <div className="px-6 py-4 hover:bg-white/10 transition-colors cursor-pointer">
-                    <div className="text-white font-semibold">All Courses</div>
-                  </div>
-                </a>
+                {renderDesktopLearnItems(learnMenuItems)}
               </div>
             </div>
 
@@ -324,21 +486,7 @@ export default function Navigation() {
             {/* Mobile Learn Section */}
             <div className="border-b border-white/20 pb-2 mb-2">
               <div className="text-white font-semibold mb-2">Learn</div>
-              <a href="/courses?country=INDIA">
-                <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
-                  Indian Courses
-                </button>
-              </a>
-              <a href="/courses?country=America">
-                <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
-                  American Courses
-                </button>
-              </a>
-              <a href="/courses">
-                <button className={`block py-2 pl-4 ${textColor} ${hoverColor} transition-colors w-full text-left text-sm`}>
-                  All Courses
-                </button>
-              </a>
+              {renderMobileLearnItems(learnMenuItems)}
             </div>
 
             {/* Mobile How it works Link */}

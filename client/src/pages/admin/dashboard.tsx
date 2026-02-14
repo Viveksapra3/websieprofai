@@ -18,6 +18,7 @@ import {
   GraduationCap,
   ShieldCheck,
   ChevronRight,
+  Mail,
   Calendar,
   Clock,
   CreditCard,
@@ -225,6 +226,19 @@ export default function AdminDashboard() {
               <Users className="h-4 w-4 mr-2" />
               Manage Users
             </Button>
+            <Button
+              onClick={() => navigate('/admin/blogs')}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+            >
+              Manage Blogs
+            </Button>
+            <Button
+              onClick={() => navigate('/admin/progress-emails')}
+              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              Send Email
+            </Button>
           </div>
         </div>
 
@@ -265,7 +279,7 @@ export default function AdminDashboard() {
               <StatCard
                 title="Active Sessions"
                 value={dashboardData?.active_sessions_24h || 0}
-                subtitle="In the last 24 hours"
+                subtitle=""
                 icon={<Activity className="h-6 w-6" />}
                 color="orange"
               />

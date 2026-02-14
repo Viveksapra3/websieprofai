@@ -129,8 +129,6 @@ export default function AdminLogin() {
           <div className="mt-6 p-4 rounded-lg bg-gray-700/30 border border-gray-600">
             <p className="text-sm text-gray-400 text-center">
               <span className="text-purple-400 font-medium">Demo Credentials:</span><br />
-              Email: admin@profai.com<br />
-              Password: Admin@123
             </p>
           </div>
         </CardContent>

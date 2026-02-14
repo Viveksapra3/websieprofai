@@ -37,11 +37,15 @@ const AdminDashboard = lazy(() => import("@/pages/admin/dashboard"));
 const AdminUsers = lazy(() => import("@/pages/admin/users"));
 const AdminUserDetail = lazy(() => import("@/pages/admin/user-detail"));
 const AdminLogin = lazy(() => import("@/pages/admin/login"));
+const AdminProgressEmails = lazy(() => import("@/pages/admin/progress-emails"));
+const AdminBlogsPage = lazy(() => import("@/pages/admin/blogs"));
 const IndiaAIMissionPage = lazy(() => import("@/pages/india-ai-mission"));
 const SuggestionsPage = lazy(() => import("@/pages/suggestions"));
 const ComparisonPage = lazy(() => import("@/pages/comparison"));
 const EducationSuitePage = lazy(() => import("@/pages/products-api"));
 const AboutPage = lazy(() => import("@/pages/about"));
+const BlogsPage = lazy(() => import("@/pages/blogs"));
+const BlogDetailPage = lazy(() => import("@/pages/blog"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -79,11 +83,15 @@ function Router() {
       <Route path="/comparison" component={ComparisonPage} />
       <Route path="/education-suite/api" component={EducationSuitePage} />
       <Route path="/education-suite/product" component={ProfAIBusinessPage} />
+      <Route path="/blogs" component={BlogsPage} />
+      <Route path="/blog/:slug" component={BlogDetailPage} />
       <Route path="/admin/course-manager" component={CourseManager} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
+      <Route path="/admin/blogs" component={AdminBlogsPage} />
       <Route path="/admin/users" component={AdminUsers} />
       <Route path="/admin/users/:id" component={AdminUserDetail} />
       <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/admin/progress-emails" component={AdminProgressEmails} />
       <Route path="/course/:id" component={CoursePage} />
       <Route path="/unlock-course" component={UnlockCoursePage} />
       <Route path="/course/:id/quiz/:quizId" component={CourseQuizPage} />

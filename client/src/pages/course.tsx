@@ -89,11 +89,15 @@ export default function CoursePage() {
   const [error, setError] = useState<string | null>(null);
   const [course, setCourse] = useState<CourseDetail | null>(null);
   const [role, setRole] = useState<string | null>(null);
+  const [userId, setUserId] = useState<number | null>(null);
+  const [userNumber, setUserNumber] = useState<string | number | null>(null);
   const [lastQuizId, setLastQuizId] = useState<string | null>(null);
   const [moduleQuizIds, setModuleQuizIds] = useState<Record<string, string | null>>({}); // key: week
   const [moduleQuizLoading, setModuleQuizLoading] = useState<Record<string, boolean>>({}); // key: week
 
   const [activeView, setActiveView] = useState<any>(null);
+  const [completedTopics, setCompletedTopics] = useState<Record<string, boolean>>({});
+  const [markingTopicIds, setMarkingTopicIds] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -106,7 +110,14 @@ export default function CoursePage() {
           return;
         }
         const userRole = String(authData?.user?.role || "").toLowerCase() || null;
-        if (!cancelled) setRole(userRole);
+        const rawUserId = authData?.user?.id;
+        const parsedUserId = typeof rawUserId === "number" ? rawUserId : Number(rawUserId);
+        const rawUserNumber = (authData as any)?.user?.user_number;
+        if (!cancelled) {
+          setRole(userRole);
+          setUserId(Number.isNaN(parsedUserId) ? null : parsedUserId);
+          setUserNumber(rawUserNumber ?? null);
+        }
 
         if (!courseId) throw new Error("Invalid course id");
 
@@ -140,27 +151,11 @@ export default function CoursePage() {
 
         console.log("Access granted, loading course content");
 
-        // Fetch course directly from VITE_API_BASE (supports both relative and absolute URLs)
-        const apiBase = (import.meta.env.VITE_API_BASE as string | undefined) || "";
-        if (!apiBase) {
-          throw new Error("VITE_API_BASE is not configured");
-        }
-        
-        // Handle both relative paths (e.g., /backend-api) and absolute URLs (e.g., http://...)
-        let courseUrl: string;
-        if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
-          // Absolute URL
-          const cleanApiBase = apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase;
-          courseUrl = `${cleanApiBase}/api/course/${encodeURIComponent(courseId)}`;
-        } else {
-          // Relative path for reverse proxy
-          const cleanApiBase = apiBase.endsWith('/') ? apiBase.slice(0, -1) : apiBase;
-          courseUrl = `${cleanApiBase}/api/course/${encodeURIComponent(courseId)}`;
-        }
-        
+        // Fetch course via local server proxy (avoids browser timeout to external API)
+        const courseUrl = `/api/course/${encodeURIComponent(courseId)}`;
         console.log('Fetching course from:', courseUrl);
         
-        const res = await fetch(courseUrl);
+        const res = await fetch(courseUrl, { credentials: "include" });
         const data = await res.json();
         if (!res.ok) throw new Error(data?.error || "Failed to load course");
 
@@ -221,6 +216,30 @@ export default function CoursePage() {
     } catch {}
   }, [courseId, course]);
 
+  useEffect(() => {
+    try {
+      if (!courseId) return;
+      const stored = localStorage.getItem(`course:${String(courseId)}:completedTopics`);
+      if (!stored) {
+        setCompletedTopics({});
+        return;
+      }
+      const parsed = JSON.parse(stored);
+      if (parsed && typeof parsed === "object") {
+        setCompletedTopics(parsed as Record<string, boolean>);
+      }
+    } catch {
+      setCompletedTopics({});
+    }
+  }, [courseId]);
+
+  useEffect(() => {
+    try {
+      if (!courseId) return;
+      localStorage.setItem(`course:${String(courseId)}:completedTopics`, JSON.stringify(completedTopics));
+    } catch {}
+  }, [courseId, completedTopics]);
+
   const handleGenerateModuleQuiz = async (week: number) => {
     if (!courseId) return;
     const weekKey = String(week);
@@ -253,6 +272,66 @@ export default function CoursePage() {
       alert(e?.message || "Failed to generate module quiz");
     } finally {
       setModuleQuizLoading((s) => ({ ...s, [weekKey]: false }));
+    }
+  };
+
+  const handleMarkTopicComplete = async (mod: any, topic: any) => {
+    if (!course || !courseId || !userNumber) return;
+
+    const topicId = topic?.id;
+    const moduleId = mod?.id ?? topic?.module_id;
+    const courseIdFromData = (course as any)?.id ?? (course as any)?.course_id ?? Number(courseId);
+
+    if (!topicId || !moduleId || !courseIdFromData) {
+      return;
+    }
+
+    const topicKey = String(topicId);
+    if (markingTopicIds[topicKey]) {
+      return;
+    }
+
+    const targetBase = AVI_BASE ? AVI_BASE.replace(/\/$/, "") : "";
+    if (!targetBase) {
+      console.error("VITE_AVI_URL is not configured for progress tracking");
+      return;
+    }
+
+    try {
+      setMarkingTopicIds((prev) => ({ ...prev, [topicKey]: true }));
+
+      const url = `${targetBase}/api/progress/mark-complete`;
+      const body = {
+        // Backend expects "user_id" field but value should be the user_number from session
+        user_id: userNumber,
+        course_id: courseIdFromData,
+        module_id: moduleId,
+        topic_id: topicId,
+      };
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        console.error("Failed to mark topic as complete", res.status, data);
+      }
+
+      setCompletedTopics((prev) => ({
+        ...prev,
+        [topicKey]: true,
+      }));
+    } catch (err) {
+      console.error("Error marking topic as complete", err);
+    } finally {
+      setMarkingTopicIds((prev) => {
+        const next = { ...prev };
+        delete next[topicKey];
+        return next;
+      });
     }
   };
 
@@ -425,6 +504,14 @@ export default function CoursePage() {
     }
   };
 
+  const getModuleProgress = (mod: any) => {
+    const topics = mod?.topics || mod?.sub_topics || [];
+    const total = topics.length;
+    const completed = topics.filter((t: any) => t.id && completedTopics[String(t.id)]).length;
+    const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { total, completed, percent };
+  };
+
   const renderCourseOverview = () => {
     if (!course) return null;
     return (
@@ -442,24 +529,50 @@ export default function CoursePage() {
               const weekKey = String(week);
               const existingQuizId = moduleQuizIds[weekKey];
               const loading = !!moduleQuizLoading[weekKey];
+              const modProgress = getModuleProgress(mod);
               return (
-                <div key={idx} className="border rounded-lg overflow-hidden shadow-sm">
+                <div key={idx} className={`border rounded-lg overflow-hidden shadow-sm ${modProgress.percent === 100 ? "border-green-300" : ""}`}>
                   <button
                     onClick={() => setActiveView(isActive ? course : mod)}
-                    className="w-full flex justify-between items-center p-4 bg-gray-100 hover:bg-gray-200 transition"
+                    className="w-full p-4 bg-gray-100 hover:bg-gray-200 transition"
                   >
-                    <span className="font-semibold text-lg text-gray-800">
-                      Week {week}: {mod.title}
-                    </span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className={`h-5 w-5 transform transition-transform ${isActive ? "rotate-180" : ""}`}
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-3">
+                        {modProgress.percent === 100 ? (
+                          <span className="flex-shrink-0 w-7 h-7 rounded-full bg-green-500 flex items-center justify-center">
+                            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                          </span>
+                        ) : (
+                          <span className="flex-shrink-0 w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
+                            {modProgress.percent}%
+                          </span>
+                        )}
+                        <span className="font-semibold text-lg text-gray-800 text-left">
+                          Week {week}: {mod.title}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${modProgress.percent === 100 ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-600"}`}>
+                          {modProgress.completed}/{modProgress.total} topics
+                        </span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className={`h-5 w-5 transform transition-transform ${isActive ? "rotate-180" : ""}`}
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                    {/* Progress bar */}
+                    <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
+                      <div
+                        className={`h-1.5 rounded-full transition-all duration-500 ${modProgress.percent === 100 ? "bg-green-500" : "bg-blue-500"}`}
+                        style={{ width: `${modProgress.percent}%` }}
+                      />
+                    </div>
                   </button>
 
                   {isActive && (
@@ -491,15 +604,54 @@ export default function CoursePage() {
                         <Button variant="outline" size="sm" onClick={() => setActiveView(course)}>Close</Button>
                       </div>
                       {(Array.isArray(mod.topics) && mod.topics.length > 0) || (Array.isArray(mod.sub_topics) && mod.sub_topics.length > 0) ? (
-                        (mod.topics || mod.sub_topics).map((st: any, i: number) => (
-                          <div key={i} className="mt-6 p-6 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                            <h3 className="text-2xl font-semibold text-blue-700 mb-4">{st.title}</h3>
-                            <div
-                              className="prose max-w-none text-gray-800"
-                              dangerouslySetInnerHTML={{ __html: formatContent(typeof st.content === "string" ? st.content : JSON.stringify(st.content ?? {}, null, 2)) }}
-                            />
-                          </div>
-                        ))
+                        (mod.topics || mod.sub_topics).map((st: any, i: number) => {
+                          const isTopicDone = !!(st.id && completedTopics[String(st.id)]);
+                          const isMarking = !!markingTopicIds[String(st.id)];
+                          return (
+                            <div key={i} className={`mt-6 p-6 border rounded-lg transition-colors ${isTopicDone ? "bg-green-50 border-green-200" : "bg-gray-50 hover:bg-gray-100"}`}>
+                              <div className="flex items-start justify-between gap-4 mb-4">
+                                <h3 className="text-2xl font-semibold text-blue-700">{st.title}</h3>
+                                {isTopicDone && (
+                                  <span className="flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
+                                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                    Done
+                                  </span>
+                                )}
+                              </div>
+                              <div
+                                className="prose max-w-none text-gray-800"
+                                dangerouslySetInnerHTML={{ __html: formatContent(typeof st.content === "string" ? st.content : JSON.stringify(st.content ?? {}, null, 2)) }}
+                              />
+                              <div className="mt-5 pt-4 border-t border-gray-200 flex items-center justify-end">
+                                {isTopicDone ? (
+                                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-semibold shadow-sm">
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                    Completed
+                                  </span>
+                                ) : (
+                                  <Button
+                                    size="sm"
+                                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 shadow-sm"
+                                    disabled={!st.id || isMarking || !userNumber}
+                                    onClick={() => handleMarkTopicComplete(mod, st)}
+                                  >
+                                    {isMarking ? (
+                                      <span className="inline-flex items-center gap-2">
+                                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                                        Marking...
+                                      </span>
+                                    ) : (
+                                      <span className="inline-flex items-center gap-2">
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="12" cy="12" r="10" /><path strokeLinecap="round" strokeLinejoin="round" d="M8 12l2.5 2.5L16 9" /></svg>
+                                        Mark as completed
+                                      </span>
+                                    )}
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })
                       ) : (
                         <p className="text-gray-600">No topics available.</p>
                       )}
@@ -547,12 +699,51 @@ export default function CoursePage() {
             <Button variant="outline" size="sm" onClick={() => setActiveView(course)}>Close</Button>
           </div>
         </div>
-        {(mod.topics || mod.sub_topics || []).map((st: any, i: number) => (
-          <div key={i} className="mt-6 p-6 border rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-            <h3 className="text-2xl font-semibold text-blue-700 mb-4">{st.title}</h3>
-            <div className="prose max-w-none text-gray-800" dangerouslySetInnerHTML={{ __html: formatContent(typeof st.content === "string" ? st.content : JSON.stringify(st.content ?? {}, null, 2)) }} />
-          </div>
-        ))}
+        {(mod.topics || mod.sub_topics || []).map((st: any, i: number) => {
+          const isTopicDone = !!(st.id && completedTopics[String(st.id)]);
+          const isMarking = !!markingTopicIds[String(st.id)];
+          return (
+            <div key={i} className={`mt-6 p-6 border rounded-lg transition-colors ${isTopicDone ? "bg-green-50 border-green-200" : "bg-gray-50 hover:bg-gray-100"}`}>
+              <div className="flex items-start justify-between gap-4 mb-4">
+                <h3 className="text-2xl font-semibold text-blue-700">{st.title}</h3>
+                {isTopicDone && (
+                  <span className="flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                    Done
+                  </span>
+                )}
+              </div>
+              <div className="prose max-w-none text-gray-800" dangerouslySetInnerHTML={{ __html: formatContent(typeof st.content === "string" ? st.content : JSON.stringify(st.content ?? {}, null, 2)) }} />
+              <div className="mt-5 pt-4 border-t border-gray-200 flex items-center justify-end">
+                {isTopicDone ? (
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-semibold shadow-sm">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                    Completed
+                  </span>
+                ) : (
+                  <Button
+                    size="sm"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 shadow-sm"
+                    disabled={!st.id || isMarking || !userNumber}
+                    onClick={() => handleMarkTopicComplete(mod, st)}
+                  >
+                    {isMarking ? (
+                      <span className="inline-flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                        Marking...
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-2">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="12" cy="12" r="10" /><path strokeLinecap="round" strokeLinejoin="round" d="M8 12l2.5 2.5L16 9" /></svg>
+                        Mark as completed
+                      </span>
+                    )}
+                  </Button>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     );
   };
@@ -609,6 +800,44 @@ export default function CoursePage() {
                 <Button variant="outline" size="sm" onClick={() => setActiveView(course)}>Close</Button>
               </div>
               <div className="prose max-w-none text-gray-800" dangerouslySetInnerHTML={{ __html: formatContent(typeof activeView.content === "string" ? activeView.content : JSON.stringify(activeView, null, 2)) }} />
+              {(() => {
+                const isTopicDone = !!(activeView.id && completedTopics[String(activeView.id)]);
+                const isMarking = !!markingTopicIds[String(activeView.id)];
+                return (
+                  <div className="mt-5 pt-4 border-t border-gray-200 flex items-center justify-end">
+                    {isTopicDone ? (
+                      <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-green-500 text-white text-sm font-semibold shadow-sm">
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                        Completed
+                      </span>
+                    ) : (
+                      <Button
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 shadow-sm"
+                        disabled={!activeView.id || isMarking || !userNumber}
+                        onClick={() =>
+                          handleMarkTopicComplete(
+                            { id: activeView.module_id },
+                            activeView,
+                          )
+                        }
+                      >
+                        {isMarking ? (
+                          <span className="inline-flex items-center gap-2">
+                            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                            Marking...
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-2">
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><circle cx="12" cy="12" r="10" /><path strokeLinecap="round" strokeLinejoin="round" d="M8 12l2.5 2.5L16 9" /></svg>
+                            Mark as completed
+                          </span>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           )}
         </div>

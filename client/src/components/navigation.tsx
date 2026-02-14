@@ -336,6 +336,16 @@ export default function Navigation() {
               </button>
             </Link> */}
 
+            {/* Blog Link */}
+            <Link href="/blogs">
+              <button 
+                className={`${textColor} ${hoverColor} transition-colors hover:scale-110`}
+                data-testid="nav-blog"
+              >
+                Blog
+              </button>
+            </Link>
+
             {/* About Link */}
             <Link href="/about">
               <button 
@@ -493,6 +503,13 @@ export default function Navigation() {
             <Link href="/how-it-works">
               <button className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left border-b border-white/20 pb-2 mb-2`}>
                 How it works
+              </button>
+            </Link>
+
+            {/* Mobile Blog Link */}
+            <Link href="/blogs">
+              <button className={`block py-2 ${textColor} ${hoverColor} transition-colors w-full text-left border-b border-white/20 pb-2 mb-2`}>
+                Blog
               </button>
             </Link>
 

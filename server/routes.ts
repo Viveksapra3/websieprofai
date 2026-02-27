@@ -1,8 +1,8 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { db, pool } from "./db";
-import { users, coursePricing, userPurchases, courseImages, courseIdMapping, courseProgress } from "@shared/schema";
+import { users, coursePricing, userPurchases, courseImages, courseIdMapping, courseProgress, blogs } from "@shared/schema";
 import { courses } from "./db/schema/course";
-import { eq, or, sql, and, asc } from "drizzle-orm";
+import { eq, or, sql, and, asc, desc } from "drizzle-orm";
 import { Pool as PgPool } from "pg";
 import crypto from "crypto";
 import multer from "multer";
@@ -11,6 +11,8 @@ import fs from "fs";
 import axios from "axios";
 import { fileURLToPath } from "url";
 import { paymentService } from "./payment-service";
+import { sendProgressEmailsToAllUsers, sendProgressEmailToUser, getAllUsersProgress } from "./email-service";
+import { syncUserAsync } from "./user-sync-service.js";
 
 
 
@@ -44,6 +46,46 @@ const externalCoursesPool = process.env.DATABASE_URL2
 // Cache is permanent until manually cleared (no TTL)
 type ExternalCoursesCacheEntry = { data: any[]; timestamp: number };
 const externalCoursesCache = new Map<string, ExternalCoursesCacheEntry>();
+
+// Helper to generate URL-friendly slugs for blog titles
+function slugify(input: string): string {
+  return input
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "") || "blog";
+}
+
+// Helper to call an external image-generation API for blog hero images
+async function generateBlogImage(title: string): Promise<string | null> {
+  const apiUrl = process.env.BLOG_IMAGE_API_URL;
+  if (!apiUrl) return null;
+
+  const apiKey = process.env.BLOG_IMAGE_API_KEY;
+
+  try {
+    const resp = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {}),
+      },
+      body: JSON.stringify({ title }),
+    });
+
+    if (!resp.ok) return null;
+
+    const data: any = await resp.json().catch(() => null);
+    if (!data) return null;
+
+    const url = data.imageUrl || data.url || data.image_url || null;
+    return typeof url === "string" && url.length > 0 ? url : null;
+  } catch {
+    return null;
+  }
+}
 
 // Helper function to get old course ID from new course ID using mapping table
 async function getOldCourseId(newCourseId: string): Promise<string> {
@@ -231,18 +273,20 @@ export async function registerRoutes(app: Express): Promise<void> {
 
   app.get("/api/admin/dashboard", async (req: Request, res: Response) => {
     if (!requireAdmin(req, res)) return;
-    await proxyToUpstream(req, res, "/admin/dashboard");
+    // Forward to upstream API's admin dashboard endpoint (with /api prefix)
+    await proxyToUpstream(req, res, "/api/admin/dashboard");
   });
 
   app.get("/api/admin/users", async (req: Request, res: Response) => {
     if (!requireAdmin(req, res)) return;
-    await proxyToUpstream(req, res, "/admin/users");
+    // Forward to upstream API's admin users endpoint
+    await proxyToUpstream(req, res, "/api/admin/users");
   });
 
   app.get("/api/admin/users/:id", async (req: Request, res: Response) => {
     if (!requireAdmin(req, res)) return;
     const id = encodeURIComponent(String(req.params.id));
-    await proxyToUpstream(req, res, `/admin/users/${id}`);
+    await proxyToUpstream(req, res, `/api/admin/users/${id}`);
   });
 
   
@@ -252,7 +296,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   app.get("/api/admin/user/:userId/quiz-stats", async (req: Request, res: Response) => {
     if (!requireAdmin(req, res)) return;
     const userId = encodeURIComponent(String(req.params.userId));
-    await proxyToUpstream(req, res, `/admin/user/${userId}/quiz-stats`);
+    await proxyToUpstream(req, res, `/api/admin/user/${userId}/quiz-stats`);
   });
 
   // Database health check with performance metrics
@@ -453,6 +497,131 @@ export async function registerRoutes(app: Express): Promise<void> {
       file: { filename: file.filename, originalName: file.originalname, size: file.size },
     };
     return res.status(201).json(payload);
+  });
+
+  // ── Blog routes ───────────────────────────────────────────────────────
+
+  // Public: list published blogs (optionally limited)
+  app.get("/api/blogs", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const limitParam = typeof req.query.limit === "string" ? parseInt(req.query.limit, 10) : NaN;
+      const limit = Number.isNaN(limitParam) ? 20 : Math.max(1, Math.min(limitParam, 50));
+
+      const publishedBlogs = await db
+        .select()
+        .from(blogs)
+        .where(eq(blogs.published, true))
+        .orderBy(desc(blogs.createdAt))
+        .limit(limit);
+
+      return res.json({ blogs: publishedBlogs });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Public: get single published blog by slug
+  app.get("/api/blogs/:slug", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { slug } = req.params;
+      const [blog] = await db
+        .select()
+        .from(blogs)
+        .where(and(eq(blogs.slug, slug), eq(blogs.published, true)))
+        .limit(1);
+
+      if (!blog) {
+        return res.status(404).json({ error: "Blog not found" });
+      }
+
+      return res.json({ blog });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Admin: list all blogs (published & drafts)
+  app.get("/api/admin/blogs", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const adminUser = requireAdmin(req, res);
+      if (!adminUser) return;
+
+      const allBlogs = await db
+        .select()
+        .from(blogs)
+        .orderBy(desc(blogs.createdAt));
+
+      return res.json({ blogs: allBlogs });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Admin: create a new blog (auto-generate slug & hero image)
+  app.post("/api/admin/blogs", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const adminUser = requireAdmin(req, res);
+      if (!adminUser) return;
+
+      const { title, slug, excerpt, content, published } = req.body || {};
+
+      if (!title || !content) {
+        return res.status(400).json({ error: "Title and content are required" });
+      }
+
+      const baseSlug = (typeof slug === "string" && slug.trim()) || slugify(String(title));
+      let uniqueSlug = baseSlug;
+      let suffix = 1;
+
+      // Ensure slug uniqueness
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const existing = await db
+          .select({ id: blogs.id })
+          .from(blogs)
+          .where(eq(blogs.slug, uniqueSlug))
+          .limit(1);
+        if (!existing.length) break;
+        uniqueSlug = `${baseSlug}-${suffix++}`;
+      }
+
+      const imageUrl = await generateBlogImage(String(title));
+
+      const [created] = await db
+        .insert(blogs)
+        .values({
+          slug: uniqueSlug,
+          title: String(title),
+          excerpt: excerpt ? String(excerpt) : null,
+          content: String(content),
+          imageUrl: imageUrl || null,
+          authorId: String((adminUser as any).id || ""),
+          published: published === false ? false : true,
+        })
+        .returning();
+
+      return res.status(201).json({ blog: created });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Admin: delete a blog
+  app.delete("/api/admin/blogs/:id", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const adminUser = requireAdmin(req, res);
+      if (!adminUser) return;
+
+      const { id } = req.params;
+      if (!id) {
+        return res.status(400).json({ error: "Blog id is required" });
+      }
+
+      await db.delete(blogs).where(eq(blogs.id, id));
+      return res.json({ success: true });
+    } catch (err) {
+      next(err);
+    }
   });
 
   // SESSION: return current authenticated user from session cookie
@@ -685,29 +854,38 @@ export async function registerRoutes(app: Express): Promise<void> {
           email,
           password: passwordHash,
           role: newRole,
-          studentType: newRole === "student" ? studentType ?? null : null,
-          collegeName: newRole === "student" && (studentType ?? "").toLowerCase() === "college" ? collegeName ?? null : null,
-          degree: newRole === "student" && (studentType ?? "").toLowerCase() === "college" ? degree ?? null : null,
-          schoolClass: newRole === "student" && (studentType ?? "").toLowerCase() === "school" ? schoolClass ?? null : null,
-          schoolAffiliation: newRole === "student" && (studentType ?? "").toLowerCase() === "school" ? schoolAffiliation ?? null : null,
+          studentType: newRole === "student" ? studentType : null,
+          collegeName: newRole === "student" ? collegeName : null,
+          degree: newRole === "student" ? degree : null,
+          schoolClass: newRole === "student" ? schoolClass : null,
+          schoolAffiliation: newRole === "student" ? schoolAffiliation : null,
           termsAccepted: Boolean(termsAccepted),
         })
-        .returning({ id: users.id, username: users.username, email: users.email, role: users.role });
-      const user = inserted[0];
-      // create session
-      try {
-        (req.session as any).user = { id: user.id, username: user.username, email: user.email, role: user.role };
-      } catch {}
+        .returning();
 
-      // compute redirect URL (per role or default)
-      const redirectUrl =
-        (user.role === "teacher" && process.env.TEACHER_REDIRECT_URL)
-          ? process.env.TEACHER_REDIRECT_URL
-          : (user.role === "student" && process.env.STUDENT_REDIRECT_URL)
-            ? process.env.STUDENT_REDIRECT_URL
-            : process.env.REDIRECT_URL || (user.role === "teacher" ? "/teacher/upload" : "/courses");
+      const newUser = inserted[0];
+      if (!newUser) throw new Error("User creation failed");
 
-      return res.status(201).json({ message: "User created", user, redirectUrl });
+      // Sync user to secondary database (async, non-blocking)
+      syncUserAsync(newUser);
+
+      // Create session
+      (req.session as any).user = {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+        role: newUser.role,
+      };
+
+      res.status(201).json({
+        message: "Account created successfully",
+        user: {
+          id: newUser.id,
+          username: newUser.username,
+          email: newUser.email,
+          role: newUser.role,
+        },
+      });
     } catch (err) {
       // Handle Postgres unique violation (duplicate key) gracefully
       const anyErr = err as any;
@@ -775,6 +953,9 @@ export async function registerRoutes(app: Express): Promise<void> {
         .returning();
       
       console.log(`[Firebase Signup] Student account created successfully: ${newUser.id}`);
+      
+      // Sync user to secondary database (async, non-blocking)
+      syncUserAsync(newUser);
       
       // Create session
       try {
@@ -863,6 +1044,9 @@ export async function registerRoutes(app: Express): Promise<void> {
       
       console.log(`[Firebase Signup] Teacher account created successfully: ${newUser.id}`);
       
+      // Sync user to secondary database (async, non-blocking)
+      syncUserAsync(newUser);
+      
       // Create session
       try {
         (req.session as any).user = { 
@@ -943,6 +1127,9 @@ export async function registerRoutes(app: Express): Promise<void> {
           
           user = newUser;
           console.log(`[Firebase Auth] Teacher account created successfully: ${user.id}`);
+          
+          // Sync user to secondary database (async, non-blocking)
+          syncUserAsync(newUser);
         } catch (insertError: any) {
           console.error('[Firebase Auth] Error creating teacher account:', insertError);
           // User might already exist with different role or username conflict
@@ -1032,6 +1219,9 @@ export async function registerRoutes(app: Express): Promise<void> {
           
           user = newUser;
           console.log(`[Firebase Auth] Student account created successfully: ${user.id}`);
+          
+          // Sync user to secondary database (async, non-blocking)
+          syncUserAsync(newUser);
         } catch (insertError: any) {
           console.error('[Firebase Auth] Error creating student account:', insertError);
           // User might already exist with different role or username conflict
@@ -1623,6 +1813,83 @@ export async function registerRoutes(app: Express): Promise<void> {
     } catch (err) {
       console.error("API access request error:", err);
       next(err);
+    }
+  });
+
+  // ── Progress Email Routes (teacher/admin only) ──────────────────────
+
+  // Send personalized progress emails to ALL users
+  app.post("/api/admin/send-progress-emails", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Check both adminUser (admin login) and user (teacher login) sessions
+      const adminUser = (req.session as any)?.adminUser;
+      const regularUser = (req.session as any)?.user;
+      const user = adminUser || regularUser;
+      
+      if (!user) return res.status(401).json({ error: "Not authenticated" });
+      const role = String(user.role).toLowerCase();
+      if (role !== "teacher" && role !== "admin") {
+        return res.status(403).json({ error: "Only teachers/admins can send progress emails" });
+      }
+
+      const result = await sendProgressEmailsToAllUsers();
+      return res.json({
+        message: `Progress emails sent: ${result.sent}/${result.total} succeeded`,
+        ...result,
+      });
+    } catch (err: any) {
+      console.error("Error sending progress emails:", err);
+      return res.status(500).json({ error: err?.message || "Failed to send progress emails" });
+    }
+  });
+
+  // Send progress email to a single user
+  app.post("/api/admin/send-progress-email/:userId", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Check both adminUser (admin login) and user (teacher login) sessions
+      const adminUser = (req.session as any)?.adminUser;
+      const regularUser = (req.session as any)?.user;
+      const user = adminUser || regularUser;
+      
+      if (!user) return res.status(401).json({ error: "Not authenticated" });
+      const role = String(user.role).toLowerCase();
+      if (role !== "teacher" && role !== "admin") {
+        return res.status(403).json({ error: "Only teachers/admins can send progress emails" });
+      }
+
+      const { userId } = req.params;
+      if (!userId) return res.status(400).json({ error: "userId is required" });
+
+      const result = await sendProgressEmailToUser(userId);
+      if (!result.sent) {
+        return res.status(400).json({ error: result.error || "Failed to send email" });
+      }
+      return res.json({ message: "Progress email sent successfully" });
+    } catch (err: any) {
+      console.error("Error sending progress email:", err);
+      return res.status(500).json({ error: err?.message || "Failed to send progress email" });
+    }
+  });
+
+  // Get all users' progress summary (for admin dashboard preview)
+  app.get("/api/admin/users-progress", async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // Check both adminUser (admin login) and user (teacher login) sessions
+      const adminUser = (req.session as any)?.adminUser;
+      const regularUser = (req.session as any)?.user;
+      const user = adminUser || regularUser;
+      
+      if (!user) return res.status(401).json({ error: "Not authenticated" });
+      const role = String(user.role).toLowerCase();
+      if (role !== "teacher" && role !== "admin") {
+        return res.status(403).json({ error: "Only teachers/admins can view all progress" });
+      }
+
+      const summaries = await getAllUsersProgress();
+      return res.json({ users: summaries });
+    } catch (err: any) {
+      console.error("Error fetching users progress:", err);
+      return res.status(500).json({ error: err?.message || "Failed to fetch users progress" });
     }
   });
 

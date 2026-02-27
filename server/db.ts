@@ -161,6 +161,20 @@ export async function ensureSchema() {
       UNIQUE(user_id, course_key, course_version)
     );
 
+    -- Blogs table
+    CREATE TABLE IF NOT EXISTS blogs (
+      id text PRIMARY KEY DEFAULT gen_random_uuid()::text,
+      slug text NOT NULL UNIQUE,
+      title text NOT NULL,
+      excerpt text,
+      content text NOT NULL,
+      image_url text,
+      author_id text REFERENCES users(id),
+      published boolean NOT NULL DEFAULT true,
+      created_at timestamp DEFAULT now(),
+      updated_at timestamp DEFAULT now()
+    );
+
     -- API Access Requests table
     CREATE TABLE IF NOT EXISTS api_access_requests (
       id text PRIMARY KEY DEFAULT gen_random_uuid()::text,
@@ -191,6 +205,8 @@ export async function ensureSchema() {
     CREATE INDEX IF NOT EXISTS idx_api_access_requests_email ON api_access_requests(email);
     CREATE INDEX IF NOT EXISTS idx_api_access_requests_status ON api_access_requests(status);
     CREATE INDEX IF NOT EXISTS idx_api_access_requests_created_at ON api_access_requests(created_at);
+    CREATE INDEX IF NOT EXISTS idx_blogs_slug ON blogs(slug);
+    CREATE INDEX IF NOT EXISTS idx_blogs_published_created_at ON blogs(published, created_at);
   `;
   await pool.query(ddl);
 }

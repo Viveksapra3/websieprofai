@@ -59,12 +59,12 @@ export default defineConfig({
       deny: ["**/.*"],
     },
     proxy: {
-      // Proxy API requests to backend in development
-      // In production, VITE_API_BASE will point directly to EC2
+      // Proxy API requests to local Express server (which handles external API forwarding with no timeout)
       '/api': {
-        target: process.env.VITE_API_BASE || 'http://localhost:5000',
+        target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
+        timeout: 120000,
       },
     },
   },

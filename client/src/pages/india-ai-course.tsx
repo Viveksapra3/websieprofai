@@ -586,7 +586,7 @@ export default function CourseProgressPage() {
       
       // Draw the user's name at the center of the certificate
       // Y position is approximately where the name space is (adjust as needed)
-      const nameY = canvas.height * 0.48; // 40% from top (adjust based on your certificate)
+      const nameY = canvas.height * 0.48  ; // 40% from top (adjust based on your certificate)
       ctx.fillText(userName, canvas.width / 2, nameY);
       
       // Add date of completion above the "DATE OF COMPLETION" line (bottom left area)

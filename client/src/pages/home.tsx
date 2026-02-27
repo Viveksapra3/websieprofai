@@ -11,6 +11,7 @@ import AboutSection from '@/components/sections/about';
 import TestimonialsSection from '@/components/sections/testimonials';
 import PricingSection from '@/components/sections/pricing';
 import ContactSection from '@/components/sections/contact';
+import BlogSection from '@/components/sections/blogs';
 import Footer from '@/components/sections/footer';
 
 export default function Home() {
@@ -29,6 +30,7 @@ export default function Home() {
       <TestimonialsSection />
       <PricingSection />
       <ContactSection /> */}
+      <BlogSection />
       <Footer />
     </div>
   );

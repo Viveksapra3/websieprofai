@@ -110,12 +110,27 @@ export const courseProgress = pgTable("course_progress", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Blogs table
+export const blogs = pgTable("blogs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  excerpt: text("excerpt"),
+  content: text("content").notNull(),
+  imageUrl: text("image_url"),
+  authorId: varchar("author_id").references(() => users.id),
+  published: boolean("published").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const insertCoursePricingSchema = createInsertSchema(coursePricing);
 export const insertUserPurchaseSchema = createInsertSchema(userPurchases);
 export const insertPaymentTransactionSchema = createInsertSchema(paymentTransactions);
 export const insertCourseImageSchema = createInsertSchema(courseImages);
 export const insertCourseIdMappingSchema = createInsertSchema(courseIdMapping);
 export const insertCourseProgressSchema = createInsertSchema(courseProgress);
+export const insertBlogSchema = createInsertSchema(blogs);
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -126,3 +141,4 @@ export type PaymentTransaction = typeof paymentTransactions.$inferSelect;
 export type CourseImage = typeof courseImages.$inferSelect;
 export type CourseIdMapping = typeof courseIdMapping.$inferSelect;
 export type CourseProgress = typeof courseProgress.$inferSelect;
+export type Blog = typeof blogs.$inferSelect;

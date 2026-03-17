@@ -56,7 +56,7 @@ export default function Footer() {
             </div>
           </div>
           
-          {/* ElevenLabs Grant Badge */}
+          {/* ElevenLabs Grant Badge
           <a 
             href="https://elevenlabs.io/startup-grants" 
             target="_blank" 
@@ -69,7 +69,7 @@ export default function Footer() {
               alt="ElevenLabs" 
               className="w-[180px] md:w-[280px] hover:opacity-80 transition-opacity"
             />
-          </a>
+          </a> */}
           </div>
         </div>
 

@@ -259,20 +259,20 @@ import { Link } from "wouter";
 import { AuthNavbar } from "@/components/auth-navbar";
 import { Eye, EyeOff, ArrowLeft, Mail, Lock, BookOpen, AlertTriangle } from 'lucide-react';
 
-// Helper function to build absolute URL from VITE_API_BASE
+// Helper function to build absolute URL from VITE_PDF_UPLOAD_URL
 const buildApiUrl = (path: string): string => {
-  const apiBase = import.meta.env.VITE_API_BASE as string | undefined;
-  if (!apiBase) throw new Error("Missing VITE_API_BASE in environment");
+  const pdfUploadUrl = import.meta.env.VITE_PDF_UPLOAD_URL as string | undefined;
+  if (!pdfUploadUrl) throw new Error("Missing VITE_PDF_UPLOAD_URL in environment");
   
-  // If apiBase is already absolute, use it directly
-  if (apiBase.startsWith('http://') || apiBase.startsWith('https://')) {
-    return `${apiBase}${path}`;
+  // If pdfUploadUrl is already absolute, use it directly
+  if (pdfUploadUrl.startsWith('http://') || pdfUploadUrl.startsWith('https://')) {
+    return `${pdfUploadUrl}${path}`;
   }
   
   // If relative, construct absolute URL using current window location
   const protocol = window.location.protocol;
   const host = window.location.host;
-  return `${protocol}//${host}${apiBase}${path}`;
+  return `${protocol}//${host}${pdfUploadUrl}${path}`;
 };
 
 export default function TeacherUploadPage() {
